@@ -6,27 +6,27 @@ import (
 
 	"github.com/cgalvisleon/et/envar"
 	"github.com/cgalvisleon/et/logs"
-	"github.com/cgalvisleon/josefina/jdb"
+	"github.com/cgalvisleon/jql/jql"
 )
 
 var driver = "postgres"
 
 func init() {
-	jdb.Register(driver, newDriver)
+	jql.Register(driver, newDriver)
 }
 
 type Driver struct {
 	name       string      `json:"-"`
-	database   *jdb.DB     `json:"-"`
+	database   *jql.DB     `json:"-"`
 	connection *Connection `json:"-"`
 }
 
 /**
 * newDriver
-* @param database *jdb.DB
-* @return jdb.Driver
+* @param database *jql.DB
+* @return jql.Driver
 **/
-func newDriver(database *jdb.DB) jdb.Driver {
+func newDriver(database *jql.DB) jql.Driver {
 	result := &Driver{
 		database: database,
 		name:     database.Name,
@@ -48,10 +48,10 @@ func newDriver(database *jdb.DB) jdb.Driver {
 
 /**
 * Connect
-* @param connection jdb.ConnectParams
+* @param connection jql.ConnectParams
 * @return *sql.DB, error
 **/
-func (s *Driver) Connect(database *jdb.DB) (*sql.DB, error) {
+func (s *Driver) Connect(database *jql.DB) (*sql.DB, error) {
 	s.database = database
 	s.name = database.Name
 
@@ -104,7 +104,7 @@ func (s *Driver) Connect(database *jdb.DB) (*sql.DB, error) {
 * @param model *Model
 * @return (string, error)
 **/
-func (s *Driver) Load(model *jdb.Model) (string, error) {
+func (s *Driver) Load(model *jql.Model) (string, error) {
 	model.Table = fmt.Sprintf("%s.%s", model.Schema, model.Name)
 	result, err := s.buildModel(model)
 	if err != nil {
@@ -124,16 +124,16 @@ func (s *Driver) Load(model *jdb.Model) (string, error) {
 * @param model *Model
 * @return (string, error)
 **/
-func (s *Driver) Mutate(model *jdb.Model) (string, error) {
+func (s *Driver) Mutate(model *jql.Model) (string, error) {
 	return "", nil
 }
 
 /**
 * Query
-* @param ql *jdb.Ql
+* @param ql *jql.Ql
 * @return (string, error)
 **/
-func (s *Driver) Query(ql *jdb.Ql) (string, error) {
+func (s *Driver) Query(ql *jql.Ql) (string, error) {
 	result, err := s.buildQuery(ql)
 	if err != nil {
 		return "", err
@@ -148,10 +148,10 @@ func (s *Driver) Query(ql *jdb.Ql) (string, error) {
 
 /**
 * Cmd
-* @param command *jdb.Cmd
+* @param command *jql.Cmd
 * @return (string, error)
 **/
-func (s *Driver) Command(cmd *jdb.Cmd) (string, error) {
+func (s *Driver) Command(cmd *jql.Cmd) (string, error) {
 	result, err := s.buildCommand(cmd)
 	if err != nil {
 		return "", err

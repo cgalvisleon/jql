@@ -1,4 +1,4 @@
-package jdb
+package jql
 
 func (s *Model) BeforeInsert(fn TriggerFunction) *Model {
 	s.beforeInserts = append(s.beforeInserts, fn)

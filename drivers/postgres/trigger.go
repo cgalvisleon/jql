@@ -3,11 +3,11 @@ package postgres
 import (
 	"database/sql"
 
-	"github.com/cgalvisleon/josefina/jdb"
+	"github.com/cgalvisleon/jql/jql"
 )
 
 func TriggerRecords(db *sql.DB) error {
-	sql := jdb.SQLUnQuote(`
+	sql := jql.SQLUnQuote(`
 	CREATE SCHEMA IF NOT EXISTS core;
 
 	CREATE TABLE IF NOT EXISTS core.tables (
@@ -124,7 +124,7 @@ func TriggerRecords(db *sql.DB) error {
     END IF;
 	END;
 	$$ LANGUAGE plpgsql;
-	`, jdb.INDEX, jdb.SOURCE, jdb.ForDelete)
+	`, jql.INDEX, jql.SOURCE, jql.ForDelete)
 
 	_, err := db.Exec(sql)
 	if err != nil {

@@ -1,71 +1,71 @@
-package jdb
+package jql
 
 import (
 	"github.com/cgalvisleon/et/et"
-	"github.com/cgalvisleon/josefina/jdb"
+	"github.com/cgalvisleon/jql/jql"
 )
 
 const (
-	DriverPostgres = jdb.DriverPostgres
-	DriverSqlite   = jdb.DriverSqlite
+	DriverPostgres = jql.DriverPostgres
+	DriverSqlite   = jql.DriverSqlite
 	// Field names
-	SOURCE     = jdb.SOURCE
-	KEY        = jdb.KEY
-	INDEX      = jdb.INDEX
-	STATUS     = jdb.STATUS
-	VERSION    = jdb.VERSION
-	PROJECT_ID = jdb.PROJECT_ID
-	TENANT_ID  = jdb.TENANT_ID
-	CREATED_AT = jdb.CREATED_AT
-	UPDATED_AT = jdb.UPDATED_AT
+	SOURCE     = jql.SOURCE
+	KEY        = jql.KEY
+	INDEX      = jql.INDEX
+	STATUS     = jql.STATUS
+	VERSION    = jql.VERSION
+	PROJECT_ID = jql.PROJECT_ID
+	TENANT_ID  = jql.TENANT_ID
+	CREATED_AT = jql.CREATED_AT
+	UPDATED_AT = jql.UPDATED_AT
 	// Data types
-	TpAny      = jdb.TpAny
-	TpBytes    = jdb.TpBytes
-	TpInt      = jdb.TpInt
-	TpFloat    = jdb.TpFloat
-	TpKey      = jdb.TpKey
-	TpText     = jdb.TpText
-	TpMemo     = jdb.TpMemo
-	TpJson     = jdb.TpJson
-	TpDateTime = jdb.TpDateTime
-	TpBoolean  = jdb.TpBoolean
-	TpGeometry = jdb.TpGeometry
-	TpCalc     = jdb.TpCalc
+	TpAny      = jql.TpAny
+	TpBytes    = jql.TpBytes
+	TpInt      = jql.TpInt
+	TpFloat    = jql.TpFloat
+	TpKey      = jql.TpKey
+	TpText     = jql.TpText
+	TpMemo     = jql.TpMemo
+	TpJson     = jql.TpJson
+	TpDateTime = jql.TpDateTime
+	TpBoolean  = jql.TpBoolean
+	TpGeometry = jql.TpGeometry
+	TpCalc     = jql.TpCalc
 	// Column types
-	TpColumn      = jdb.TpColumn
-	TpAtrib       = jdb.TpAtrib
-	TpDetail      = jdb.TpDetail
-	TpRollup      = jdb.TpRollup
-	TpAggregation = jdb.TpAggregation
+	TpColumn      = jql.TpColumn
+	TpAtrib       = jql.TpAtrib
+	TpDetail      = jql.TpDetail
+	TpRollup      = jql.TpRollup
+	TpAggregation = jql.TpAggregation
 	// Status record
-	Active    = jdb.Active
-	Archived  = jdb.Archived
-	Canceled  = jdb.Canceled
-	OfSystem  = jdb.OfSystem
-	ForDelete = jdb.ForDelete
-	Pending   = jdb.Pending
-	Approved  = jdb.Approved
-	Rejected  = jdb.Rejected
+	Active    = jql.Active
+	Archived  = jql.Archived
+	Canceled  = jql.Canceled
+	OfSystem  = jql.OfSystem
+	ForDelete = jql.ForDelete
+	Pending   = jql.Pending
+	Approved  = jql.Approved
+	Rejected  = jql.Rejected
 )
 
 var (
 	// Error
-	ErrDuplicate   = jdb.ErrDuplicate
-	ErrNotInserted = jdb.ErrNotInserted
-	ErrNotUpdated  = jdb.ErrNotUpdated
-	ErrNotFound    = jdb.ErrNotFound
-	ErrNotUpserted = jdb.ErrNotUpserted
+	ErrDuplicate   = jql.ErrDuplicate
+	ErrNotInserted = jql.ErrNotInserted
+	ErrNotUpdated  = jql.ErrNotUpdated
+	ErrNotFound    = jql.ErrNotFound
+	ErrNotUpserted = jql.ErrNotUpserted
 )
 
-type TypeColumn = jdb.TypeColumn
-type TypeData = jdb.TypeData
-type Driver = jdb.Driver
-type DB = jdb.DB
-type Model = jdb.Model
-type Tx = jdb.Tx
-type Condition = jdb.Condition
-type Ql = jdb.Ql
-type Cmd = jdb.Cmd
+type TypeColumn = jql.TypeColumn
+type TypeData = jql.TypeData
+type Driver = jql.Driver
+type DB = jql.DB
+type Model = jql.Model
+type Tx = jql.Tx
+type Condition = jql.Condition
+type Ql = jql.Ql
+type Cmd = jql.Cmd
 
 /**
 * NewModel
@@ -92,7 +92,7 @@ func NewModel(db *DB, schema, name string, version int) (*Model, error) {
 * @return (*DB, error)
 **/
 func ConnectTo(tenantId, name, driver string, userCore bool, params et.Json) (*DB, error) {
-	return jdb.ConnectTo(tenantId, name, driver, userCore, params)
+	return jql.ConnectTo(tenantId, name, driver, userCore, params)
 }
 
 /**
@@ -101,7 +101,7 @@ func ConnectTo(tenantId, name, driver string, userCore bool, params et.Json) (*D
 * @return (*DB, error)
 **/
 func LoadTo(name string) (*DB, error) {
-	return jdb.LoadTo(name)
+	return jql.LoadTo(name)
 }
 
 /**
@@ -109,7 +109,7 @@ func LoadTo(name string) (*DB, error) {
 * @return (*DB, error)
 **/
 func Load() (*DB, error) {
-	return jdb.Load()
+	return jql.Load()
 }
 
 /**
@@ -118,7 +118,7 @@ func Load() (*DB, error) {
 * @return (*Model, error)
 **/
 func Define(definition et.Json) (*Model, error) {
-	return jdb.Define(definition)
+	return jql.Define(definition)
 }
 
 /**
@@ -127,7 +127,7 @@ func Define(definition et.Json) (*Model, error) {
 * @return *Ql
 **/
 func From(model *Model, as string) *Ql {
-	return jdb.From(model, as)
+	return jql.From(model, as)
 }
 
 /**
@@ -136,5 +136,5 @@ func From(model *Model, as string) *Ql {
 * @return et.Items, error
 **/
 func Query(query et.Json) (et.Items, error) {
-	return jdb.Query(query)
+	return jql.Query(query)
 }

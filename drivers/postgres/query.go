@@ -6,15 +6,15 @@ import (
 
 	"github.com/cgalvisleon/et/logs"
 	"github.com/cgalvisleon/et/strs"
-	"github.com/cgalvisleon/josefina/jdb"
+	"github.com/cgalvisleon/jql/jql"
 )
 
 /**
 * Query
-* @param query *jdb.Ql
+* @param query *jql.Ql
 * @return (string, error)
 **/
-func (s *Driver) buildQuery(ql *jdb.Ql) (string, error) {
+func (s *Driver) buildQuery(ql *jql.Ql) (string, error) {
 	if ql.IsDebug {
 		logs.Debug("query:", ql.ToJson().ToString())
 	}
@@ -94,7 +94,7 @@ func (s *Driver) buildQuery(ql *jdb.Ql) (string, error) {
 		sql = strs.Append(sql, def, "\n")
 	}
 
-	if ql.Type == jdb.TpExists {
+	if ql.Type == jql.TpExists {
 		return fmt.Sprintf("SELECT EXISTS(%s);", sql), nil
 	} else {
 		return fmt.Sprintf("%s;", sql), nil
@@ -103,44 +103,44 @@ func (s *Driver) buildQuery(ql *jdb.Ql) (string, error) {
 
 /**
 * buildSelect
-* @param ql *jdb.Ql
+* @param ql *jql.Ql
 * @return (string, error)
 **/
-func (s *Driver) buildSelect(ql *jdb.Ql) (string, error) {
-	if ql.Type == jdb.TpExists {
+func (s *Driver) buildSelect(ql *jql.Ql) (string, error) {
+	if ql.Type == jql.TpExists {
 		return "", nil
 	}
 
-	if ql.Type == jdb.TpCounted {
+	if ql.Type == jql.TpCounted {
 		return "COUNT(*) AS all", nil
 	}
 
 	result := ""
-	if ql.Type == jdb.TpData {
+	if ql.Type == jql.TpData {
 		if len(ql.Selects) == 0 {
 			hiddens := make([]string, 0)
 			for _, fld := range ql.Hidden {
 				as := FieldAs(fld)
 				hiddens = append(hiddens, as)
 			}
-			hiddens = append(hiddens, jdb.SOURCE)
+			hiddens = append(hiddens, jql.SOURCE)
 			def := fmt.Sprintf("to_jsonb(A) - ARRAY[%s]", strings.Join(hiddens, ", "))
 			result = strs.Append(result, def, "||")
 		} else {
 			selects := map[string]string{}
 			atribs := map[string]string{}
 			for _, fld := range ql.Selects {
-				if fld.TypeColumn == jdb.TpColumn {
+				if fld.TypeColumn == jql.TpColumn {
 					as := FieldAs(fld)
 					selects[fld.As] = as
-				} else if fld.TypeColumn == jdb.TpAtrib {
+				} else if fld.TypeColumn == jql.TpAtrib {
 					as := FieldAs(fld)
 					atribs[fld.As] = as
 				}
 			}
 
 			if len(atribs) == 0 {
-				result = fmt.Sprintf("\n%s", jdb.SOURCE)
+				result = fmt.Sprintf("\n%s", jql.SOURCE)
 			} else {
 				for k, v := range atribs {
 					def := fmt.Sprintf("\n'%s', %s", k, v)
@@ -183,7 +183,7 @@ func (s *Driver) buildSelect(ql *jdb.Ql) (string, error) {
 	} else {
 		selects := map[string]string{}
 		for _, fld := range ql.Selects {
-			if fld.TypeColumn == jdb.TpColumn {
+			if fld.TypeColumn == jql.TpColumn {
 				as := FieldAs(fld)
 				selects[fld.As] = as
 			}
@@ -204,14 +204,14 @@ func (s *Driver) buildSelect(ql *jdb.Ql) (string, error) {
 
 /**
 * buildFrom
-* @param ql *jdb.Ql
+* @param ql *jql.Ql
 * @return (string, error)
 **/
-func (s *Driver) buildFrom(ql *jdb.Ql) (string, error) {
+func (s *Driver) buildFrom(ql *jql.Ql) (string, error) {
 	result := ""
 
 	if len(ql.Froms) == 0 {
-		return result, fmt.Errorf(jdb.MSG_FROM_REQUIRED)
+		return result, fmt.Errorf(jql.MSG_FROM_REQUIRED)
 	}
 
 	for _, from := range ql.Froms {
@@ -231,10 +231,10 @@ func (s *Driver) buildFrom(ql *jdb.Ql) (string, error) {
 
 /**
 * buildJoins
-* @param ql *jdb.Ql
+* @param ql *jql.Ql
 * @return (string, error)
 **/
-func (s *Driver) buildJoins(ql *jdb.Ql) (string, error) {
+func (s *Driver) buildJoins(ql *jql.Ql) (string, error) {
 	result := ""
 
 	if len(ql.Joins) == 0 {
@@ -251,11 +251,11 @@ func (s *Driver) buildJoins(ql *jdb.Ql) (string, error) {
 			}
 		}
 
-		if join.Type == jdb.TpLeft {
+		if join.Type == jql.TpLeft {
 			result = strs.Append(result, def, "\nLEFT JOIN ")
-		} else if join.Type == jdb.TpRight {
+		} else if join.Type == jql.TpRight {
 			result = strs.Append(result, def, "\nRIGHT JOIN ")
-		} else if join.Type == jdb.TpFull {
+		} else if join.Type == jql.TpFull {
 			result = strs.Append(result, def, "\nFULL JOIN ")
 		} else {
 			result = strs.Append(result, def, "\nJOIN ")
@@ -267,45 +267,45 @@ func (s *Driver) buildJoins(ql *jdb.Ql) (string, error) {
 
 /**
 * buildCondition
-* @param cond *jdb.Condition
+* @param cond *jql.Condition
 * @return string
 **/
-func (s *Driver) buildCondition(cond *jdb.Condition) string {
+func (s *Driver) buildCondition(cond *jql.Condition) string {
 	key := FieldAs(cond.Field)
-	value := jdb.Quoted(cond.Value)
+	value := jql.Quoted(cond.Value)
 	switch cond.Operator {
-	case jdb.OpEq:
+	case jql.OpEq:
 		return fmt.Sprintf("%s = %v", key, value)
-	case jdb.OpNeg:
+	case jql.OpNeg:
 		return fmt.Sprintf("%s != %v", key, value)
-	case jdb.OpLess:
+	case jql.OpLess:
 		return fmt.Sprintf("%s < %v", key, value)
-	case jdb.OpLessEq:
+	case jql.OpLessEq:
 		return fmt.Sprintf("%s <= %v", key, value)
-	case jdb.OpMore:
+	case jql.OpMore:
 		return fmt.Sprintf("%s > %v", key, value)
-	case jdb.OpMoreEq:
+	case jql.OpMoreEq:
 		return fmt.Sprintf("%s >= %v", key, value)
-	case jdb.OpLike:
+	case jql.OpLike:
 		return fmt.Sprintf("%s LIKE %v", key, value)
-	case jdb.OpIn:
+	case jql.OpIn:
 		return fmt.Sprintf("%s IN %v", key, value)
-	case jdb.OpNotIn:
+	case jql.OpNotIn:
 		return fmt.Sprintf("%s NOT IN %v", key, value)
-	case jdb.OpIs:
+	case jql.OpIs:
 		return fmt.Sprintf("%s IS %v", key, value)
-	case jdb.OpIsNot:
+	case jql.OpIsNot:
 		return fmt.Sprintf("%s IS NOT %v", key, value)
-	case jdb.OpNull:
+	case jql.OpNull:
 		return fmt.Sprintf("%s IS NULL", key)
-	case jdb.OpNotNull:
+	case jql.OpNotNull:
 		return fmt.Sprintf("%s IS NOT NULL", key)
-	case jdb.OpBetween:
+	case jql.OpBetween:
 		vals := cond.Value.([]interface{})
-		return fmt.Sprintf("%s BETWEEN %v AND %v", key, jdb.Quoted(vals[0]), jdb.Quoted(vals[1]))
-	case jdb.OpNotBetween:
+		return fmt.Sprintf("%s BETWEEN %v AND %v", key, jql.Quoted(vals[0]), jql.Quoted(vals[1]))
+	case jql.OpNotBetween:
 		vals := cond.Value.([]interface{})
-		return fmt.Sprintf("%s NOT BETWEEN %v AND %v", key, jdb.Quoted(vals[0]), jdb.Quoted(vals[1]))
+		return fmt.Sprintf("%s NOT BETWEEN %v AND %v", key, jql.Quoted(vals[0]), jql.Quoted(vals[1]))
 	}
 
 	return ""
@@ -313,16 +313,16 @@ func (s *Driver) buildCondition(cond *jdb.Condition) string {
 
 /**
 * buildWhere
-* @param wheres []jdb.Condition
+* @param wheres []jql.Condition
 * @return (string, error)
 **/
-func (s *Driver) buildWhere(wheres []*jdb.Condition) (string, error) {
+func (s *Driver) buildWhere(wheres []*jql.Condition) (string, error) {
 	result := ""
 
 	for i, cond := range wheres {
 		if i == 0 {
 			result = s.buildCondition(cond)
-		} else if cond.Connector == jdb.Or {
+		} else if cond.Connector == jql.Or {
 			result = fmt.Sprintf("%s\nOR %s", result, s.buildCondition(cond))
 		} else {
 			result = fmt.Sprintf("%s\nAND %s", result, s.buildCondition(cond))
@@ -334,10 +334,10 @@ func (s *Driver) buildWhere(wheres []*jdb.Condition) (string, error) {
 
 /**
 * buildGroupBy
-* @param ql *jdb.Ql
+* @param ql *jql.Ql
 * @return (string, error)
 **/
-func (s *Driver) buildGroupBy(ql *jdb.Ql) (string, error) {
+func (s *Driver) buildGroupBy(ql *jql.Ql) (string, error) {
 	result := ""
 
 	if len(ql.GroupsBy) == 0 {
@@ -355,10 +355,10 @@ func (s *Driver) buildGroupBy(ql *jdb.Ql) (string, error) {
 
 /**
 * buildOrderBy
-* @param ql *jdb.Ql
+* @param ql *jql.Ql
 * @return (string, error)
 **/
-func (s *Driver) buildOrderBy(ql *jdb.Ql) (string, error) {
+func (s *Driver) buildOrderBy(ql *jql.Ql) (string, error) {
 	asc := ""
 	desc := ""
 	for _, order := range ql.OrdersBy {
@@ -384,10 +384,10 @@ func (s *Driver) buildOrderBy(ql *jdb.Ql) (string, error) {
 
 /**
 * buildLimit
-* @param ql *jdb.Ql
+* @param ql *jql.Ql
 * @return (string, error)
 **/
-func (s *Driver) buildLimit(ql *jdb.Ql) (string, error) {
+func (s *Driver) buildLimit(ql *jql.Ql) (string, error) {
 	result := ""
 
 	if ql.Rows > ql.MaxRows {

@@ -6,15 +6,15 @@ import (
 	"github.com/cgalvisleon/et/logs"
 	"github.com/cgalvisleon/et/strs"
 	"github.com/cgalvisleon/et/utility"
-	"github.com/cgalvisleon/josefina/jdb"
+	"github.com/cgalvisleon/jql/jql"
 )
 
 /**
 * buildModel
-* @param model *jdb.Model
+* @param model *jql.Model
 * @return (string, error)
 **/
-func (s *Driver) buildModel(model *jdb.Model) (string, error) {
+func (s *Driver) buildModel(model *jql.Model) (string, error) {
 	if model.IsDebug {
 		logs.Debug("model:", model.ToJson().ToString())
 	}
@@ -74,10 +74,10 @@ func (s *Driver) buildModel(model *jdb.Model) (string, error) {
 
 /**
 * buildSchema
-* @param model *jdb.Model
+* @param model *jql.Model
 * @return (string, error)
 **/
-func (s *Driver) buildSchema(model *jdb.Model) (string, error) {
+func (s *Driver) buildSchema(model *jql.Model) (string, error) {
 	if !utility.ValidStr(model.Schema, 0, []string{}) {
 		return "", fmt.Errorf(MSG_ATRIB_REQUIRED, "schema")
 	}
@@ -96,23 +96,23 @@ func (s *Driver) buildSchema(model *jdb.Model) (string, error) {
 
 /**
 * buildTable
-* @param model *jdb.Model
+* @param model *jql.Model
 * @return (string, error)
 **/
-func (s *Driver) buildTable(model *jdb.Model) (string, error) {
-	getType := func(tp jdb.TypeData) string {
-		types := map[jdb.TypeData]string{
-			jdb.TpAny:      "VARCHAR(250)",
-			jdb.TpBytes:    "BYTEA",
-			jdb.TpInt:      "BIGINT",
-			jdb.TpFloat:    "DOUBLE PRECISION",
-			jdb.TpKey:      "VARCHAR(80)",
-			jdb.TpText:     "VARCHAR(250)",
-			jdb.TpMemo:     "TEXT",
-			jdb.TpJson:     "JSONB",
-			jdb.TpDateTime: "TIMESTAMP",
-			jdb.TpBoolean:  "BOOLEAN",
-			jdb.TpGeometry: "JSONB",
+func (s *Driver) buildTable(model *jql.Model) (string, error) {
+	getType := func(tp jql.TypeData) string {
+		types := map[jql.TypeData]string{
+			jql.TpAny:      "VARCHAR(250)",
+			jql.TpBytes:    "BYTEA",
+			jql.TpInt:      "BIGINT",
+			jql.TpFloat:    "DOUBLE PRECISION",
+			jql.TpKey:      "VARCHAR(80)",
+			jql.TpText:     "VARCHAR(250)",
+			jql.TpMemo:     "TEXT",
+			jql.TpJson:     "JSONB",
+			jql.TpDateTime: "TIMESTAMP",
+			jql.TpBoolean:  "BOOLEAN",
+			jql.TpGeometry: "JSONB",
 		}
 
 		if t, ok := types[tp]; ok {
@@ -122,19 +122,19 @@ func (s *Driver) buildTable(model *jdb.Model) (string, error) {
 		return "VARCHAR(250)"
 	}
 
-	defaultValue := func(tp jdb.TypeData) string {
-		values := map[jdb.TypeData]string{
-			jdb.TpAny:      "",
-			jdb.TpBytes:    "''",
-			jdb.TpInt:      "0",
-			jdb.TpFloat:    "0.0",
-			jdb.TpKey:      "''",
-			jdb.TpText:     "''",
-			jdb.TpMemo:     "''",
-			jdb.TpJson:     "'{}'",
-			jdb.TpDateTime: "NOW()",
-			jdb.TpBoolean:  "FALSE",
-			jdb.TpGeometry: "'{}'",
+	defaultValue := func(tp jql.TypeData) string {
+		values := map[jql.TypeData]string{
+			jql.TpAny:      "",
+			jql.TpBytes:    "''",
+			jql.TpInt:      "0",
+			jql.TpFloat:    "0.0",
+			jql.TpKey:      "''",
+			jql.TpText:     "''",
+			jql.TpMemo:     "''",
+			jql.TpJson:     "'{}'",
+			jql.TpDateTime: "NOW()",
+			jql.TpBoolean:  "FALSE",
+			jql.TpGeometry: "'{}'",
 		}
 
 		if t, ok := values[tp]; ok {
@@ -148,7 +148,7 @@ func (s *Driver) buildTable(model *jdb.Model) (string, error) {
 	columnsDef := ""
 	for _, column := range columns {
 		tpColumn := column.TypeColumn
-		if tpColumn != jdb.TpColumn {
+		if tpColumn != jql.TpColumn {
 			continue
 		}
 		tpData := column.TypeData
@@ -178,10 +178,10 @@ func (s *Driver) buildTable(model *jdb.Model) (string, error) {
 
 /**
 * buildPrimaryKeys
-* @param model *jdb.Model
+* @param model *jql.Model
 * @return (string, error)
 **/
-func (s *Driver) buildPrimaryKeys(model *jdb.Model) (string, error) {
+func (s *Driver) buildPrimaryKeys(model *jql.Model) (string, error) {
 	if len(model.PrimaryKeys) == 0 {
 		return "", nil
 	}
@@ -199,10 +199,10 @@ func (s *Driver) buildPrimaryKeys(model *jdb.Model) (string, error) {
 
 /**
 * buildForeignKeys
-* @param model *jdb.Model
+* @param model *jql.Model
 * @return (string, error)
 **/
-func (s *Driver) buildForeignKeys(model *jdb.Model) (string, error) {
+func (s *Driver) buildForeignKeys(model *jql.Model) (string, error) {
 	if len(model.Master) == 0 {
 		return "", nil
 	}
@@ -234,10 +234,10 @@ func (s *Driver) buildForeignKeys(model *jdb.Model) (string, error) {
 
 /**
 * buildIndexes
-* @param model *jdb.Model
+* @param model *jql.Model
 * @return (string, error)
 **/
-func (s *Driver) buildIndexes(model *jdb.Model) (string, error) {
+func (s *Driver) buildIndexes(model *jql.Model) (string, error) {
 	if len(model.Indexes) == 0 {
 		return "", nil
 	}
@@ -247,7 +247,7 @@ func (s *Driver) buildIndexes(model *jdb.Model) (string, error) {
 	result := ""
 	for _, v := range model.Indexes {
 		def := fmt.Sprintf("idx_%s_%s", name, v)
-		if v == jdb.SOURCE {
+		if v == jql.SOURCE {
 			def = fmt.Sprintf("CREATE INDEX IF NOT EXISTS %s ON %s USING GIN (%s);", def, table, v)
 		} else {
 			def = fmt.Sprintf("CREATE INDEX IF NOT EXISTS %s ON %s(%s);", def, table, v)
@@ -260,10 +260,10 @@ func (s *Driver) buildIndexes(model *jdb.Model) (string, error) {
 
 /**
 * buildUniqueIndex
-* @param model *jdb.Model
+* @param model *jql.Model
 * @return (string, error)
 **/
-func (s *Driver) buildUniqueIndex(model *jdb.Model) (string, error) {
+func (s *Driver) buildUniqueIndex(model *jql.Model) (string, error) {
 	if len(model.Unique) == 0 {
 		return "", nil
 	}
@@ -282,10 +282,10 @@ func (s *Driver) buildUniqueIndex(model *jdb.Model) (string, error) {
 
 /**
 * buildTriggerBeforeInsert
-* @param model *jdb.Model
+* @param model *jql.Model
 * @return (string, error)
 **/
-func (s *Driver) buildTriggerBeforeInsert(model *jdb.Model) (string, error) {
+func (s *Driver) buildTriggerBeforeInsert(model *jql.Model) (string, error) {
 	if model.IndexField == nil {
 		return "", nil
 	}
@@ -309,9 +309,9 @@ func (s *Driver) buildTriggerBeforeInsert(model *jdb.Model) (string, error) {
 
 /**
 * mutateModel
-* @param model *jdb.Model
+* @param model *jql.Model
 * @return (string, error)
 **/
-func (s *Driver) mutateModel(model *jdb.Model) (string, error) {
+func (s *Driver) mutateModel(model *jql.Model) (string, error) {
 	return "", nil
 }

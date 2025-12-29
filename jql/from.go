@@ -1,4 +1,4 @@
-package jdb
+package jql
 
 type Froms struct {
 	Model *Model `json:"model"`

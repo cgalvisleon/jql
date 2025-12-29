@@ -1,4 +1,4 @@
-package jdb
+package jql
 
 const (
 	EVENT_SQL_ERROR  = "sql:error"

@@ -3,7 +3,7 @@ package postgres
 import (
 	"database/sql"
 
-	"github.com/cgalvisleon/josefina/jdb"
+	"github.com/cgalvisleon/jql/jql"
 )
 
 /**
@@ -23,7 +23,7 @@ func ExistTable(db *sql.DB, schema, name string) (bool, error) {
 	}
 	defer rows.Close()
 
-	items := jdb.RowsToItems(rows)
+	items := jql.RowsToItems(rows)
 
 	if items.Count == 0 {
 		return false, nil

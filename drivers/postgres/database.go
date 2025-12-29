@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cgalvisleon/et/logs"
-	"github.com/cgalvisleon/josefina/jdb"
+	"github.com/cgalvisleon/jql/jql"
 	_ "github.com/lib/pq"
 )
 
@@ -26,7 +26,7 @@ func ExistDatabase(db *sql.DB, name string) (bool, error) {
 	}
 	defer rows.Close()
 
-	items := jdb.RowsToItems(rows)
+	items := jql.RowsToItems(rows)
 
 	if items.Count == 0 {
 		return false, nil

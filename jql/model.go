@@ -1,4 +1,4 @@
-package jdb
+package jql
 
 import (
 	"encoding/json"
