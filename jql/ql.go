@@ -9,7 +9,6 @@ import (
 
 	"github.com/cgalvisleon/et/envar"
 	"github.com/cgalvisleon/et/et"
-	"github.com/cgalvisleon/et/logs"
 )
 
 type TypeQuery string
@@ -374,14 +373,13 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 /**
 * getDetails
 * @param tx *Tx, data et.Json
-* @return error
 **/
-func (s *Ql) getDetails(tx *Tx, data et.Json) error {
+func (s *Ql) getDetails(tx *Tx, data et.Json) {
 	for name, dtl := range s.Details {
 		to := dtl.To
 		model, err := s.db.getModel(to.Schema, to.Name)
 		if err != nil {
-			return err
+			return
 		}
 
 		ql := model.
@@ -390,13 +388,12 @@ func (s *Ql) getDetails(tx *Tx, data et.Json) error {
 			val := data[pk]
 			ql.Where(Eq(fk, val))
 		}
-		ql.Limit(dtl.Page, dtl.Rows)
+		result, err := ql.LimitTx(tx, dtl.Page, dtl.Rows)
 		if err != nil {
-			logs.Error(err)
-			continue
+			return
 		}
 
-		data[name] = items.Result
+		data[name] = result.Result
 	}
 }
 
@@ -406,25 +403,40 @@ func (s *Ql) getDetails(tx *Tx, data et.Json) error {
 * @return
 **/
 func (s *Ql) getRollups(tx *Tx, data et.Json) {
-	for name, rollup := range s.Rollups {
-		to := rollup.To
-		conditions := WhereByKeys(data, rollup.Keys)
-		items, err := From(to, "A").
-			Select(rollup.Select...).
-			WhereByConditions(conditions).
-			LimitTx(tx, rollup.Page, rollup.Rows)
+	for name, dtl := range s.Rollups {
+		to := dtl.To
+		model, err := s.db.getModel(to.Schema, to.Name)
 		if err != nil {
-			logs.Error(err)
-			continue
+			return
 		}
 
-		item := items.First().Result
-		if len(item) == 1 {
-			for _, v := range item {
-				data[name] = v
+		flc := len(dtl.Select)
+		ql := model.
+			Select(dtl.Select...)
+		for pk, fk := range dtl.Keys {
+			val := data[pk]
+			ql.Where(Eq(fk, val))
+		}
+		result, err := ql.LimitTx(tx, dtl.Page, dtl.Rows)
+		if err != nil {
+			return
+		}
+
+		if result.Count == 0 {
+			if flc > 1 {
+				data[name] = et.Json{}
+			} else {
+				data[name] = ""
 			}
-		} else {
-			data[name] = item
+		} else if result.Count > 0 {
+			if flc > 1 {
+				data[name] = result.Result[0]
+			} else {
+				for _, v := range result.Result {
+					data[name] = v
+					break
+				}
+			}
 		}
 	}
 }
