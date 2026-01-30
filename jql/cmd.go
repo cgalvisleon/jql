@@ -105,19 +105,19 @@ func (s *Cmd) setTx(tx *Tx) *Cmd {
 * @return et.Items, error
 **/
 func (s *Cmd) ExecTx(tx *Tx) (et.Items, error) {
-	if s.DB == nil {
+	if s.db == nil {
 		return et.Items{}, fmt.Errorf(MSG_DATABASE_REQUIRED)
 	}
 
 	s.setTx(tx)
 	switch s.Type {
-	case TypeInsert:
+	case INSERT:
 		return s.insert()
-	case TypeUpdate:
+	case UPDATE:
 		return s.update()
-	case TypeDelete:
+	case DELETE:
 		return s.delete()
-	case TypeUpsert:
+	case UPSERT:
 		return s.upsert()
 	default:
 		return et.Items{}, fmt.Errorf("invalid command: %s", s.Type)
@@ -160,41 +160,11 @@ func (s *Cmd) One() (et.Item, error) {
 * @return *Cmd
 **/
 func (s *Cmd) Where(condition *Condition) *Cmd {
-	s.Wheres.Add(condition)
-	return s
-}
-
-/**
-* WhereByWhere
-* @param where *Wheres
-* @return *Cmd
-**/
-func (s *Cmd) WhereByJson(where []et.Json) *Cmd {
-	for _, w := range where {
-		field := w.String("field")
-		value := w.Get("value")
-		operator := Operator(w.String("operator"))
-		condition := condition(field, value, operator)
-		s.Wheres.Add(condition)
+	fld := s.findField(condition.Field)
+	if fld != nil {
+		condition.Field = fld
 	}
-	return s
-}
-
-/**
-* WhereByPrimaryKeys
-* @param data et.Json
-* @return *Cmd
-**/
-func (s *Cmd) WhereByPrimaryKeys(data et.Json) *Cmd {
-	s.Wheres = newWhere(s)
-	for _, col := range s.Model.PrimaryKeys {
-		val := data[col]
-		if val == nil {
-			continue
-		}
-		s.Where(Eq(col, val))
-	}
-
+	s.Wheres.add(condition)
 	return s
 }
 
@@ -204,7 +174,8 @@ func (s *Cmd) WhereByPrimaryKeys(data et.Json) *Cmd {
 * @return *Cmd
 **/
 func (s *Cmd) And(condition *Condition) *Cmd {
-	s.Wheres.Add(condition)
+	condition.Connector = AND
+	s.Where(condition)
 	return s
 }
 
@@ -214,6 +185,7 @@ func (s *Cmd) And(condition *Condition) *Cmd {
 * @return *Cmd
 **/
 func (s *Cmd) Or(condition *Condition) *Cmd {
-	s.Wheres.Add(condition)
+	condition.Connector = OR
+	s.Where(condition)
 	return s
 }
