@@ -4,8 +4,8 @@ import "github.com/cgalvisleon/et/envar"
 
 const (
 	SOURCE     string = "source"
-	KEY        string = "id"
-	INDEX      string = "index"
+	ID         string = "id"
+	IDX        string = "idx"
 	STATUS     string = "status"
 	VERSION    string = "version"
 	PROJECT_ID string = "project_id"
@@ -21,12 +21,12 @@ func (s TypeColumn) Str() string {
 }
 
 const (
-	TpColumn      TypeColumn = "column"
-	TpAtrib       TypeColumn = "atrib"
-	TpDetail      TypeColumn = "detail"
-	TpRollup      TypeColumn = "rollup"
-	TpCalc        TypeColumn = "calc"
-	TpAggregation TypeColumn = "aggregation"
+	TpColumn   TypeColumn = "column"
+	TpAtrib    TypeColumn = "atrib"
+	TpDetail   TypeColumn = "detail"
+	TpRollup   TypeColumn = "rollup"
+	TpRelation TypeColumn = "relation"
+	TpCalc     TypeColumn = "calc"
 )
 
 type TypeData string
@@ -100,7 +100,7 @@ const (
 )
 
 type Column struct {
-	From       *Model      `json:"from"`
+	From       *From       `json:"from"`
 	Name       string      `json:"name"`
 	TypeColumn TypeColumn  `json:"type_column"`
 	TypeData   TypeData    `json:"type_data"`

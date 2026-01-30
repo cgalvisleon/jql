@@ -31,9 +31,11 @@ func (s *Schema) newModel(name string, version int) (*Model, error) {
 
 	name = utility.Normalize(name)
 	result = &Model{
-		Database:      s.Database,
-		Schema:        s.Name,
-		Name:          name,
+		From: &From{
+			Database: s.Database,
+			Schema:   s.Name,
+			Name:     name,
+		},
 		Columns:       make([]*Column, 0),
 		Indexes:       make([]string, 0),
 		PrimaryKeys:   make([]string, 0),
@@ -44,7 +46,6 @@ func (s *Schema) newModel(name string, version int) (*Model, error) {
 		Details:       make(map[string]*Detail, 0),
 		Rollups:       make(map[string]*Detail, 0),
 		Relations:     make(map[string]*Detail, 0),
-		Calcs:         make(map[string][]byte, 0),
 		BeforeInserts: make([]*Trigger, 0),
 		BeforeUpdates: make([]*Trigger, 0),
 		BeforeDeletes: make([]*Trigger, 0),

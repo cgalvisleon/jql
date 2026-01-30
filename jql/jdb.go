@@ -148,15 +148,6 @@ func Query(query et.Json) (et.Items, error) {
 }
 
 /**
-* From
-* @param model *Model, as string
-* @return *Ql
-**/
-func From(model *Model, as string) *Ql {
-	return newQuery(model, as, TpSelect)
-}
-
-/**
 * HttpDefine
 * @param w http.ResponseWriter, r *http.Request
 * @return

@@ -144,7 +144,7 @@ func (s *DB) newModel(schema, name string, version int) (*Model, error) {
 	}
 
 	sch := s.getSchema(schema)
-	return sch.newModel(name, isCore, version)
+	return sch.newModel(name, version)
 }
 
 /**
@@ -369,11 +369,8 @@ func (s *DB) Define(definition et.Json) (*Model, error) {
 		}
 	}
 
-	isLocked := definition.Bool("is_locked")
-	result.IsLocked = isLocked
-	isDebug := definition.Bool("is_debug")
-	result.IsDebug = isDebug
-
+	result.IsStrict = definition.Bool("is_strict")
+	result.IsDebug = definition.Bool("is_debug")
 	build := definition.Bool("build")
 	if !build {
 		return result, nil
@@ -423,7 +420,7 @@ func (s *DB) Insert(query et.Json) (et.Items, error) {
 		return et.Items{}, fmt.Errorf(MSG_FROM_REQUIRED)
 	}
 
-	model, err := s.GetModel(from)
+	model, err := s.getModel(schema, from)
 	if err != nil {
 		return et.Items{}, err
 	}
