@@ -34,16 +34,16 @@ const (
 
 type Joins struct {
 	Type TypeJoin
-	To   *Froms
+	To   *From
 	Keys map[string]string
 }
 
 /**
 * newJoins
-* @param tp TypeJoin, from *Froms, keys map[string]string
+* @param tp TypeJoin, from *From, keys map[string]string
 * @return *Joins
 **/
-func newJoins(tp TypeJoin, from *Froms, keys map[string]string) *Joins {
+func newJoins(tp TypeJoin, from *From, keys map[string]string) *Joins {
 	return &Joins{
 		Type: tp,
 		To:   from,

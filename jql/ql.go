@@ -25,7 +25,7 @@ type Orders struct {
 type Ql struct {
 	DB       *DB                    `json:"-"`
 	Type     TypeQuery              `json:"type"`
-	Froms    []*Froms               `json:"froms"`
+	Froms    []*From                `json:"froms"`
 	Joins    []*Joins               `json:"joins"`
 	Wheres   *Wheres                `json:"wheres"`
 	Selects  []*Field               `json:"select"`
