@@ -395,46 +395,13 @@ func (s *Ql) Where(condition *Condition) *Ql {
 }
 
 /**
-* WhereByKeys
-* @param keys et.Json
-* @return *Ql
-**/
-func (s *Ql) WhereByKeys(keys et.Json) *Ql {
-	for k, v := range keys {
-		s.Wheres.Add(Eq(k, v))
-	}
-	return s
-}
-
-/**
-* WhereByConditions
-* @param conditions []*Condition
-* @return *Ql
-**/
-func (s *Ql) WhereByConditions(conditions []*Condition) *Ql {
-	for _, condition := range conditions {
-		s.Wheres.Add(condition)
-	}
-	return s
-}
-
-/**
-* WhereByJson
-* @param jsons []et.Json
-* @return *Ql
-**/
-func (s *Ql) WhereByJson(jsons []et.Json) *Ql {
-	s.Wheres.ByJson(jsons)
-	return s
-}
-
-/**
 * And
 * @param condition *Condition
 * @return *Ql
 **/
 func (s *Ql) And(condition *Condition) *Ql {
-	s.Wheres.Add(condition)
+	condition.Connector = And
+	s.Where(condition)
 	return s
 }
 
@@ -444,7 +411,8 @@ func (s *Ql) And(condition *Condition) *Ql {
 * @return *Ql
 **/
 func (s *Ql) Or(condition *Condition) *Ql {
-	s.Wheres.Add(condition)
+	condition.Connector = And
+	s.Where(condition)
 	return s
 }
 

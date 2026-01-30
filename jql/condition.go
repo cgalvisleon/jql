@@ -66,9 +66,9 @@ func ToOperator(s string) Operator {
 type Connector string
 
 const (
-	NaC Connector = ""
-	And Connector = "and"
-	Or  Connector = "or"
+	NAC Connector = ""
+	AND Connector = "and"
+	OR  Connector = "or"
 )
 
 func (s Connector) Str() string {
@@ -92,7 +92,7 @@ type Condition struct {
 * @return et.Json
 **/
 func (s *Condition) ToJson() et.Json {
-	if s.Connector == NaC {
+	if s.Connector == NAC {
 		return et.Json{
 			s.Field.AS(): et.Json{
 				s.Operator.Str(): s.Value,
@@ -169,7 +169,7 @@ func ToCondition(json et.Json) *Condition {
 	and := func(jsons et.Json) *Condition {
 		result := getWhere(jsons)
 		if result != nil {
-			result.Connector = And
+			result.Connector = AND
 		}
 
 		return result
@@ -178,7 +178,7 @@ func ToCondition(json et.Json) *Condition {
 	or := func(jsons et.Json) *Condition {
 		result := getWhere(jsons)
 		if result != nil {
-			result.Connector = Or
+			result.Connector = OR
 		}
 
 		return result
@@ -209,7 +209,7 @@ func condition(field interface{}, value interface{}, op Operator) *Condition {
 		Field:     &Field{Field: field},
 		Operator:  op,
 		Value:     value,
-		Connector: NaC,
+		Connector: NAC,
 	}
 }
 

@@ -8,7 +8,6 @@ import (
 * Wheres
 **/
 type Wheres struct {
-	owner      *From        `json:"-"`
 	conditions []*Condition `json:"-"`
 	isDebug    bool         `json:"-"`
 }
@@ -19,22 +18,8 @@ type Wheres struct {
 **/
 func newWhere() *Wheres {
 	return &Wheres{
-		owner:      &From{},
 		conditions: make([]*Condition, 0),
 	}
-}
-
-/**
-* setModel
-* @param model *Model
-* @return *Wheres
-**/
-func (s *Wheres) setModel(model *Model) *Wheres {
-	if model == nil {
-		return s
-	}
-	s.owner = model.from()
-	return s
 }
 
 /**
@@ -84,37 +69,6 @@ func (s *Wheres) add(condition *Condition) *Wheres {
 	if len(s.conditions) > 0 && condition.Connector == NaC {
 		condition.Connector = And
 	}
-	condition.Field.From = s.owner
 	s.conditions = append(s.conditions, condition)
 	return s
-}
-
-/**
-* Where
-* @param condition *Condition
-* @return *Wheres
-**/
-func (s *Wheres) Where(condition *Condition) *Wheres {
-	condition.Connector = NaC
-	return s.add(condition)
-}
-
-/**
-* And
-* @param condition *Condition
-* @return *Wheres
-**/
-func (s *Wheres) And(condition *Condition) *Wheres {
-	condition.Connector = And
-	return s.add(condition)
-}
-
-/**
-* Or
-* @param condition *Condition
-* @return *Wheres
-**/
-func (s *Wheres) Or(condition *Condition) *Wheres {
-	condition.Connector = Or
-	return s.add(condition)
 }
