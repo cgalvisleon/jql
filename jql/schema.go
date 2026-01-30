@@ -16,10 +16,10 @@ type Schema struct {
 
 /**
 * newModel
-* @param name string, isCore bool, version int
+* @param name string, version int
 * @return (*Model, error)
 **/
-func (s *Schema) newModel(name string, isCore bool, version int) (*Model, error) {
+func (s *Schema) newModel(name string, version int) (*Model, error) {
 	if !utility.ValidStr(name, 0, []string{""}) {
 		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, "name")
 	}
@@ -51,7 +51,6 @@ func (s *Schema) newModel(name string, isCore bool, version int) (*Model, error)
 		AfterInserts:  make([]*Trigger, 0),
 		AfterUpdates:  make([]*Trigger, 0),
 		AfterDeletes:  make([]*Trigger, 0),
-		IsCore:        isCore,
 		Version:       version,
 		beforeInserts: make([]TriggerFunction, 0),
 		beforeUpdates: make([]TriggerFunction, 0),

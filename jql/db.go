@@ -135,10 +135,10 @@ func (s *DB) getSchema(name string) *Schema {
 
 /**
 * newModel
-* @param schema, name string
+* @param schema, name string, version int
 * @return *Model
 **/
-func (s *DB) newModel(schema, name string, isCore bool, version int) (*Model, error) {
+func (s *DB) newModel(schema, name string, version int) (*Model, error) {
 	if !utility.ValidStr(schema, 0, []string{}) {
 		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, schema)
 	}
@@ -167,73 +167,12 @@ func (s *DB) getModel(schema, name string) (*Model, error) {
 * @return error
 **/
 func (s *DB) deleteModel(schema, name string) error {
-	if models == nil {
-		return nil
+	sch, ok := s.Schemas[schema]
+	if !ok {
+		return fmt.Errorf(MSG_SCHEMA_NOT_FOUND, schema)
 	}
 
-	_, err := models.
-		Delete().
-		Where(Eq("name", name)).
-		Exec()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-/**
-* Load
-* @param model *Model
-* @return et.Item, error
-**/
-func (s *DB) Load(model *Model) (et.Item, error) {
-	if s.driver == nil {
-		return et.Item{}, fmt.Errorf(MSG_DRIVER_NOT_FOUND)
-	}
-
-	if model.IsDebug {
-		logs.Debugf("load:%s", model.ToJson().ToEscapeHTML())
-	}
-
-	sql, err := s.driver.Load(model)
-	if err != nil {
-		return et.Item{}, err
-	}
-
-	result, err := s.SqlTx(nil, sql)
-	if err != nil {
-		return et.Item{}, err
-	}
-
-	return result.First(), nil
-}
-
-/**
-* Mutate
-* @param model *Model
-* @return *Model, error
-**/
-func (s *DB) Mutate(model *Model) (*Model, error) {
-	if s.driver == nil {
-		return nil, fmt.Errorf(MSG_DRIVER_NOT_FOUND)
-	}
-
-	if model.IsDebug {
-		logs.Debugf("load:%s", model.ToJson().ToEscapeHTML())
-	}
-
-	sql, err := s.driver.Mutate(model)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = s.SqlTx(nil, sql)
-	if err != nil {
-		return nil, err
-	}
-
-	return model, nil
+	return sch.deleteModel(name)
 }
 
 /**
@@ -312,7 +251,7 @@ func (s *DB) Define(definition et.Json) (*Model, error) {
 	}
 
 	version := definition.ValInt(1, "version")
-	result, err := s.NewModel(schema, name, version)
+	result, err := s.newModel(schema, name, version)
 	if err != nil {
 		return nil, err
 	}
