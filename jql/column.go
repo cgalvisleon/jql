@@ -125,7 +125,7 @@ type Agg struct {
 * @return string
 **/
 func (s *Agg) AS() string {
-	return fmt.Sprintf(`%s(%s):%s`, s.Agg, s.Field)
+	return fmt.Sprintf(`%s(%s):%s`, s.Agg, s.Field, s.Agg)
 }
 
 var Aggs = []string{"count", "sum", "avg", "max", "min", "exp"}
