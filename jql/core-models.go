@@ -62,24 +62,3 @@ func defineModel(db *DB) error {
 
 	return nil
 }
-
-/**
-* deleteModel
-* @param name string
-* @return error
-**/
-func (s *DB) deleteModel(name string) error {
-	if models == nil {
-		return nil
-	}
-
-	_, err := models.
-		Delete().
-		Where(Eq("name", name)).
-		Exec()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}

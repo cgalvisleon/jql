@@ -119,3 +119,30 @@ func (s *Schema) getModel(name string) (*Model, error) {
 	s.Models[name] = result
 	return result, nil
 }
+
+/**
+* deleteModel
+* @param name string
+* @return error
+**/
+func (s *Schema) deleteModel(name string) error {
+	_, ok := s.Models[name]
+	if !ok {
+		return nil
+	}
+
+	delete(s.Models, name)
+	if models == nil {
+		return nil
+	}
+
+	_, err := models.
+		Delete().
+		Where(Eq("name", name)).
+		Exec()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

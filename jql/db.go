@@ -134,20 +134,6 @@ func (s *DB) getSchema(name string) *Schema {
 }
 
 /**
-* getModel
-* @param schema, name string
-* @return *Model
-**/
-func (s *DB) getModel(schema, name string) (*Model, error) {
-	sch, ok := s.Schemas[schema]
-	if !ok {
-		return nil, fmt.Errorf(MSG_SCHEMA_NOT_FOUND, schema)
-	}
-
-	return sch.getModel(name)
-}
-
-/**
 * newModel
 * @param schema, name string
 * @return *Model
@@ -162,88 +148,38 @@ func (s *DB) newModel(schema, name string, isCore bool, version int) (*Model, er
 }
 
 /**
-* loadModel
-* @param name string
+* getModel
+* @param schema, name string
 * @return *Model
 **/
-func (s *DB) loadModel(schema, name string, dest *Model) (bool, error) {
-	if models == nil {
-		return false, ErrModelNotFound
+func (s *DB) getModel(schema, name string) (*Model, error) {
+	sch, ok := s.Schemas[schema]
+	if !ok {
+		return nil, fmt.Errorf(MSG_SCHEMA_NOT_FOUND, schema)
 	}
 
-	items, err := models.
-		Select().
-		Where(Eq("name", name)).
-		One()
-	if err != nil {
-		return false, err
-	}
-
-	if !items.Ok {
-		return false, ErrModelNotFound
-	}
-
-	scr, err := items.Byte("definition")
-	if err != nil {
-		return false, err
-	}
-
-	err = json.Unmarshal(scr, &dest)
-	if err != nil {
-		return false, err
-	}
-
-	dest.DB = s
-	dest.beforeInserts = make([]TriggerFunction, 0)
-	dest.beforeUpdates = make([]TriggerFunction, 0)
-	dest.beforeDeletes = make([]TriggerFunction, 0)
-	dest.afterInserts = make([]TriggerFunction, 0)
-	dest.afterUpdates = make([]TriggerFunction, 0)
-	dest.afterDeletes = make([]TriggerFunction, 0)
-
-	return result, nil
+	return sch.getModel(name)
 }
 
 /**
-* GetModel
-* @param name string
-* @return *Model
-**/
-func (s *DB) GetModel(name string) (*Model, error) {
-	idx := s.idxModel(name)
-	if idx != -1 {
-		return s.Models[idx], nil
-	}
-
-	return s.loadModel(name)
-}
-
-/**
-* NewModel
-* @params schema, name string, version int
-* @return *Model
-**/
-func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
-	idx := s.idxModel(name)
-	if idx != -1 {
-		result := s.Models[idx]
-		if result.Version < version {
-			return s.Mutate(result)
-		}
-
-		return result, nil
-	}
-
-	return s.newModel(schema, name, version)
-}
-
-/**
-* DeleteModel
+* deleteModel
 * @param name string
 * @return error
 **/
-func (s *DB) DeleteModel(name string) error {
-	return s.deleteModel(name)
+func (s *DB) deleteModel(schema, name string) error {
+	if models == nil {
+		return nil
+	}
+
+	_, err := models.
+		Delete().
+		Where(Eq("name", name)).
+		Exec()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 /**
