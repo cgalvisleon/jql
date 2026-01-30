@@ -47,19 +47,19 @@ const (
 	TpGeometry TypeData = "geometry"
 )
 
-type TypeAggregation string
+type Aggregation string
 
-func (s TypeAggregation) Str() string {
+func (s Aggregation) Str() string {
 	return string(s)
 }
 
 /**
 * GetAggregation
 * @param tp string
-* @return TypeAggregation
+* @return Aggregation
 **/
-func GetAggregation(tp string) TypeAggregation {
-	aggregation := map[string]TypeAggregation{
+func GetAggregation(tp string) Aggregation {
+	aggregation := map[string]Aggregation{
 		"count": TpCount,
 		"sum":   TpSum,
 		"avg":   TpAvg,
@@ -76,12 +76,12 @@ func GetAggregation(tp string) TypeAggregation {
 }
 
 const (
-	TpCount TypeAggregation = "count"
-	TpSum   TypeAggregation = "sum"
-	TpAvg   TypeAggregation = "avg"
-	TpMax   TypeAggregation = "max"
-	TpMin   TypeAggregation = "min"
-	TpExp   TypeAggregation = "exp"
+	TpCount Aggregation = "count"
+	TpSum   Aggregation = "sum"
+	TpAvg   Aggregation = "avg"
+	TpMax   Aggregation = "max"
+	TpMin   Aggregation = "min"
+	TpExp   Aggregation = "exp"
 )
 
 type Status string
