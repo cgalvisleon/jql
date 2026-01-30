@@ -220,8 +220,11 @@ func findField(froms []*From, name string) *Field {
 			}
 			result := findField(froms, name)
 			if result != nil {
-				result.TypeColumn = TpAggregation
-				result.Aggregation = GetAggregation(aggregation)
+				result.TypeColumn = AGG
+				result.Field = &Agg{
+					Agg:   agg,
+					Field: name,
+				}
 				result.As = as
 				return result
 			}
@@ -229,24 +232,29 @@ func findField(froms []*From, name string) *Field {
 	} else if pattern4.MatchString(name) {
 		matches := pattern4.FindStringSubmatch(name)
 		if len(matches) == 3 {
-			aggregation := matches[1]
+			agg := matches[1]
 			name = matches[2]
-			result := FindField(froms, name)
+			as := agg
+			if !slices.Contains(Aggs, agg) {
+				return nil
+			}
+			result := findField(froms, name)
 			if result != nil {
-				result.TypeColumn = TpAggregation
-				result.Aggregation = GetAggregation(aggregation)
-				result.As = aggregation
+				result.TypeColumn = AGG
+				result.Field = &Agg{
+					Agg:   agg,
+					Field: name,
+				}
+				result.As = as
 				return result
 			}
 		}
 	} else {
-		if len(froms) == 0 {
-			return nil
-		}
-		from := froms[0]
-		result := from.FindField(name)
-		if result != nil {
-			return result
+		for _, f := range froms {
+			result := f.findField(name)
+			if result != nil {
+				return result
+			}
 		}
 	}
 
