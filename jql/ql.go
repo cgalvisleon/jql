@@ -327,11 +327,44 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 				continue
 			}
 
-			detail, ok := details.Details[f.Name()]
+			name := f.Name()
+			detail, ok := details.Details[name]
 			if !ok {
 				continue
 			}
-			s.Details[f.AS()] = detail
+			s.Details[name] = detail
+		case ROLLUP:
+			if f.From == nil {
+				continue
+			}
+
+			details, err := s.db.getModel(f.From.Database, f.From.Schema)
+			if err != nil {
+				continue
+			}
+
+			name := f.Name()
+			detail, ok := details.Rollups[name]
+			if !ok {
+				continue
+			}
+			s.Rollups[name] = detail
+		case CALC:
+			if f.From == nil {
+				continue
+			}
+
+			details, err := s.db.getModel(f.From.Database, f.From.Schema)
+			if err != nil {
+				continue
+			}
+
+			name := f.Name()
+			detail, ok := details.calcs[name]
+			if !ok {
+				continue
+			}
+			s.Calcs[name] = detail
 		}
 	}
 	return s
