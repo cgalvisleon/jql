@@ -26,12 +26,12 @@ type Ql struct {
 	DB       *DB                    `json:"-"`
 	Type     TypeQuery              `json:"type"`
 	Froms    []*From                `json:"froms"`
-	Joins    []*Joins               `json:"joins"`
-	Wheres   *Wheres                `json:"wheres"`
 	Selects  []*Field               `json:"select"`
 	Hidden   []*Field               `json:"hidden"`
-	Details  map[string]*Field      `json:"details"`
-	Rollups  map[string]*Field      `json:"rollups"`
+	Wheres   *Wheres                `json:"wheres"`
+	Joins    []*Joins               `json:"joins"`
+	Details  map[string]*Detail     `json:"details"`
+	Rollups  map[string]*Detail     `json:"rollups"`
 	Calcs    map[string]DataContext `json:"calcs"`
 	GroupsBy []*Field               `json:"group_by"`
 	Havings  *Wheres                `json:"having"`
