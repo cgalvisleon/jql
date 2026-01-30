@@ -66,8 +66,8 @@ func (s *Wheres) ToJson() []et.Json {
 * @return *Wheres
 **/
 func (s *Wheres) add(condition *Condition) *Wheres {
-	if len(s.conditions) > 0 && condition.Connector == NaC {
-		condition.Connector = And
+	if len(s.conditions) > 0 && condition.Connector == NAC {
+		condition.Connector = AND
 	}
 	s.conditions = append(s.conditions, condition)
 	return s
