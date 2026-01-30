@@ -95,6 +95,7 @@ func (s *Wheres) Add(condition *Condition) *Wheres {
 * @return *Wheres
 **/
 func (s *Wheres) Where(condition *Condition) *Wheres {
+	condition.Connector = NaC
 	return s.Add(condition)
 }
 

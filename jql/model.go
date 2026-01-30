@@ -386,16 +386,16 @@ func (s *Model) Counted() *Ql {
 * Current
 * @return *Ql
 **/
-func (s *Model) Current(where *Wheres) *Ql {
-	result := From(s, "A")
+func (s *Model) Current(data et.Json) *Ql {
+	result := newQuery(s, "A")
 	for _, col := range s.Columns {
-		if col.TypeColumn == TpColumn {
+		if col.TypeColumn == COLUMN {
 			field := col.Field()
 			result.Selects = append(result.Selects, field)
 		}
 	}
-	for _, cond := range where.Conditions {
-		result.Where(cond)
+	for _, key := range s.PrimaryKeys {
+		result.Wheres()
 	}
 	return result
 }
