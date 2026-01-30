@@ -17,6 +17,10 @@ func defineModel(db *DB) error {
 	if err != nil {
 		return err
 	}
+	models.defineCreatedAtField()
+	models.defineUpdatedAtField()
+	models.definePrimaryKeyField()
+	models.IsCore = true
 
 	models, err = db.NewModel(et.Json{
 		"schema":  "core",

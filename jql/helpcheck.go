@@ -195,6 +195,24 @@ func Literal(val any) any {
 }
 
 /**
+* insertBeforeLast
+* @param s []T, v T
+* @return []T
+**/
+func insertBeforeLast[T any](s []T, v T) []T {
+	if len(s) < 1 {
+		return append(s, v)
+	}
+	if len(s) == 1 {
+		return []T{v, s[0]}
+	}
+
+	s = append(s[:len(s)-1], s[len(s)-1:]...)
+	s[len(s)-2] = v
+	return s
+}
+
+/**
 * rowsToItems
 * @param rows *sql.Rows
 * @return et.Items

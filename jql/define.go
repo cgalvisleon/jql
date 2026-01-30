@@ -32,7 +32,7 @@ func (s *Model) defineColumn(name string, tpColumn TypeColumn, tpData TypeData, 
 	}
 
 	result := newColumn(s, name, tpColumn, tpData, defaultValue, definition)
-	s.Columns = append(s.Columns, result)
+	s.Columns = insertBeforeLast(s.Columns, result)
 	return result, nil
 }
 
@@ -324,7 +324,6 @@ func (s *Model) DefineModel() *Model {
 	s.defineStatusFieldDefault()
 	s.definePrimaryKeyField()
 	s.defineSourceFieldDefault()
-	s.DefineIdxField(IDX)
 	return s
 }
 

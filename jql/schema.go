@@ -58,7 +58,7 @@ func (s *Schema) newModel(name string, version int) (*Model, error) {
 		afterDeletes:  make([]TriggerFunction, 0),
 		calcs:         make(map[string]DataContext),
 	}
-
+	result.DefineIdxField(IDX)
 	s.Models[name] = result
 
 	return result, nil
