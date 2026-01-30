@@ -10,6 +10,7 @@ import (
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/logs"
 	"github.com/cgalvisleon/et/utility"
+	"github.com/cgalvisleon/josefina/pkg/msg"
 )
 
 var dbs map[string]*DB
@@ -22,39 +23,44 @@ type DB struct {
 	Name       string             `json:"name"`
 	Schemas    map[string]*Schema `json:"schemas"`
 	Connection et.Json            `json:"connection"`
+	driver     Driver             `json:"-"`
 	db         *sql.DB            `json:"-"`
 }
 
 /**
-* getDatabase
-* @param id, name, driver string, userCore bool, params Connection
+* getDb
+* @param name string, params Connection
 * @return (*DB, error)
 **/
-func getDatabase(id, name, driver string, userCore bool, params et.Json) (*DB, error) {
-	idx := indexDb(name)
-	if idx != -1 {
-		return dbs[idx], nil
+func getDb(name string, params et.Json) (*DB, error) {
+	if !utility.ValidStr(name, 0, []string{""}) {
+		return nil, fmt.Errorf(msg.MSG_ARG_REQUIRED, "name")
 	}
 
-	if _, ok := drivers[driver]; !ok {
+	name = utility.Normalize(name)
+	result, ok := dbs[name]
+	if ok {
+		return result, nil
+	}
+
+	driver := params.Str("driver")
+	drv, ok := drivers[driver]
+	if !ok {
 		return nil, fmt.Errorf(MSG_DRIVER_NOT_FOUND, driver)
 	}
 
-	result := &DB{
+	result = &DB{
 		Name:       name,
-		Models:     make([]*Model, 0),
-		UseCore:    userCore,
+		Schemas:    make(map[string]*Schema),
 		Connection: params,
-		Language:   "en",
+		driver:     drv,
 	}
-	result.driver = drivers[driver](result)
 	err := result.load()
 	if err != nil {
 		return nil, err
 	}
 
-	databases = append(databases, result)
-
+	dbs[name] = result
 	return result, nil
 }
 
@@ -62,7 +68,7 @@ func getDatabase(id, name, driver string, userCore bool, params et.Json) (*DB, e
 * Serialize
 * @return []byte, error
 **/
-func (s *DB) Serialize() ([]byte, error) {
+func (s *DB) serialize() ([]byte, error) {
 	bt, err := json.Marshal(s)
 	if err != nil {
 		return nil, err
@@ -76,7 +82,7 @@ func (s *DB) Serialize() ([]byte, error) {
 * @return et.Json
 **/
 func (s *DB) ToJson() et.Json {
-	bt, err := s.Serialize()
+	bt, err := s.serialize()
 	if err != nil {
 		return et.Json{}
 	}
@@ -143,7 +149,6 @@ func (s *DB) newModel(schema, name string, version int) (*Model, error) {
 		version = 1
 	}
 
-	
 	s.Models = append(s.Models, result)
 	return result, nil
 }

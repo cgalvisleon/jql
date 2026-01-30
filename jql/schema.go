@@ -1,7 +1,7 @@
 package jql
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/cgalvisleon/et/utility"
 	"github.com/cgalvisleon/josefina/pkg/msg"
@@ -15,7 +15,7 @@ type Schema struct {
 
 func (s *Schema) newModel(name string, isCore bool, version int) (*Model, error) {
 	if !utility.ValidStr(name, 0, []string{""}) {
-		return nil, errors.New(msg.MSG_MODEL_NOT_FOUND)
+		return nil, fmt.Errorf(msg.MSG_ARG_REQUIRED, "name")
 	}
 
 	result, ok := s.Models[name]
