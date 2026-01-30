@@ -9,19 +9,19 @@ import "github.com/cgalvisleon/et/et"
 func (s *Cmd) insert() (et.Items, error) {
 	result := et.Items{}
 	for _, new := range s.Data {
-		s.New = new.Clone()
+		old := et.Json{}
 		for _, fn := range s.beforeInserts {
-			err := fn(s.tx, et.Json{}, s.New)
+			err := fn(s.tx, old, new)
 			if err != nil {
 				return et.Items{}, err
 			}
 		}
 
-		if s.New.IsEmpty() {
+		if new.IsEmpty() {
 			continue
 		}
 
-		result, err := s.DB.Command(s)
+		result, err := s.db.Command(s)
 		if err != nil {
 			return et.Items{}, err
 		}
@@ -30,15 +30,15 @@ func (s *Cmd) insert() (et.Items, error) {
 			continue
 		}
 
-		s.New = result.First().Result
+		new = result.First().Result
 		for _, fn := range s.afterInserts {
-			err := fn(s.tx, et.Json{}, s.New)
+			err := fn(s.tx, old, new)
 			if err != nil {
 				return et.Items{}, err
 			}
 		}
 
-		result.Add(s.New)
+		result.Add(new)
 	}
 
 	return result, nil
