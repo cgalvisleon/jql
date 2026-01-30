@@ -1,7 +1,7 @@
 package jql
 
 type Detail struct {
-	To              *Model            `json:"to"`
+	To              From              `json:"to"`
 	Keys            map[string]string `json:"keys"`
 	Select          []string          `json:"select"`
 	OnDeleteCascade bool              `json:"on_delete_cascade"`
@@ -15,7 +15,12 @@ type Detail struct {
 **/
 func newDetail(to *Model, keys map[string]string, selecs []string, onDeleteCascade, onUpdateCascade bool) *Detail {
 	return &Detail{
-		To:              to,
+		To: From{
+			Database: to.Database,
+			Schema:   to.Schema,
+			Name:     to.Name,
+			As:       to.Name,
+		},
 		Keys:            keys,
 		Select:          selecs,
 		OnDeleteCascade: onDeleteCascade,

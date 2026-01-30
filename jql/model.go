@@ -180,7 +180,7 @@ func (s *Model) FindColumn(name string) *Column {
 		return nil
 	}
 
-	return newColumn(s, name, TpAtrib, TpAny, "", []byte{})
+	return newColumn(name, ATTRIB, ANY, "", []byte{})
 }
 
 /**
@@ -226,42 +226,82 @@ func (s *Model) GetId(id string) string {
 	return reg.TagULID(s.Name, id)
 }
 
+/**
+* BeforeInsert
+* @param fn TriggerFunction
+* @return *Model
+**/
 func (s *Model) BeforeInsert(fn TriggerFunction) *Model {
 	s.beforeInserts = append(s.beforeInserts, fn)
 	return s
 }
 
+/**
+* BeforeUpdate
+* @param fn TriggerFunction
+* @return *Model
+**/
 func (s *Model) BeforeUpdate(fn TriggerFunction) *Model {
 	s.beforeUpdates = append(s.beforeUpdates, fn)
 	return s
 }
 
+/**
+* BeforeDelete
+* @param fn TriggerFunction
+* @return *Model
+**/
 func (s *Model) BeforeDelete(fn TriggerFunction) *Model {
 	s.beforeDeletes = append(s.beforeDeletes, fn)
 	return s
 }
 
+/**
+* BeforeInsertOrUpdate
+* @param fn TriggerFunction
+* @return *Model
+**/
 func (s *Model) BeforeInsertOrUpdate(fn TriggerFunction) *Model {
 	s.beforeInserts = append(s.beforeInserts, fn)
 	s.beforeUpdates = append(s.beforeUpdates, fn)
 	return s
 }
 
+/**
+* AfterInsert
+* @param fn TriggerFunction
+* @return *Model
+**/
 func (s *Model) AfterInsert(fn TriggerFunction) *Model {
 	s.afterInserts = append(s.afterInserts, fn)
 	return s
 }
 
+/**
+* AfterUpdate
+* @param fn TriggerFunction
+* @return *Model
+**/
 func (s *Model) AfterUpdate(fn TriggerFunction) *Model {
 	s.afterUpdates = append(s.afterUpdates, fn)
 	return s
 }
 
+/**
+* AfterDelete
+* @param fn TriggerFunction
+* @return *Model
+**/
 func (s *Model) AfterDelete(fn TriggerFunction) *Model {
 	s.afterDeletes = append(s.afterDeletes, fn)
 	return s
 }
 
+/**
+* AfterInsertOrUpdate
+* @param fn TriggerFunction
+* @return *Model
+**/
 func (s *Model) AfterInsertOrUpdate(fn TriggerFunction) *Model {
 	s.afterInserts = append(s.afterInserts, fn)
 	s.afterUpdates = append(s.afterUpdates, fn)

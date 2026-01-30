@@ -73,6 +73,7 @@ func (s *Model) DefinePrimaryKeys(names ...string) {
 		}
 
 		s.PrimaryKeys = append(s.PrimaryKeys, name)
+		s.DefineRequired(name)
 	}
 }
 
@@ -190,91 +191,6 @@ func (s *Model) DefineAttribute(name string, tpData TypeData, defaultValue inter
 		}
 	}
 	return s.defineColumn(name, ATTRIB, tpData, defaultValue, []byte{})
-}
-
-/**
-* DefineRequired
-* @param names ...string
-* @return
-**/
-func (s *Model) DefineRequired(names ...string) {
-	for _, name := range names {
-		idx := slices.Index(s.Required, name)
-		if idx != -1 {
-			continue
-		}
-
-		idx = s.idxColumn(name)
-		if idx == -1 {
-			continue
-		}
-
-		s.Required = append(s.Required, name)
-	}
-}
-
-/**
-* DefineUnique
-* @param names ...string
-* @return
-**/
-func (s *Model) DefineUnique(names ...string) {
-	for _, name := range names {
-		idx := slices.Index(s.Unique, name)
-		if idx != -1 {
-			continue
-		}
-
-		idx = s.idxColumn(name)
-		if idx == -1 {
-			continue
-		}
-
-		s.Unique = append(s.Unique, name)
-	}
-}
-
-/**
-* DefinePrimaryKeys
-* @param names ...string
-* @return
-**/
-func (s *Model) DefinePrimaryKeys(names ...string) {
-	for _, name := range names {
-		idx := slices.Index(s.PrimaryKeys, name)
-		if idx != -1 {
-			continue
-		}
-
-		idx = s.idxColumn(name)
-		if idx == -1 {
-			continue
-		}
-
-		s.DefineRequired(name)
-		s.DefineUnique(name)
-		s.PrimaryKeys = append(s.PrimaryKeys, name)
-	}
-}
-
-/**
-* DefineHidden
-* @param names ...string
-* @return
-**/
-func (s *Model) DefineHidden(names ...string) {
-	for _, name := range names {
-		idx := slices.Index(s.Hidden, name)
-		if idx != -1 {
-			continue
-		}
-
-		idx = s.idxColumn(name)
-		if idx == -1 {
-			continue
-		}
-		s.Hidden = append(s.Hidden, name)
-	}
 }
 
 /**
