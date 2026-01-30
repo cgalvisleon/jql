@@ -223,11 +223,6 @@ func (s *Model) DefineDetail(name string, keys map[string]string, version int) (
 
 	detail := newDetail(to, keys, []string{}, true, true)
 	s.Details[name] = detail
-	fkeys := map[string]string{}
-	for k, v := range keys {
-		fkeys[v] = k
-	}
-	to.Master[s.Name] = newDetail(s, fkeys, []string{}, true, true)
 	return to, nil
 }
 
@@ -236,18 +231,13 @@ func (s *Model) DefineDetail(name string, keys map[string]string, version int) (
 * @param name string, from string, keys map[string]string, selects []string
 * @return *Model
 **/
-func (s *Model) DefineRollup(name, from string, keys map[string]string, selects []string) error {
-	_, err := s.defineColumn(name, TpRollup, TpJson, false, []et.Json{}, []byte{})
+func (s *Model) DefineRollup(name string, from *Model, keys map[string]string, selects []string) error {
+	_, err := s.defineColumn(name, ROLLUP, JSON, "", []byte{})
 	if err != nil {
 		return err
 	}
 
-	to, err := s.DB.GetModel(from)
-	if err != nil {
-		return err
-	}
-
-	detail := newDetail(to, keys, selects, false, false)
+	detail := newDetail(from, keys, selects, false, false)
 	s.Rollups[name] = detail
 	return nil
 }
@@ -257,14 +247,9 @@ func (s *Model) DefineRollup(name, from string, keys map[string]string, selects 
 * @param name string, from string, keys map[string]string
 * @return *Model
 **/
-func (s *Model) DefineRelation(from string, keys map[string]string) error {
-	to, err := s.DB.GetModel(from)
-	if err != nil {
-		return err
-	}
-
-	detail := newDetail(to, keys, []string{}, false, false)
-	s.Relations[to.Name] = detail
+func (s *Model) DefineRelation(from *Model, keys map[string]string) error {
+	detail := newDetail(from, keys, []string{}, false, false)
+	s.Relations[from.Name] = detail
 	return nil
 }
 
