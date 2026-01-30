@@ -80,68 +80,78 @@ type Field struct {
 	Rows       int        `json:"rows"`
 }
 
-var AGGREGATIONS = []string{"count", "sum", "avg", "max", "min", "exp"}
+func (s *Field) AS() string {
+	return fmt.Sprintf(`%s.%s`, s.From.As, s.Name)
+}
+
+type Agg struct {
+	Agg   string `json:"agg"`
+	Field string `json:"field"`
+}
 
 /**
 * agg
 * @param agg string, field string
 * @return string
 **/
-func agg(agg string, field string) string {
-	return fmt.Sprintf(`%s(%s)`, agg, field)
+func agg(agg string, field string) *Agg {
+	return &Agg{
+		Agg:   agg,
+		Field: field,
+	}
 }
 
 /**
 * COUNT
 * @param field string
-* @return string
+* @return *Agg
 **/
-func COUNT(field string) string {
+func COUNT(field string) *Agg {
 	return agg("count", field)
 }
 
 /**
 * SUM
 * @param field string
-* @return string
+* @return *Agg
 **/
-func SUM(field string) string {
+func SUM(field string) *Agg {
 	return agg("sum", field)
 }
 
 /**
 * AVG
 * @param field string
-* @return string
+* @return *Agg
 **/
-func AVG(field string) string {
+func AVG(field string) *Agg {
 	return agg("avg", field)
 }
 
 /**
 * MAX
 * @param field string
-* @return string
+* @return *Agg
 **/
-func MAX(field string) string {
+func MAX(field string) *Agg {
 	return agg("max", field)
 }
 
 /**
 * MIN
 * @param field string
-* @return string
+* @return *Agg
 **/
-func MIN(field string) string {
+func MIN(field string) *Agg {
 	return agg("min", field)
 }
 
 /**
 * EXP
 * @param field string
-* @return string
+* @return *Agg
 **/
-func EXP(field string) string {
+func EXP(field string) *Agg {
 	return agg("exp", field)
 }
 
