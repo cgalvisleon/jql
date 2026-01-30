@@ -110,8 +110,8 @@ type Column struct {
 * Field
 * @return Field
 **/
-func (s *Column) Field() Field {
-	return Field{
+func (s *Column) Field() *Field {
+	return &Field{
 		TypeColumn: s.TypeColumn,
 		From:       s.model.from(),
 		Name:       s.Name,
