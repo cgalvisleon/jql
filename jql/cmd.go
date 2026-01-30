@@ -184,7 +184,7 @@ func (s *Cmd) update() (et.Items, error) {
 				}
 			}
 
-			result.Add(s.New)
+			result.Add(new)
 		}
 	}
 
