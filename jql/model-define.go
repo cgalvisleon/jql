@@ -10,10 +10,10 @@ import (
 
 /**
 * defineColumn
-* @param name string, tpColumn TypeColumn, tpData TypeData, hidden bool, defaultValue interface{}, definition []byte
+* @param name string, tpColumn TypeColumn, tpData TypeData, defaultValue interface{}, definition []byte
 * @return *Column
 **/
-func (s *Model) defineColumn(name string, tpColumn TypeColumn, tpData TypeData, hidden bool, defaultValue interface{}, definition []byte) (*Column, error) {
+func (s *Model) defineColumn(name string, tpColumn TypeColumn, tpData TypeData, defaultValue interface{}, definition []byte) (*Column, error) {
 	if !utility.ValidStr(name, 0, []string{}) {
 		return nil, fmt.Errorf(MSG_NAME_REQUIRED)
 	}
@@ -33,18 +33,14 @@ func (s *Model) defineColumn(name string, tpColumn TypeColumn, tpData TypeData, 
 
 	result := newColumn(name, tpColumn, tpData, defaultValue, definition)
 	s.Columns = append(s.Columns, result)
-	if hidden {
-		s.Hidden = append(s.Hidden, name)
-	}
 	return result, nil
 }
 
 /**
 * DefineIndex
 * @param names ...string
-* @return error
 **/
-func (s *Model) DefineIndex(names ...string) error {
+func (s *Model) DefineIndex(names ...string) {
 	for _, name := range names {
 		idx := s.idxColumn(name)
 		if idx == -1 {
@@ -58,17 +54,95 @@ func (s *Model) DefineIndex(names ...string) error {
 
 		s.Indexes = append(s.Indexes, name)
 	}
+}
 
-	return nil
+/**
+* DefinePrimaryKeys
+* @param names ...string
+**/
+func (s *Model) DefinePrimaryKeys(names ...string) {
+	for _, name := range names {
+		idx := s.idxColumn(name)
+		if idx == -1 {
+			continue
+		}
+
+		idx = slices.Index(s.PrimaryKeys, name)
+		if idx != -1 {
+			continue
+		}
+
+		s.PrimaryKeys = append(s.PrimaryKeys, name)
+	}
+}
+
+/**
+* DefineUnique
+* @param names ...string
+**/
+func (s *Model) DefineUnique(names ...string) {
+	for _, name := range names {
+		idx := s.idxColumn(name)
+		if idx == -1 {
+			continue
+		}
+
+		idx = slices.Index(s.Unique, name)
+		if idx != -1 {
+			continue
+		}
+
+		s.Unique = append(s.Unique, name)
+	}
+}
+
+/**
+* DefineRequired
+* @param names ...string
+**/
+func (s *Model) DefineRequired(names ...string) {
+	for _, name := range names {
+		idx := s.idxColumn(name)
+		if idx == -1 {
+			continue
+		}
+
+		idx = slices.Index(s.Required, name)
+		if idx != -1 {
+			continue
+		}
+
+		s.Required = append(s.Required, name)
+	}
+}
+
+/**
+* DefineHidden
+* @param names ...string
+**/
+func (s *Model) DefineHidden(names ...string) {
+	for _, name := range names {
+		idx := s.idxColumn(name)
+		if idx == -1 {
+			continue
+		}
+
+		idx = slices.Index(s.Hidden, name)
+		if idx != -1 {
+			continue
+		}
+
+		s.Hidden = append(s.Hidden, name)
+	}
 }
 
 /**
 * DefineColumn
-* @param name string, tpData TypeData
+* @param name string, tpData TypeData, defaultValue interface{}
 * @return *Column
 **/
-func (s *Model) DefineColumn(name string, tpData TypeData) (*Column, error) {
-	return s.defineColumn(name, COLUMN, tpData, false, nil, []byte{})
+func (s *Model) DefineColumn(name string, tpData TypeData, defaultValue interface{}) (*Column, error) {
+	return s.defineColumn(name, COLUMN, tpData, defaultValue, []byte{})
 }
 
 /**
@@ -76,31 +150,31 @@ func (s *Model) DefineColumn(name string, tpData TypeData) (*Column, error) {
 * @param name string
 * @return error
 **/
-func (s *Model) DefineSourceField(name string) error {
-	col, err := s.defineColumn(name, TpColumn, TpJson, false, nil, []byte{})
+func (s *Model) DefineSourceField(name string) (*Column, error) {
+	result, err := s.DefineColumn(name, JSON, et.Json{})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	s.SourceField = col
+	s.SourceField = name
 	s.DefineIndex(name)
-	return nil
+	return result, nil
 }
 
 /**
-* DefineIndexField
+* DefineIdxField
 * @param name string
 * @return error
 **/
-func (s *Model) DefineIndexField(name string) error {
-	col, err := s.defineColumn(name, TpColumn, TpJson, false, nil, []byte{})
+func (s *Model) DefineIdxField(name string) (*Column, error) {
+	result, err := s.DefineColumn(name, KEY, "")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	s.IndexField = col
+	s.IdxField = name
 	s.DefineIndex(name)
-	return nil
+	return result, nil
 }
 
 /**
@@ -109,10 +183,13 @@ func (s *Model) DefineIndexField(name string) error {
 * @return *Column, error
 **/
 func (s *Model) DefineAttribute(name string, tpData TypeData, defaultValue interface{}) (*Column, error) {
-	if s.SourceField == nil {
-		s.DefineSourceField(SOURCE)
+	if s.SourceField == "" {
+		_, err := s.DefineSourceField(SOURCE)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return s.defineColumn(name, TpAtrib, tpData, false, defaultValue, []byte{})
+	return s.defineColumn(name, ATTRIB, tpData, defaultValue, []byte{})
 }
 
 /**
