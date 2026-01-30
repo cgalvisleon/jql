@@ -259,9 +259,9 @@ func (s *DB) Query(query *Ql) (et.Items, error) {
 	for _, item := range result.Result {
 		wg.Add(1)
 		go func(item et.Json) {
-			query.getDetailsTx(query.tx, item)
-			query.getRollupsTx(query.tx, item)
-			query.getCallsTx(query.tx, item)
+			query.getDetails(query.tx, item)
+			query.getRollups(query.tx, item)
+			query.getCalls(query.tx, item)
 		}(item)
 	}
 	wg.Wait()

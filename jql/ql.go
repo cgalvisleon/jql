@@ -9,6 +9,7 @@ import (
 
 	"github.com/cgalvisleon/et/envar"
 	"github.com/cgalvisleon/et/et"
+	"github.com/cgalvisleon/et/logs"
 )
 
 type TypeQuery string
@@ -368,6 +369,75 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 		}
 	}
 	return s
+}
+
+/**
+* getDetails
+* @param tx *Tx, data et.Json
+* @return error
+**/
+func (s *Ql) getDetails(tx *Tx, data et.Json) error {
+	for name, dtl := range s.Details {
+		to := dtl.To
+		model, err := s.db.getModel(to.Schema, to.Name)
+		if err != nil {
+			return err
+		}
+
+		ql := model.
+			Select(dtl.Select)
+		conditions := WhereByKeys(data, detail.Keys)
+		items, err := From(to, "A").
+			Select(detail.Select...).
+			WhereByConditions(conditions).
+			LimitTx(tx, detail.Page, detail.Rows)
+		if err != nil {
+			logs.Error(err)
+			continue
+		}
+
+		data[name] = items.Result
+	}
+}
+
+/**
+* getRollups
+* @param tx *Tx, data et.Json
+* @return
+**/
+func (s *Ql) getRollups(tx *Tx, data et.Json) {
+	for name, rollup := range s.Rollups {
+		to := rollup.To
+		conditions := WhereByKeys(data, rollup.Keys)
+		items, err := From(to, "A").
+			Select(rollup.Select...).
+			WhereByConditions(conditions).
+			LimitTx(tx, rollup.Page, rollup.Rows)
+		if err != nil {
+			logs.Error(err)
+			continue
+		}
+
+		item := items.First().Result
+		if len(item) == 1 {
+			for _, v := range item {
+				data[name] = v
+			}
+		} else {
+			data[name] = item
+		}
+	}
+}
+
+/**
+* getCalls
+* @param tx *Tx, data et.Json
+* @return
+**/
+func (s *Ql) getCalls(tx *Tx, data et.Json) {
+	for _, call := range s.Calcs {
+		call(tx, data)
+	}
 }
 
 /**

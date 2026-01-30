@@ -3,17 +3,17 @@ package jql
 type Detail struct {
 	To              *From             `json:"to"`
 	Keys            map[string]string `json:"keys"`
-	Select          []string          `json:"select"`
+	Select          []interface{}     `json:"select"`
 	OnDeleteCascade bool              `json:"on_delete_cascade"`
 	OnUpdateCascade bool              `json:"on_update_cascade"`
 }
 
 /**
 * newDetail
-* @param to *Model, keys map[string]string, selecs []string, onDeleteCascade, onUpdateCascade bool
+* @param to *Model, keys map[string]string, selecs []interface{}, onDeleteCascade, onUpdateCascade bool
 * @return *Detail
 **/
-func newDetail(to *Model, keys map[string]string, selecs []string, onDeleteCascade, onUpdateCascade bool) *Detail {
+func newDetail(to *Model, keys map[string]string, selecs []interface{}, onDeleteCascade, onUpdateCascade bool) *Detail {
 	return &Detail{
 		To:              to.from(),
 		Keys:            keys,
