@@ -111,7 +111,6 @@ func (s *Schema) getModel(name string) (*Model, error) {
 	result.afterDeletes = make([]TriggerFunction, 0)
 	result.calcs = make(map[string]DataContext)
 	result.db = s.db
-
 	err = result.Init()
 	if err != nil {
 		return nil, err
