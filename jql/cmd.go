@@ -192,6 +192,54 @@ func (s *Cmd) update() (et.Items, error) {
 }
 
 /**
+* delete
+* @return et.Items, error
+**/
+func (s *Cmd) delete() (et.Items, error) {
+	from := s.Model
+	result := et.Items{}
+	for _, data := range s.Data {
+		current, err := from.
+			Current(data).
+			All()
+		if err != nil {
+			return et.Items{}, err
+		}
+
+		for _, old := range current.Result {
+			new := et.Json{}
+			for _, fn := range s.beforeDeletes {
+				err := fn(s.tx, old, new)
+				if err != nil {
+					return et.Items{}, err
+				}
+			}
+
+			result, err := s.db.Command(s)
+			if err != nil {
+				return et.Items{}, err
+			}
+
+			if !result.Ok {
+				continue
+			}
+
+			old = result.First().Result
+			for _, fn := range s.afterDeletes {
+				err := fn(s.tx, old, new)
+				if err != nil {
+					return et.Items{}, err
+				}
+			}
+
+			result.Add(old)
+		}
+	}
+
+	return result, nil
+}
+
+/**
 * ExecTx
 * @param tx *Tx
 * @return et.Items, error
