@@ -19,12 +19,12 @@ func (s TypeColumn) Str() string {
 }
 
 const (
-	TpColumn   TypeColumn = "column"
-	TpAtrib    TypeColumn = "atrib"
-	TpDetail   TypeColumn = "detail"
-	TpRollup   TypeColumn = "rollup"
-	TpRelation TypeColumn = "relation"
-	TpCalc     TypeColumn = "calc"
+	COLUMN   TypeColumn = "column"
+	ATTRIB   TypeColumn = "atrib"
+	DETAIL   TypeColumn = "detail"
+	ROLLUP   TypeColumn = "rollup"
+	RELATION TypeColumn = "relation"
+	CALC     TypeColumn = "calc"
 )
 
 type TypeData string
