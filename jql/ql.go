@@ -333,7 +333,7 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 			if !ok {
 				continue
 			}
-			s.Details[name] = detail
+			s.Details[name] = detail.setLimit(s.Page, s.Rows)
 		case ROLLUP:
 			if f.From == nil {
 				continue
@@ -349,7 +349,7 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 			if !ok {
 				continue
 			}
-			s.Rollups[name] = detail
+			s.Rollups[name] = detail.setLimit(s.Page, s.Rows)
 		case CALC:
 			if f.From == nil {
 				continue
@@ -385,12 +385,12 @@ func (s *Ql) getDetails(tx *Tx, data et.Json) error {
 		}
 
 		ql := model.
-			Select(dtl.Select)
-		conditions := WhereByKeys(data, detail.Keys)
-		items, err := From(to, "A").
-			Select(detail.Select...).
-			WhereByConditions(conditions).
-			LimitTx(tx, detail.Page, detail.Rows)
+			Select(dtl.Select...)
+		for pk, fk := range dtl.Keys {
+			val := data[pk]
+			ql.Where(Eq(fk, val))
+		}
+		ql.Limit(dtl.Page, dtl.Rows)
 		if err != nil {
 			logs.Error(err)
 			continue

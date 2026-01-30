@@ -6,6 +6,25 @@ type Detail struct {
 	Select          []interface{}     `json:"select"`
 	OnDeleteCascade bool              `json:"on_delete_cascade"`
 	OnUpdateCascade bool              `json:"on_update_cascade"`
+	Page            int               `json:"page"`
+	Rows            int               `json:"rows"`
+}
+
+/**
+* setLimit
+* @param page, rows int
+* @return *Detail
+**/
+func (s *Detail) setLimit(page, rows int) *Detail {
+	return &Detail{
+		To:              s.To,
+		Keys:            s.Keys,
+		Select:          s.Select,
+		OnDeleteCascade: s.OnDeleteCascade,
+		OnUpdateCascade: s.OnUpdateCascade,
+		Page:            page,
+		Rows:            rows,
+	}
 }
 
 /**
