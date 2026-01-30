@@ -319,17 +319,18 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 * @return *Ql
 **/
 func (s *Ql) join(tp TypeJoin, model *Model, as string, keys map[string]string) *Ql {
-	from := newFrom(model, as)
+	from := model.from()
+	from.As = as
 	s.Froms = append(s.Froms, from)
 
 	rKeys := make(map[string]string)
 	for k, fk := range keys {
-		field := FindField(s.Froms, k)
+		field := s.findField(k)
 		if field != nil {
 			k = field.AS()
 		}
 
-		field = FindField(s.Froms, fk)
+		field = s.findField(fk)
 		if field != nil {
 			fk = field.AS()
 		}
