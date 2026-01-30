@@ -113,6 +113,26 @@ func (s *DB) load() error {
 }
 
 /**
+* getSchema
+* @param name string
+* @return *Schema
+**/
+func (s *DB) getSchema(name string) *Schema {
+	result, ok := s.Schemas[name]
+	if ok {
+		return result
+	}
+
+	result = &Schema{
+		Database: s.Name,
+		Name:     name,
+		Models:   make(map[string]*Model),
+	}
+	s.Schemas[name] = result
+	return result
+}
+
+/**
 * getModel
 * @param schema, name string
 * @return *Model
@@ -131,21 +151,13 @@ func (s *DB) getModel(schema, name string) (*Model, error) {
 * @param schema, name string
 * @return *Model
 **/
-func (s *DB) newModel(schema, name string, version int) (*Model, error) {
-	if !utility.ValidStr(name, 0, []string{}) {
-		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, name)
-	}
-
+func (s *DB) newModel(schema, name string, isCore bool, version int) (*Model, error) {
 	if !utility.ValidStr(schema, 0, []string{}) {
 		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, schema)
 	}
 
-	if version <= 0 {
-		version = 1
-	}
-
-	s.Models = append(s.Models, result)
-	return result, nil
+	sch := s.getSchema(schema)
+	return sch.newModel(name, isCore, version)
 }
 
 /**
