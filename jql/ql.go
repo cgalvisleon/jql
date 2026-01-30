@@ -134,11 +134,11 @@ func (s *Ql) Debug() *Ql {
 }
 
 /**
-* FindField
+* findFieldByName
 * @param froms []*From, name string // from.name:as|1:30
 * @return *Field
 **/
-func findField(froms []*From, name string) *Field {
+func findFieldByStr(froms []*From, name string) *Field {
 	pattern1 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+):([A-Za-z0-9]+)$`) // from.name:as
 	pattern2 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+)$`)                // from.name
 	pattern3 := regexp.MustCompile(`^([A-Za-z]+)\((.+)\):([A-Za-z0-9]+)$`)            // agg(field):as
@@ -185,6 +185,7 @@ func findField(froms []*From, name string) *Field {
 					result = f.findField(name)
 				}
 				if result != nil {
+					result.From = f
 					result.As = as
 					return result
 				}
@@ -204,6 +205,7 @@ func findField(froms []*From, name string) *Field {
 					result = f.findField(name)
 				}
 				if result != nil {
+					result.From = f
 					result.As = as
 					return result
 				}
@@ -218,7 +220,7 @@ func findField(froms []*From, name string) *Field {
 			if !slices.Contains(Aggs, agg) {
 				return nil
 			}
-			result := findField(froms, name)
+			result := findFieldByStr(froms, name)
 			if result != nil {
 				result.TypeColumn = AGG
 				result.Field = &Agg{
@@ -238,7 +240,7 @@ func findField(froms []*From, name string) *Field {
 			if !slices.Contains(Aggs, agg) {
 				return nil
 			}
-			result := findField(froms, name)
+			result := findFieldByStr(froms, name)
 			if result != nil {
 				result.TypeColumn = AGG
 				result.Field = &Agg{
@@ -253,12 +255,31 @@ func findField(froms []*From, name string) *Field {
 		for _, f := range froms {
 			result := f.findField(name)
 			if result != nil {
+				result.From = f
 				return result
 			}
 		}
 	}
 
 	return nil
+}
+
+/**
+* findField
+* @param field interface{}
+* @return *Field
+**/
+func (s *Ql) findField(field interface{}) *Field {
+	switch v := field.(type) {
+	case string:
+		return findFieldByStr(s.Froms, v)
+	case *Agg:
+		return findFieldByStr(s.Froms, v.Field)
+	case *Field:
+		return v
+	default:
+		return nil
+	}
 }
 
 /**
@@ -284,19 +305,12 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 	}
 
 	for _, fld := range fields {
-		switch v := fld.(type) {
-		case string:
-			f := findField(s.Froms, v)
-			f.From = s.Froms[0]
+		f := s.findField(fld)
+		if f != nil {
 			s.Selects = append(s.Selects, f)
-		case *Field:
-			v.From = s.Froms[0]
-			s.Selects = append(s.Selects, v)
-		case *Agg:
-			ql.Selects = append(ql.Selects, v)
 		}
 	}
-	return ql
+	return s
 }
 
 /**
