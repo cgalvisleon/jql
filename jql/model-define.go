@@ -221,17 +221,17 @@ func (s *Model) DefineDetail(name string, keys map[string]string, version int) (
 		}
 	}
 
-	detail := newDetail(to, keys, []string{}, true, true)
+	detail := newDetail(to, keys, []interface{}{}, true, true)
 	s.Details[name] = detail
 	return to, nil
 }
 
 /**
 * DefineRollup
-* @param name string, from string, keys map[string]string, selects []string
+* @param name string, from string, keys map[string]string, selects []interface{}
 * @return *Model
 **/
-func (s *Model) DefineRollup(name string, from *Model, keys map[string]string, selects []string) error {
+func (s *Model) DefineRollup(name string, from *Model, keys map[string]string, selects []interface{}) error {
 	_, err := s.defineColumn(name, ROLLUP, JSON, "", []byte{})
 	if err != nil {
 		return err
@@ -248,7 +248,7 @@ func (s *Model) DefineRollup(name string, from *Model, keys map[string]string, s
 * @return *Model
 **/
 func (s *Model) DefineRelation(from *Model, keys map[string]string) error {
-	detail := newDetail(from, keys, []string{}, false, false)
+	detail := newDetail(from, keys, []interface{}{}, false, false)
 	s.Relations[from.Name] = detail
 	return nil
 }
