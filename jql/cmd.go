@@ -140,6 +140,58 @@ func (s *Cmd) insert() (et.Items, error) {
 }
 
 /**
+* update
+* @return et.Items, error
+**/
+func (s *Cmd) update() (et.Items, error) {
+	from := s.Model
+	result := et.Items{}
+	for _, data := range s.Data {
+		current, err := from.
+			Current(data).
+			All()
+		if err != nil {
+			return et.Items{}, err
+		}
+
+		for _, old := range current.Result {
+			new := old.Clone()
+			for k, v := range data {
+				new[k] = v
+			}
+
+			for _, fn := range s.beforeUpdates {
+				err := fn(s.tx, old, new)
+				if err != nil {
+					return et.Items{}, err
+				}
+			}
+
+			result, err := s.db.Command(s)
+			if err != nil {
+				return et.Items{}, err
+			}
+
+			if !result.Ok {
+				continue
+			}
+
+			new = result.First().Result
+			for _, fn := range s.afterUpdates {
+				err := fn(s.tx, old, new)
+				if err != nil {
+					return et.Items{}, err
+				}
+			}
+
+			result.Add(s.New)
+		}
+	}
+
+	return result, nil
+}
+
+/**
 * ExecTx
 * @param tx *Tx
 * @return et.Items, error
