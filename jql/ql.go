@@ -48,20 +48,21 @@ type Ql struct {
 * @param model *Model, as string, tp TypeQuery
 * @return *Ql
 **/
-func newQuery(model *Model, as string, tp TypeQuery) *Ql {
-	if model.SourceField != nil {
-		tp = TpData
+func newQuery(model *Model, as string) *Ql {
+	tp := SELECT
+	if model.SourceField != "" {
+		tp = DATA
 	}
 	maxRows := envar.GetInt("MAX_ROWS", 100)
 	result := &Ql{
 		Type:     tp,
-		DB:       model.DB,
-		Froms:    []*Froms{newFrom(model, as)},
+		DB:       model.db,
+		Froms:    []*From{model.from()},
 		Joins:    make([]*Joins, 0),
 		Selects:  make([]*Field, 0),
 		Hidden:   make([]*Field, 0),
-		Details:  make(map[string]*Field),
-		Rollups:  make(map[string]*Field),
+		Details:  make(map[string]*Detail),
+		Rollups:  make(map[string]*Detail),
 		Calcs:    make(map[string]DataContext),
 		GroupsBy: make([]*Field, 0),
 		OrdersBy: make([]*Orders, 0),
@@ -69,17 +70,17 @@ func newQuery(model *Model, as string, tp TypeQuery) *Ql {
 		Rows:     0,
 		MaxRows:  maxRows,
 	}
-	result.Wheres = newWhere(result)
-	result.Havings = newWhere(result)
+	result.Wheres = newWhere()
+	result.Havings = newWhere()
 
 	return result
 }
 
 /**
-* Serialize
+* serialize
 * @return []byte, error
 **/
-func (s *Ql) Serialize() ([]byte, error) {
+func (s *Ql) serialize() ([]byte, error) {
 	bt, err := json.Marshal(s)
 	if err != nil {
 		return nil, err
@@ -93,7 +94,7 @@ func (s *Ql) Serialize() ([]byte, error) {
 * @return et.Json
 **/
 func (s *Ql) ToJson() et.Json {
-	bt, err := s.Serialize()
+	bt, err := s.serialize()
 	if err != nil {
 		return et.Json{}
 	}
@@ -108,11 +109,11 @@ func (s *Ql) ToJson() et.Json {
 }
 
 /**
-* SetDebug
+* setDebug
 * @param isDebug bool
 * @return *Ql
 **/
-func (s *Ql) SetDebug(isDebug bool) *Ql {
+func (s *Ql) setDebug(isDebug bool) *Ql {
 	s.IsDebug = isDebug
 	return s
 }
@@ -122,94 +123,8 @@ func (s *Ql) SetDebug(isDebug bool) *Ql {
 * @return *Ql
 **/
 func (s *Ql) Debug() *Ql {
-	s.IsDebug = true
+	s.setDebug(true)
 	return s
-}
-
-/**
-* Join
-* @param model *Model, as string, keys map[string]string
-* @return *Ql
-**/
-func (s *Ql) join(tp TypeJoin, model *Model, as string, keys map[string]string) *Ql {
-	from := newFrom(model, as)
-	s.Froms = append(s.Froms, from)
-
-	rKeys := make(map[string]string)
-	for k, fk := range keys {
-		field := FindField(s.Froms, k)
-		if field != nil {
-			k = field.AS()
-		}
-
-		field = FindField(s.Froms, fk)
-		if field != nil {
-			fk = field.AS()
-		}
-
-		rKeys[k] = fk
-	}
-
-	join := newJoins(tp, from, rKeys)
-	s.Joins = append(s.Joins, join)
-
-	return s
-}
-
-/**
-* From
-* @param model *Model, as string
-* @return *Ql
-**/
-func (s *Ql) From(model *Model, as string) *Ql {
-	if len(s.Froms) == 0 {
-		return s
-	}
-
-	main := s.Froms[0].Model
-	detail, ok := main.Relations[model.Name]
-	if !ok {
-		return s
-	}
-
-	keys := detail.Keys
-	return s.Join(model, as, keys)
-}
-
-/**
-* Join
-* @param model *Model, as string, keys map[string]string
-* @return *Ql
-**/
-func (s *Ql) Join(model *Model, as string, keys map[string]string) *Ql {
-	return s.join(TpJoin, model, as, keys)
-}
-
-/**
-* LeftJoin
-* @param model *Model, as string, keys map[string]string
-* @return *Ql
-**/
-func (s *Ql) LeftJoin(model *Model, as string, keys map[string]string) *Ql {
-	return s.join(TpLeft, model, as, keys)
-}
-
-/**
-* RightJoin
-* @param model *Model, as string, keys map[string]string
-* @return *Ql
-**/
-func (s *Ql) RightJoin(model *Model, as string, keys map[string]string) *Ql {
-	return s.join(TpRight, model, as, keys)
-}
-
-/**
-* FullJoin
-* @param model *Model, as string, keys map[string]string
-* @return *Ql
-**/
-func (s *Ql) FullJoin(model *Model, as string, keys map[string]string) *Ql {
-	return s.join(TpFull, model, as, keys)
 }
 
 /**
@@ -253,6 +168,72 @@ func (s *Ql) Select(fields ...string) *Ql {
 		}
 	}
 	return s
+}
+
+/**
+* Join
+* @param model *Model, as string, keys map[string]string
+* @return *Ql
+**/
+func (s *Ql) join(tp TypeJoin, model *Model, as string, keys map[string]string) *Ql {
+	from := newFrom(model, as)
+	s.Froms = append(s.Froms, from)
+
+	rKeys := make(map[string]string)
+	for k, fk := range keys {
+		field := FindField(s.Froms, k)
+		if field != nil {
+			k = field.AS()
+		}
+
+		field = FindField(s.Froms, fk)
+		if field != nil {
+			fk = field.AS()
+		}
+
+		rKeys[k] = fk
+	}
+
+	join := newJoins(tp, from, rKeys)
+	s.Joins = append(s.Joins, join)
+
+	return s
+}
+
+/**
+* Join
+* @param model *Model, as string, keys map[string]string
+* @return *Ql
+**/
+func (s *Ql) Join(model *Model, as string, keys map[string]string) *Ql {
+	return s.join(TpJoin, model, as, keys)
+}
+
+/**
+* LeftJoin
+* @param model *Model, as string, keys map[string]string
+* @return *Ql
+**/
+func (s *Ql) LeftJoin(model *Model, as string, keys map[string]string) *Ql {
+	return s.join(TpLeft, model, as, keys)
+}
+
+/**
+* RightJoin
+* @param model *Model, as string, keys map[string]string
+* @return *Ql
+**/
+func (s *Ql) RightJoin(model *Model, as string, keys map[string]string) *Ql {
+	return s.join(TpRight, model, as, keys)
+}
+
+/**
+* FullJoin
+* @param model *Model, as string, keys map[string]string
+* @return *Ql
+**/
+func (s *Ql) FullJoin(model *Model, as string, keys map[string]string) *Ql {
+	return s.join(TpFull, model, as, keys)
 }
 
 /**

@@ -366,25 +366,20 @@ func (s *Model) Upsert(data et.Json) *Cmd {
 * @param fields ...string
 * @return *Ql
 **/
-func (s *Model) Select(fields ...string) *Ql {
-	result := From(s, "A")
-	for _, field := range fields {
-		fld := s.FindField(field)
-		if fld != nil {
-			result.Selects = append(result.Selects, fld)
-		}
-	}
-
+func (s *Model) Selects(fields ...string) *Ql {
+	result := newQuery(s, "A")
+	result.Select(fields...)
 	return result
 }
 
 /**
 * Counted
-* @return (int, error)
+* @return *Ql
 **/
-func (s *Model) Counted() (int, error) {
-	result := From(s, "A")
-	return result.Count()
+func (s *Model) Counted() *Ql {
+	result := newQuery(s, "A")
+	result.Type = COUNTED
+	return result
 }
 
 /**

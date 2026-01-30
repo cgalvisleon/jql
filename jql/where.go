@@ -8,7 +8,7 @@ import (
 * Wheres
 **/
 type Wheres struct {
-	owner      From         `json:"-"`
+	owner      *From        `json:"-"`
 	conditions []*Condition `json:"-"`
 	isDebug    bool         `json:"-"`
 }
@@ -19,7 +19,7 @@ type Wheres struct {
 **/
 func newWhere() *Wheres {
 	return &Wheres{
-		owner:      From{},
+		owner:      &From{},
 		conditions: make([]*Condition, 0),
 	}
 }
@@ -34,16 +34,6 @@ func (s *Wheres) setModel(model *Model) *Wheres {
 		return s
 	}
 	s.owner = model.from()
-	return s
-}
-
-/**
-* setFrom
-* @param from From
-* @return *Wheres
-**/
-func (s *Wheres) setFrom(from From) *Wheres {
-	s.owner = from
 	return s
 }
 
