@@ -71,6 +71,7 @@ func newQuery(model *Model, as string) *Ql {
 		MaxRows:  maxRows,
 	}
 	result.Wheres = newWhere()
+	result.Wheres.setModel(model)
 	result.Havings = newWhere()
 
 	return result

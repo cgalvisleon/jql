@@ -76,11 +76,11 @@ func (s *Wheres) ToJson() []et.Json {
 }
 
 /**
-* Add
+* add
 * @param condition *Condition
 * @return *Wheres
 **/
-func (s *Wheres) Add(condition *Condition) *Wheres {
+func (s *Wheres) add(condition *Condition) *Wheres {
 	if len(s.conditions) > 0 && condition.Connector == NaC {
 		condition.Connector = And
 	}
@@ -96,7 +96,7 @@ func (s *Wheres) Add(condition *Condition) *Wheres {
 **/
 func (s *Wheres) Where(condition *Condition) *Wheres {
 	condition.Connector = NaC
-	return s.Add(condition)
+	return s.add(condition)
 }
 
 /**
@@ -106,7 +106,7 @@ func (s *Wheres) Where(condition *Condition) *Wheres {
 **/
 func (s *Wheres) And(condition *Condition) *Wheres {
 	condition.Connector = And
-	return s.Add(condition)
+	return s.add(condition)
 }
 
 /**
@@ -116,5 +116,5 @@ func (s *Wheres) And(condition *Condition) *Wheres {
 **/
 func (s *Wheres) Or(condition *Condition) *Wheres {
 	condition.Connector = Or
-	return s.Add(condition)
+	return s.add(condition)
 }

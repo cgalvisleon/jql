@@ -26,10 +26,10 @@ func newDetail(to *Model, keys map[string]string, selecs []string, onDeleteCasca
 type TypeJoin string
 
 const (
-	TpJoin  TypeJoin = "join"
-	TpLeft  TypeJoin = "left"
-	TpRight TypeJoin = "right"
-	TpFull  TypeJoin = "full"
+	JOIN  TypeJoin = "join"
+	LEFT  TypeJoin = "left"
+	RIGHT TypeJoin = "right"
+	FULL  TypeJoin = "full"
 )
 
 type Joins struct {

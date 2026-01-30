@@ -373,6 +373,17 @@ func (s *Model) Selects(fields ...string) *Ql {
 }
 
 /**
+* Join
+* @param to *Model, as string, keys map[string]string
+* @return *Ql
+**/
+func (s *Model) Join(to *Model, as string, keys map[string]string) *Ql {
+	result := newQuery(s, "A")
+	result.join(TpJoin, to, as, keys)
+	return result
+}
+
+/**
 * Counted
 * @return *Ql
 **/
@@ -395,7 +406,10 @@ func (s *Model) Current(data et.Json) *Ql {
 		}
 	}
 	for _, key := range s.PrimaryKeys {
-		result.Wheres()
+		if _, ok := data[key]; !ok {
+			continue
+		}
+		result.Wheres.add(Eq(key, data[key]))
 	}
 	return result
 }
