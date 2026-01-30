@@ -9,34 +9,20 @@ import (
 
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/logs"
-	"github.com/cgalvisleon/et/reg"
 	"github.com/cgalvisleon/et/utility"
 )
 
-var databases []*DB
+var dbs map[string]*DB
 
 func init() {
-	databases = []*DB{}
+	dbs = make(map[string]*DB)
 }
 
 type DB struct {
-	Id         string   `json:"id"`
-	Name       string   `json:"name"`
-	Models     []*Model `json:"models"`
-	UseCore    bool     `json:"use_core"`
-	Connection et.Json  `json:"connection"`
-	Language   string   `json:"language"`
-	Db         *sql.DB  `json:"-"`
-	driver     Driver   `json:"-"`
-}
-
-/**
-* indexDatabase
-* @param name string
-* @return int
-**/
-func indexDatabase(name string) int {
-	return slices.IndexFunc(databases, func(db *DB) bool { return db.Name == name })
+	Name       string             `json:"name"`
+	Schemas    map[string]*Schema `json:"schemas"`
+	Connection et.Json            `json:"connection"`
+	db         *sql.DB            `json:"-"`
 }
 
 /**
@@ -45,18 +31,16 @@ func indexDatabase(name string) int {
 * @return (*DB, error)
 **/
 func getDatabase(id, name, driver string, userCore bool, params et.Json) (*DB, error) {
-	idx := indexDatabase(name)
+	idx := indexDb(name)
 	if idx != -1 {
-		return databases[idx], nil
+		return dbs[idx], nil
 	}
 
 	if _, ok := drivers[driver]; !ok {
 		return nil, fmt.Errorf(MSG_DRIVER_NOT_FOUND, driver)
 	}
 
-	id = reg.TagULID("db", id)
 	result := &DB{
-		Id:         id,
 		Name:       name,
 		Models:     make([]*Model, 0),
 		UseCore:    userCore,
@@ -159,36 +143,7 @@ func (s *DB) newModel(schema, name string, version int) (*Model, error) {
 		version = 1
 	}
 
-	result := &Model{
-		DB:            s,
-		Schema:        schema,
-		Name:          name,
-		Table:         name,
-		Columns:       make([]*Column, 0),
-		PrimaryKeys:   make([]string, 0),
-		Unique:        make([]string, 0),
-		Indexes:       make([]string, 0),
-		Required:      make([]string, 0),
-		Hidden:        make([]string, 0),
-		Master:        make(map[string]*Detail),
-		Details:       make(map[string]*Detail),
-		Rollups:       make(map[string]*Detail),
-		Relations:     make(map[string]*Detail),
-		BeforeInserts: make([]*Trigger, 0),
-		BeforeUpdates: make([]*Trigger, 0),
-		BeforeDeletes: make([]*Trigger, 0),
-		AfterInserts:  make([]*Trigger, 0),
-		AfterUpdates:  make([]*Trigger, 0),
-		AfterDeletes:  make([]*Trigger, 0),
-		Version:       version,
-		calcs:         make(map[string]DataContext),
-		beforeInserts: make([]TriggerFunction, 0),
-		beforeUpdates: make([]TriggerFunction, 0),
-		beforeDeletes: make([]TriggerFunction, 0),
-		afterInserts:  make([]TriggerFunction, 0),
-		afterUpdates:  make([]TriggerFunction, 0),
-		afterDeletes:  make([]TriggerFunction, 0),
-	}
+	
 	s.Models = append(s.Models, result)
 	return result, nil
 }

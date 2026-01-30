@@ -14,52 +14,52 @@ type Trigger struct {
 	Name       string `json:"name"`
 	Definition []byte `json:"definition"`
 }
-
 type TriggerFunction func(tx *Tx, old, new et.Json) error
 type DataContext func(tx *Tx, data et.Json)
 
 type Model struct {
-	DB            *DB                    `json:"-"`
+	Database      string                 `json:"database"`
 	Schema        string                 `json:"schema"`
 	Name          string                 `json:"name"`
 	Table         string                 `json:"table"`
 	Columns       []*Column              `json:"columns"`
-	SourceField   *Column                `json:"source_field"`
-	IndexField    *Column                `json:"index_field"`
+	SourceField   string                 `json:"source_field"`
+	IdxField      string                 `json:"idx_field"`
+	Indexes       []string               `json:"indexes"`
 	PrimaryKeys   []string               `json:"primary_keys"`
 	Unique        []string               `json:"unique"`
-	Indexes       []string               `json:"indexes"`
 	Required      []string               `json:"required"`
 	Hidden        []string               `json:"hidden"`
-	Master        map[string]*Detail     `json:"master"`
+	References    map[string]*Detail     `json:"references"`
 	Details       map[string]*Detail     `json:"details"`
 	Rollups       map[string]*Detail     `json:"rollups"`
 	Relations     map[string]*Detail     `json:"relations"`
+	Calcs         map[string][]byte      `json:"calcs"`
 	BeforeInserts []*Trigger             `json:"before_inserts"`
 	BeforeUpdates []*Trigger             `json:"before_updates"`
 	BeforeDeletes []*Trigger             `json:"before_deletes"`
 	AfterInserts  []*Trigger             `json:"after_inserts"`
 	AfterUpdates  []*Trigger             `json:"after_updates"`
 	AfterDeletes  []*Trigger             `json:"after_deletes"`
-	IsLocked      bool                   `json:"is_locked"`
+	IsStrict      bool                   `json:"is_strict"`
 	Version       int                    `json:"version"`
 	IsCore        bool                   `json:"is_core"`
 	IsDebug       bool                   `json:"-"`
 	isInit        bool                   `json:"-"`
-	calcs         map[string]DataContext `json:"-"`
 	beforeInserts []TriggerFunction      `json:"-"`
 	beforeUpdates []TriggerFunction      `json:"-"`
 	beforeDeletes []TriggerFunction      `json:"-"`
 	afterInserts  []TriggerFunction      `json:"-"`
 	afterUpdates  []TriggerFunction      `json:"-"`
 	afterDeletes  []TriggerFunction      `json:"-"`
+	calcs         map[string]DataContext `json:"-"`
 }
 
 /**
-* Serialize
+* serialize
 * @return []byte, error
 **/
-func (s *Model) Serialize() ([]byte, error) {
+func (s *Model) serialize() ([]byte, error) {
 	bt, err := json.Marshal(s)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (s *Model) Serialize() ([]byte, error) {
 * @return et.Json
 **/
 func (s *Model) ToJson() et.Json {
-	bt, err := s.Serialize()
+	bt, err := s.serialize()
 	if err != nil {
 		return et.Json{}
 	}
@@ -96,7 +96,11 @@ func (s *Model) Save() error {
 		return nil
 	}
 
-	serialize, err := s.Serialize()
+	if s.IsCore {
+		return nil
+	}
+
+	serialize, err := s.serialize()
 	if err != nil {
 		return err
 	}
@@ -139,6 +143,14 @@ func (s *Model) Init() error {
 }
 
 /**
+* Stricted
+* @return error
+**/
+func (s *Model) Stricted() {
+	s.IsStrict = true
+}
+
+/**
 * idxColumn
 * @param name string
 * @return int
@@ -158,11 +170,11 @@ func (s *Model) FindColumn(name string) *Column {
 		return s.Columns[idx]
 	}
 
-	if s.IsLocked {
+	if s.IsStrict {
 		return nil
 	}
 
-	if s.SourceField == nil {
+	if s.SourceField == "" {
 		return nil
 	}
 
@@ -272,20 +284,6 @@ func (s *Model) Select(fields ...string) *Ql {
 }
 
 /**
-* SelectColumns
-* @return []string
-**/
-func (s *Model) SelectColumns() []string {
-	result := []string{}
-	for _, col := range s.Columns {
-		if col.TypeColumn == TpColumn {
-			result = append(result, col.Name)
-		}
-	}
-	return result
-}
-
-/**
 * Counted
 * @return (int, error)
 **/
@@ -341,8 +339,12 @@ func (s *Model) WhereByCommand(cmd *Cmd) *Ql {
 **/
 func (s *Model) Current(where *Wheres) *Ql {
 	result := From(s, "A")
-	fields := s.SelectColumns()
-	result.Select(fields...)
+	for _, col := range s.Columns {
+		if col.TypeColumn == TpColumn {
+			field := col.Field()
+			result.Selects = append(result.Selects, field)
+		}
+	}
 	for _, cond := range where.Conditions {
 		result.Where(cond)
 	}
