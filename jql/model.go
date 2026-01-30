@@ -88,10 +88,10 @@ func (s *Model) ToJson() et.Json {
 }
 
 /**
-* Save
+* save
 * @return error
 **/
-func (s *Model) Save() error {
+func (s *Model) save() error {
 	if models == nil {
 		return nil
 	}
@@ -139,7 +139,7 @@ func (s *Model) Init() error {
 	}
 
 	s.isInit = true
-	return nil
+	return s.save()
 }
 
 /**
@@ -224,6 +224,48 @@ func (s *Model) GetId(id string) string {
 	return reg.TagULID(s.Name, id)
 }
 
+func (s *Model) BeforeInsert(fn TriggerFunction) *Model {
+	s.beforeInserts = append(s.beforeInserts, fn)
+	return s
+}
+
+func (s *Model) BeforeUpdate(fn TriggerFunction) *Model {
+	s.beforeUpdates = append(s.beforeUpdates, fn)
+	return s
+}
+
+func (s *Model) BeforeDelete(fn TriggerFunction) *Model {
+	s.beforeDeletes = append(s.beforeDeletes, fn)
+	return s
+}
+
+func (s *Model) BeforeInsertOrUpdate(fn TriggerFunction) *Model {
+	s.beforeInserts = append(s.beforeInserts, fn)
+	s.beforeUpdates = append(s.beforeUpdates, fn)
+	return s
+}
+
+func (s *Model) AfterInsert(fn TriggerFunction) *Model {
+	s.afterInserts = append(s.afterInserts, fn)
+	return s
+}
+
+func (s *Model) AfterUpdate(fn TriggerFunction) *Model {
+	s.afterUpdates = append(s.afterUpdates, fn)
+	return s
+}
+
+func (s *Model) AfterDelete(fn TriggerFunction) *Model {
+	s.afterDeletes = append(s.afterDeletes, fn)
+	return s
+}
+
+func (s *Model) AfterInsertOrUpdate(fn TriggerFunction) *Model {
+	s.afterInserts = append(s.afterInserts, fn)
+	s.afterUpdates = append(s.afterUpdates, fn)
+	return s
+}
+
 /**
 * Insert
 * @param data et.Json
@@ -290,47 +332,6 @@ func (s *Model) Select(fields ...string) *Ql {
 func (s *Model) Counted() (int, error) {
 	result := From(s, "A")
 	return result.Count()
-}
-
-/**
-* Where
-* @param condition *Condition
-* @return *Ql
-**/
-func (s *Model) Where(condition *Condition) *Ql {
-	result := From(s, "A")
-	result.Wheres.Add(condition)
-	return result
-}
-
-/**
-* WhereByPrimaryKeys
-* @param data et.Json
-* @return *Ql
-**/
-func (s *Model) WhereByPrimaryKeys(data et.Json) *Ql {
-	result := From(s, "A")
-	for _, col := range s.PrimaryKeys {
-		val := data[col]
-		if val == nil {
-			continue
-		}
-		result.Where(Eq(col, val))
-	}
-	return result
-}
-
-/**
-* WhereByCommand
-* @param cmd *Cmd
-* @return *Ql
-**/
-func (s *Model) WhereByCommand(cmd *Cmd) *Ql {
-	result := From(s, "A")
-	for _, cond := range cmd.Wheres.Conditions {
-		result.Where(cond)
-	}
-	return result
 }
 
 /**

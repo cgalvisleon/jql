@@ -17,11 +17,11 @@ type Tx struct {
 }
 
 /**
-* NewTx
+* newTx
 * @return *Tx
 **/
-func NewTx() *Tx {
-	now := timezone.NowTime()
+func newTx() *Tx {
+	now := timezone.Now()
 	return &Tx{
 		CreatedAt: now,
 		EndAt:     now,
@@ -30,13 +30,13 @@ func NewTx() *Tx {
 }
 
 /**
-* InitTx
+* GetTx
 * @param tx *Tx
 * @return *Tx
 **/
-func InitTx(tx *Tx) *Tx {
+func GetTx(tx *Tx) *Tx {
 	if tx.Tx == nil {
-		tx = NewTx()
+		tx = newTx()
 	}
 
 	return tx
@@ -77,7 +77,7 @@ func (s *Tx) Commit() error {
 
 	err := s.Tx.Commit()
 	s.Committed = true
-	s.EndAt = timezone.NowTime()
+	s.EndAt = timezone.Now()
 
 	return err
 }
@@ -97,7 +97,7 @@ func (s *Tx) Rollback() error {
 
 	err := s.Tx.Rollback()
 	s.Committed = true
-	s.EndAt = timezone.NowTime()
+	s.EndAt = timezone.Now()
 
 	return err
 }
