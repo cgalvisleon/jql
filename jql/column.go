@@ -34,17 +34,17 @@ func (s TypeData) Str() string {
 }
 
 const (
-	TpAny      TypeData = "any"
-	TpBytes    TypeData = "bytes"
-	TpInt      TypeData = "int"
-	TpFloat    TypeData = "float"
-	TpKey      TypeData = "key"
-	TpText     TypeData = "text"
-	TpMemo     TypeData = "memo"
-	TpJson     TypeData = "json"
-	TpDateTime TypeData = "datetime"
-	TpBoolean  TypeData = "boolean"
-	TpGeometry TypeData = "geometry"
+	ANY      TypeData = "any"
+	BYTES    TypeData = "bytes"
+	INT      TypeData = "int"
+	FLOAT    TypeData = "float"
+	KEY      TypeData = "key"
+	TEXT     TypeData = "text"
+	MEMO     TypeData = "memo"
+	JSON     TypeData = "json"
+	DATETIME TypeData = "datetime"
+	BOOLEAN  TypeData = "boolean"
+	GEOMETRY TypeData = "geometry"
 )
 
 type Aggregation string
@@ -60,28 +60,28 @@ func (s Aggregation) Str() string {
 **/
 func GetAggregation(tp string) Aggregation {
 	aggregation := map[string]Aggregation{
-		"count": TpCount,
-		"sum":   TpSum,
-		"avg":   TpAvg,
-		"max":   TpMax,
-		"min":   TpMin,
-		"exp":   TpExp,
+		"count": COUNT,
+		"sum":   SUM,
+		"avg":   AVG,
+		"max":   MAX,
+		"min":   MIN,
+		"exp":   EXP,
 	}
 
 	result, ok := aggregation[tp]
 	if !ok {
-		return TpExp
+		return EXP
 	}
 	return result
 }
 
 const (
-	TpCount Aggregation = "count"
-	TpSum   Aggregation = "sum"
-	TpAvg   Aggregation = "avg"
-	TpMax   Aggregation = "max"
-	TpMin   Aggregation = "min"
-	TpExp   Aggregation = "exp"
+	COUNT Aggregation = "count"
+	SUM   Aggregation = "sum"
+	AVG   Aggregation = "avg"
+	MAX   Aggregation = "max"
+	MIN   Aggregation = "min"
+	EXP   Aggregation = "exp"
 )
 
 type Status string
