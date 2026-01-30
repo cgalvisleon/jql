@@ -259,7 +259,7 @@ func (s *Model) DefineRelation(from *Model, keys map[string]string) error {
 * @return error
 **/
 func (s *Model) DefineCalc(name string, fn DataContext) error {
-	_, err := s.defineColumn(name, TpCalc, TpAny, false, nil, []byte{})
+	_, err := s.defineColumn(name, CALC, ANY, []byte{}, []byte{})
 	if err != nil {
 		return err
 	}
@@ -269,52 +269,48 @@ func (s *Model) DefineCalc(name string, fn DataContext) error {
 }
 
 /**
-* DefineCreatedAtField
+* defineCreatedAtField
 * @return *Model
 **/
-func (s *Model) DefineCreatedAtField() *Model {
-	s.DefineColumn(CREATED_AT, TpDateTime)
+func (s *Model) defineCreatedAtField() *Model {
+	s.DefineColumn(CREATED_AT, DATETIME, "")
 	return s
 }
 
 /**
-* DefineUpdatedAtField
+* defineUpdatedAtField
 * @return *Model
 **/
-func (s *Model) DefineUpdatedAtField() *Model {
-	s.DefineColumn(UPDATED_AT, TpDateTime)
+func (s *Model) defineUpdatedAtField() *Model {
+	s.DefineColumn(UPDATED_AT, DATETIME, "")
 	return s
 }
 
 /**
-* DefineStatusFieldDefault
+* defineStatusFieldDefault
 * @return *Model
 **/
-func (s *Model) DefineStatusFieldDefault() *Model {
-	s.DefineColumn(STATUS, TpKey)
+func (s *Model) defineStatusFieldDefault() *Model {
+	s.DefineColumn(STATUS, KEY, "")
 	return s
 }
 
 /**
-* DefinePrimaryKeyField
+* definePrimaryKeyField
 * @return *Model
 **/
-func (s *Model) DefinePrimaryKeyField() *Model {
-	s.DefinePrimaryKeys(KEY)
+func (s *Model) definePrimaryKeyField() *Model {
+	s.DefineColumn(ID, KEY, "")
+	s.DefinePrimaryKeys(ID)
 	return s
 }
 
 /**
-* DefineSourceFieldDefault
+* defineSourceFieldDefault
 * @return *Model
 **/
-func (s *Model) DefineSourceFieldDefault() *Model {
+func (s *Model) defineSourceFieldDefault() *Model {
 	s.DefineSourceField(SOURCE)
-	return s
-}
-
-func (s *Model) DefineIndexFieldDefault() *Model {
-	s.DefineIndexField(IDX)
 	return s
 }
 
@@ -323,12 +319,12 @@ func (s *Model) DefineIndexFieldDefault() *Model {
 * @return *Model
 **/
 func (s *Model) DefineModel() *Model {
-	s.DefineCreatedAtField()
-	s.DefineUpdatedAtField()
-	s.DefineStatusFieldDefault()
-	s.DefinePrimaryKeyField()
-	s.DefineSourceFieldDefault()
-	s.DefineIndexFieldDefault()
+	s.defineCreatedAtField()
+	s.defineUpdatedAtField()
+	s.defineStatusFieldDefault()
+	s.definePrimaryKeyField()
+	s.defineSourceFieldDefault()
+	s.DefineIdxField(IDX)
 	return s
 }
 
@@ -337,13 +333,13 @@ func (s *Model) DefineModel() *Model {
 * @return *Model
 **/
 func (s *Model) DefineProjectModel() *Model {
-	s.DefineCreatedAtField()
-	s.DefineUpdatedAtField()
-	s.DefineStatusFieldDefault()
-	s.DefinePrimaryKeyField()
-	s.DefineColumn(PROJECT_ID, TpKey)
-	s.DefineSourceFieldDefault()
-	s.DefineIndexFieldDefault()
+	s.defineCreatedAtField()
+	s.defineUpdatedAtField()
+	s.defineStatusFieldDefault()
+	s.definePrimaryKeyField()
+	s.DefineColumn(PROJECT_ID, KEY, "")
+	s.defineSourceFieldDefault()
+	s.DefineIdxField(IDX)
 	s.DefineIndex(PROJECT_ID)
 	return s
 }
