@@ -43,13 +43,13 @@ func defineModel(db *DB) error {
 				"type": "bytes",
 			},
 			{
-				"name": INDEX,
+				"name": IDX,
 				"type": "key",
 			},
 		},
-		"record_field": INDEX,
+		"record_field": IDX,
 		"primary_keys": []string{"name"},
-		"indexes":      []string{"version", INDEX},
+		"indexes":      []string{"version", IDX},
 		"is_core":      true,
 	})
 	if err != nil {

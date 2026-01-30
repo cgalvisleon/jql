@@ -11,7 +11,7 @@ const (
 	// Field names
 	SOURCE     = jql.SOURCE
 	KEY        = jql.KEY
-	INDEX      = jql.INDEX
+	IDX        = jql.IDX
 	STATUS     = jql.STATUS
 	VERSION    = jql.VERSION
 	PROJECT_ID = jql.PROJECT_ID

@@ -336,7 +336,7 @@ func (s *Model) DefineSourceFieldDefault() *Model {
 }
 
 func (s *Model) DefineIndexFieldDefault() *Model {
-	s.DefineIndexField(INDEX)
+	s.DefineIndexField(IDX)
 	return s
 }
 
