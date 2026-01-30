@@ -350,7 +350,7 @@ func (s *Ql) join(tp TypeJoin, model *Model, as string, keys map[string]string) 
 * @return *Ql
 **/
 func (s *Ql) Join(model *Model, as string, keys map[string]string) *Ql {
-	return s.join(TpJoin, model, as, keys)
+	return s.join(JOIN, model, as, keys)
 }
 
 /**
@@ -359,7 +359,7 @@ func (s *Ql) Join(model *Model, as string, keys map[string]string) *Ql {
 * @return *Ql
 **/
 func (s *Ql) LeftJoin(model *Model, as string, keys map[string]string) *Ql {
-	return s.join(TpLeft, model, as, keys)
+	return s.join(LEFT, model, as, keys)
 }
 
 /**
@@ -368,7 +368,7 @@ func (s *Ql) LeftJoin(model *Model, as string, keys map[string]string) *Ql {
 * @return *Ql
 **/
 func (s *Ql) RightJoin(model *Model, as string, keys map[string]string) *Ql {
-	return s.join(TpRight, model, as, keys)
+	return s.join(RIGHT, model, as, keys)
 }
 
 /**
@@ -377,7 +377,7 @@ func (s *Ql) RightJoin(model *Model, as string, keys map[string]string) *Ql {
 * @return *Ql
 **/
 func (s *Ql) FullJoin(model *Model, as string, keys map[string]string) *Ql {
-	return s.join(TpFull, model, as, keys)
+	return s.join(FULL, model, as, keys)
 }
 
 /**

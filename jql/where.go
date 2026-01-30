@@ -47,7 +47,7 @@ func ByJson(jsons []et.Json) *Wheres {
 	for _, where := range jsons {
 		condition := ToCondition(where)
 		if condition != nil {
-			result.Add(condition)
+			result.add(condition)
 		}
 	}
 	return result
@@ -73,30 +73,6 @@ func (s *Wheres) ToJson() []et.Json {
 	}
 
 	return result
-}
-
-/**
-* Add
-* @param condition *Condition
-* @return *Wheres
-**/
-func (s *Wheres) Add(condition *Condition) *Wheres {
-	return s.add(condition)
-}
-
-/**
-* ByJson
-* @param jsons []et.Json
-* @return *Wheres
-**/
-func (s *Wheres) ByJson(jsons []et.Json) *Wheres {
-	for _, where := range jsons {
-		condition := ToCondition(where)
-		if condition != nil {
-			s.Add(condition)
-		}
-	}
-	return s
 }
 
 /**
