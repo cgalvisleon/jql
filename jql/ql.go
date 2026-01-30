@@ -26,7 +26,6 @@ type Orders struct {
 }
 
 type Ql struct {
-	DB       *DB                    `json:"-"`
 	Type     TypeQuery              `json:"type"`
 	Froms    []*From                `json:"froms"`
 	Selects  []interface{}          `json:"select"`
@@ -43,6 +42,7 @@ type Ql struct {
 	Rows     int                    `json:"rows"`
 	MaxRows  int                    `json:"max_rows"`
 	IsDebug  bool                   `json:"is_debug"`
+	db       *DB                    `json:"-"`
 	tx       *Tx                    `json:"-"`
 }
 
@@ -61,7 +61,6 @@ func newQuery(model *Model, as string) *Ql {
 	maxRows := envar.GetInt("MAX_ROWS", 100)
 	result := &Ql{
 		Type:     tp,
-		DB:       model.db,
 		Froms:    []*From{from},
 		Joins:    make([]*Joins, 0),
 		Selects:  make([]interface{}, 0),
@@ -74,6 +73,8 @@ func newQuery(model *Model, as string) *Ql {
 		Page:     0,
 		Rows:     0,
 		MaxRows:  maxRows,
+		db:       model.db,
+		tx:       nil,
 	}
 	result.Wheres = newWhere()
 	result.Havings = newWhere()
@@ -504,29 +505,12 @@ func (s *Ql) Hiddens(fields ...string) *Ql {
 }
 
 /**
-* prepare
-**/
-func (s *Ql) prepare() {
-	if len(s.Selects) == 0 {
-		return
-	}
-
-	for _, hidden := range s.Hidden {
-		idx := slices.IndexFunc(s.Selects, func(fld *Field) bool { return fld.AS() == hidden.AS() })
-		if idx != -1 {
-			s.Selects = append(s.Selects[:idx], s.Selects[idx+1:]...)
-		}
-	}
-}
-
-/**
 * AllTx
 * @param tx *Tx
 * @return et.Items, error
 **/
 func (s *Ql) AllTx(tx *Tx) (et.Items, error) {
-	s.prepare()
-	return s.DB.Query(s)
+	return s.db.Query(s)
 }
 
 /**
@@ -581,42 +565,17 @@ func (s *Ql) One() (et.Item, error) {
 }
 
 /**
-* ItExistsTx
-* @param tx *Tx
-* @return bool, error
-**/
-func (s *Ql) ItExistsTx(tx *Tx) (bool, error) {
-	s.Type = TpExists
-	result, err := s.AllTx(tx)
-	if err != nil {
-		return false, err
-	}
-
-	exists := result.First().Bool("exists")
-	return exists, nil
-}
-
-/**
-* ItExists
-* @return bool, error
-**/
-func (s *Ql) ItExists() (bool, error) {
-	return s.ItExistsTx(nil)
-}
-
-/**
 * CountTx
 * @param tx *Tx
 * @return int, error
 **/
 func (s *Ql) CountTx(tx *Tx) (int, error) {
-	s.Type = TpCounted
-	result, err := s.AllTx(tx)
+	result, err := s.OneTx(tx)
 	if err != nil {
 		return 0, err
 	}
 
-	count := result.First().Int("count")
+	count := result.Int("count")
 	return count, nil
 }
 
@@ -626,4 +585,28 @@ func (s *Ql) CountTx(tx *Tx) (int, error) {
 **/
 func (s *Ql) Count() (int, error) {
 	return s.CountTx(nil)
+}
+
+/**
+* ItExistsTx
+* @param tx *Tx
+* @return bool, error
+**/
+func (s *Ql) ItExistsTx(tx *Tx) (bool, error) {
+	s.Type = EXISTS
+	result, err := s.OneTx(tx)
+	if err != nil {
+		return false, err
+	}
+
+	exists := result.Bool("exists")
+	return exists, nil
+}
+
+/**
+* ItExists
+* @return bool, error
+**/
+func (s *Ql) ItExists() (bool, error) {
+	return s.ItExistsTx(nil)
 }

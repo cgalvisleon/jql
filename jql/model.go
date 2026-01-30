@@ -378,23 +378,22 @@ func (s *Model) Select(fields ...interface{}) *Ql {
 }
 
 /**
-* Join
-* @param to *Model, as string, keys map[string]string
-* @return *Ql
-**/
-func (s *Model) Join(to *Model, as string, keys map[string]string) *Ql {
-	result := newQuery(s, "A")
-	result.join(JOIN, to, as, keys)
-	return result
-}
-
-/**
 * Counted
 * @return *Ql
 **/
 func (s *Model) Counted() *Ql {
 	result := newQuery(s, "A")
 	result.Type = COUNTED
+	return result
+}
+
+/**
+* ItExists
+* @return *Ql
+**/
+func (s *Model) ItExists() *Ql {
+	result := newQuery(s, "A")
+	result.Type = EXISTS
 	return result
 }
 
