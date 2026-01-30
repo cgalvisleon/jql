@@ -276,3 +276,48 @@ func (s *DB) Query(query *Ql) (et.Items, error) {
 func (s *DB) Define(definition et.Json) (*Model, error) {
 	return nil, nil
 }
+
+/**
+* Insert
+* @param insert et.Json
+* @return et.Items, error
+**/
+func (s *DB) Insert(sql et.Json) (et.Items, error) {
+	return et.Items{}, nil
+}
+
+/**
+* Update
+* @param insert et.Json
+* @return et.Items, error
+**/
+func (s *DB) Update(sql et.Json) (et.Items, error) {
+	return et.Items{}, nil
+}
+
+/**
+* Delete
+* @param insert et.Json
+* @return et.Items, error
+**/
+func (s *DB) Delete(sql et.Json) (et.Items, error) {
+	return et.Items{}, nil
+}
+
+/**
+* Delete
+* @param insert et.Json
+* @return et.Items, error
+**/
+func (s *DB) Upsert(sql et.Json) (et.Items, error) {
+	return et.Items{}, nil
+}
+
+/**
+* Delete
+* @param insert et.Json
+* @return et.Items, error
+**/
+func (s *DB) Select(sql et.Json) (et.Items, error) {
+	return et.Items{}, nil
+}

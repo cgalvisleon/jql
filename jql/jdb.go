@@ -20,11 +20,11 @@ var (
 
 /**
 * ConnectTo
-* @param id, name, driver string, userCore bool, params Connection
+* @param name string, params Connection
 * @return (*DB, error)
 **/
-func ConnectTo(id, name, driver string, userCore bool, params et.Json) (*DB, error) {
-	return getDatabase(id, name, driver, userCore, params)
+func ConnectTo(name string, params et.Json) (*DB, error) {
+	return getDb(name, params)
 }
 
 /**
@@ -33,8 +33,8 @@ func ConnectTo(id, name, driver string, userCore bool, params et.Json) (*DB, err
 * @return (*DB, error)
 **/
 func LoadTo(name string) (*DB, error) {
-	driver := envar.GetStr("DB_DRIVER", "postgres")
 	params := et.Json{
+		"driver":   envar.GetStr("DB_DRIVER", "postgres"),
 		"database": name,
 		"host":     envar.GetStr("DB_HOST", "localhost"),
 		"port":     envar.GetInt("DB_PORT", 5432),
@@ -44,7 +44,7 @@ func LoadTo(name string) (*DB, error) {
 		"version":  envar.GetInt("DB_VERSION", 15),
 	}
 
-	return getDatabase(name, name, driver, true, params)
+	return ConnectTo(name, params)
 }
 
 /**
@@ -62,28 +62,28 @@ func Load() (*DB, error) {
 * @return (*DB, error)
 **/
 func GetDatabase(name string) (*DB, error) {
-	idx := indexDatabase(name)
-	if idx == -1 {
-		return nil, fmt.Errorf(MSG_DATABASE_NOT_FOUND, name)
+	result, ok := dbs[name]
+	if ok {
+		return result, nil
 	}
 
-	return databases[idx], nil
+	return nil, fmt.Errorf(MSG_DATABASE_NOT_FOUND, name)
 }
 
 /**
 * GetModel
-* @param database, name string
+* @param database, schema, name string
 * @return (*Model, error)
 **/
-func GetModel(database, name string) (*Model, error) {
+func GetModel(database, schema, name string) (*Model, error) {
 	db, err := GetDatabase(database)
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := db.GetModel(name)
+	result, err := db.getModel(schema, name)
 	if err != nil {
-		return nil, fmt.Errorf(MSG_MODEL_NOT_FOUND, name)
+		return nil, err
 	}
 
 	return result, nil
