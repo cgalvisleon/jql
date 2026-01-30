@@ -19,15 +19,11 @@ type TriggerFunction func(tx *Tx, old, new et.Json) error
 
 type DataContext func(tx *Tx, data et.Json)
 
-type From struct {
-	Database string `json:"database"`
-	Schema   string `json:"schema"`
-	Name     string `json:"name"`
-	Table    string `json:"table"`
-}
-
 type Model struct {
-	*From         `json:"from"`
+	Database      string                 `json:"database"`
+	Schema        string                 `json:"schema"`
+	Name          string                 `json:"name"`
+	Table         string                 `json:"table"`
 	Columns       []*Column              `json:"columns"`
 	SourceField   string                 `json:"source_field"`
 	IdxField      string                 `json:"idx_field"`

@@ -1,7 +1,5 @@
 package jql
 
-import "github.com/cgalvisleon/et/envar"
-
 const (
 	SOURCE     string = "source"
 	ID         string = "id"
@@ -100,7 +98,6 @@ const (
 )
 
 type Column struct {
-	From       *From       `json:"from"`
 	Name       string      `json:"name"`
 	TypeColumn TypeColumn  `json:"type_column"`
 	TypeData   TypeData    `json:"type_data"`
@@ -109,69 +106,12 @@ type Column struct {
 }
 
 /**
-* Field
-* @return *Field
-**/
-func (s *Column) Field() *Field {
-	result := &Field{
-		TypeColumn: s.TypeColumn,
-		Column:     s,
-		Name:       s.Name,
-		As:         s.Name,
-	}
-
-	if result.TypeColumn == TpAtrib {
-		result.SourceField = s.From.SourceField
-	} else if result.TypeColumn == TpDetail {
-		if s.From == nil {
-			return result
-		}
-
-		if s.From.Details == nil {
-			return result
-		}
-
-		detail := s.From.Details[s.Name]
-		if detail == nil {
-			return result
-		}
-
-		rows := envar.GetInt("rows", 30)
-		result.To = detail.To
-		result.Keys = detail.Keys
-		result.Select = detail.Select
-		result.Page = 1
-		result.Rows = rows
-	} else if result.TypeColumn == TpRollup {
-		if s.From == nil {
-			return result
-		}
-
-		if s.From.Rollups == nil {
-			return result
-		}
-
-		detail := s.From.Rollups[s.Name]
-		if detail == nil {
-			return result
-		}
-
-		result.To = detail.To
-		result.Keys = detail.Keys
-		result.Select = detail.Select
-	}
-
-	return result
-}
-
-/**
 * newColumn
-* @param model *Model, name string, tpColumn TypeColumn, tpData TypeData, defaultValue interface{}, definition []byte
+* @param name string, tpColumn TypeColumn, tpData TypeData, defaultValue interface{}, definition []byte
 * @return *Column
 **/
-func newColumn(model *Model, name string, tpColumn TypeColumn, tpData TypeData, defaultValue interface{}, definition []byte) *Column {
+func newColumn(name string, tpColumn TypeColumn, tpData TypeData, defaultValue interface{}, definition []byte) *Column {
 	return &Column{
-		From:       model,
 		Name:       name,
 		TypeColumn: tpColumn,
 		TypeData:   tpData,
