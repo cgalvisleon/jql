@@ -57,120 +57,92 @@ type From struct {
 	Fields   []*Field `json:"fields"`
 }
 
-type Field struct {
-	TypeColumn TypeColumn  `json:"type_column"`
-	From       *From       `json:"from"`
-	Name       interface{} `json:"name"`
-	As         string      `json:"as"`
-}
-
-func (s *Field) AS() string {
-	return fmt.Sprintf("%s.%s", s.From.As, s.As)
-}
-
-type Agg struct {
-	Agg    string   `json:"agg"`
-	Fields []*Field `json:"fields"`
-}
-
-type Fld interface {
-	string | *Field | *Agg
-}
-
 /**
-* field
-* @param f T
+* findField
+* @param name string
 * @return *Field
 **/
-func field[T Fld](f T) *Field {
-	switch v := any(f).(type) {
-	case string:
-		return &Field{
-			Name: v,
-			As:   v,
+func (s *From) findField(name string) *Field {
+	for _, fld := range s.Fields {
+		if fld.Name == name {
+			return fld
 		}
-	case *Field:
-		return v
-	case *Agg:
-		return &Field{
-			Name: v,
-			As:   v.Agg,
-		}
-	default:
-		return nil
 	}
+	return nil
 }
+
+type Field struct {
+	TypeColumn TypeColumn `json:"type_column"`
+	From       *From      `json:"from"`
+	Name       string     `json:"name"`
+	As         string     `json:"as"`
+	Page       int        `json:"page"`
+	Rows       int        `json:"rows"`
+}
+
+var AGGREGATIONS = []string{"count", "sum", "avg", "max", "min", "exp"}
 
 /**
 * agg
-* @param agg string, fields ...Fld
-* @return *Agg
+* @param agg string, field string
+* @return string
 **/
-func agg[T Fld](agg string, fields ...T) *Agg {
-	result := &Agg{
-		Agg:    agg,
-		Fields: make([]*Field, 0),
-	}
-
-	for _, f := range fields {
-		result.Fields = append(result.Fields, field(f))
-	}
-
-	return result
+func agg(agg string, field string) string {
+	return fmt.Sprintf(`%s(%s)`, agg, field)
 }
 
 /**
 * COUNT
-* @param fields ...Fld
-* @return *Agg
+* @param field string
+* @return string
 **/
-func COUNT[T Fld](fields ...T) *Agg {
-	return agg("count", fields...)
+func COUNT(field string) string {
+	return agg("count", field)
 }
 
 /**
 * SUM
-* @param fields ...Fld
-* @return *Agg
+* @param field string
+* @return string
 **/
-func SUM[T Fld](fields ...T) *Agg {
-	return agg("sum", fields...)
+func SUM(field string) string {
+	return agg("sum", field)
 }
 
 /**
 * AVG
-* @param fields ...Fld
-* @return *Agg
+* @param field string
+* @return string
 **/
-func AVG[T Fld](fields ...T) *Agg {
-	return agg("avg", fields...)
+func AVG(field string) string {
+	return agg("avg", field)
 }
 
 /**
 * MAX
-* @param fields ...Fld
-* @return *Agg
+* @param field string
+* @return string
 **/
-func MAX[T Fld](fields ...T) *Agg {
-	return agg("max", fields...)
+func MAX(field string) string {
+	return agg("max", field)
 }
 
 /**
 * MIN
-* @param fields ...Fld
-* @return *Agg
+* @param field string
+* @return string
 **/
-func MIN[T Fld](fields ...T) *Agg {
-	return agg("min", fields...)
+func MIN(field string) string {
+	return agg("min", field)
 }
 
 /**
-* MIN
-* @param fields ...Fld
-* @return *Agg
+* EXP
+* @param field string
+* @return string
 **/
-func EXP[T Fld](fields ...T) *Agg {
-	return agg("exp", fields...)
+func EXP(field string) string {
+	return agg("exp", field)
 }
 
 type Status string

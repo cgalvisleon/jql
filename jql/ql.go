@@ -2,7 +2,10 @@ package jql
 
 import (
 	"encoding/json"
+	"regexp"
 	"slices"
+	"strconv"
+	"strings"
 
 	"github.com/cgalvisleon/et/envar"
 	"github.com/cgalvisleon/et/et"
@@ -131,10 +134,127 @@ func (s *Ql) Debug() *Ql {
 }
 
 /**
-* SelectByColumns
+* FindField
+* @param froms []*From, name string // from.name:as|1:30
+* @return *Field
+**/
+func findField(froms []*From, name string) *Field {
+	pattern1 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+):([A-Za-z0-9]+)$`) // from.name:as
+	pattern2 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+)$`)                // from.name
+	pattern3 := regexp.MustCompile(`^([A-Za-z]+)\((.+)\):([A-Za-z0-9]+)$`)            // agg(field):as
+	pattern4 := regexp.MustCompile(`^([A-Za-z]+)\((.+)\)`)                            // agg(field)
+	pattern5 := regexp.MustCompile(`^(\d+)\|(\d+)$`)                                  // page:rows
+
+	split := strings.Split(name, "|")
+	if len(split) == 2 {
+		name = split[0]
+		limit := split[1]
+		result := findField(froms, name)
+		if result != nil {
+			if pattern5.MatchString(limit) {
+				matches := pattern5.FindStringSubmatch(limit)
+				if len(matches) == 3 {
+					page, err := strconv.Atoi(matches[1])
+					if err != nil {
+						page = 0
+					}
+					rows, err := strconv.Atoi(matches[2])
+					if err != nil {
+						rows = 0
+					}
+					result.Page = page
+					result.Rows = rows
+				}
+			}
+		}
+
+		return result
+	}
+
+	if pattern1.MatchString(name) {
+		matches := pattern1.FindStringSubmatch(name)
+		if len(matches) == 4 {
+			from := matches[1]
+			name = matches[2]
+			as := matches[3]
+			var result *Field
+			for _, f := range froms {
+				if f.As == from {
+					result = f.findField(name)
+				} else if f.Name == from {
+					result = f.findField(name)
+				}
+				if result != nil {
+					result.As = as
+					return result
+				}
+			}
+		}
+	} else if pattern2.MatchString(name) {
+		matches := pattern2.FindStringSubmatch(name)
+		if len(matches) == 3 {
+			from := matches[1]
+			name = matches[2]
+			as := matches[2]
+			var result *Field
+			for _, f := range froms {
+				if f.As == from {
+					result = f.findField(name)
+				} else if f.Name == from {
+					result = f.findField(name)
+				}
+				if result != nil {
+					result.As = as
+					return result
+				}
+			}
+		}
+	} else if pattern3.MatchString(name) {
+		matches := pattern3.FindStringSubmatch(name)
+		if len(matches) == 4 {
+			agg := matches[1]
+			name = matches[2]
+			as := matches[3]
+			result := FindField(froms, name)
+			if result != nil {
+				result.TypeColumn = TpAggregation
+				result.Aggregation = GetAggregation(aggregation)
+				result.As = as
+				return result
+			}
+		}
+	} else if pattern4.MatchString(name) {
+		matches := pattern4.FindStringSubmatch(name)
+		if len(matches) == 3 {
+			aggregation := matches[1]
+			name = matches[2]
+			result := FindField(froms, name)
+			if result != nil {
+				result.TypeColumn = TpAggregation
+				result.Aggregation = GetAggregation(aggregation)
+				result.As = aggregation
+				return result
+			}
+		}
+	} else {
+		if len(froms) == 0 {
+			return nil
+		}
+		from := froms[0]
+		result := from.FindField(name)
+		if result != nil {
+			return result
+		}
+	}
+
+	return nil
+}
+
+/**
+* selects
 * @return *Ql
 **/
-func Select[T Fld](ql *Ql, fields ...T) *Ql {
+func selects[T Fld](ql *Ql, fields ...T) *Ql {
 	if len(ql.Froms) == 0 {
 		return ql
 	}
@@ -155,7 +275,8 @@ func Select[T Fld](ql *Ql, fields ...T) *Ql {
 		f := field(fld)
 		switch v := f.Name.(type) {
 		case string:
-			ql.Selects = append(ql.Selects, FindField(ql.Froms, v))
+			f = findField(ql.Froms, v)
+			ql.Selects = append(ql.Selects, f)
 		case *Field:
 			ql.Selects = append(ql.Selects, v)
 		case *Agg:
