@@ -81,7 +81,7 @@ func GetModel(database, schema, name string) (*Model, error) {
 		return nil, err
 	}
 
-	result, err := db.getModel(schema, name)
+	result, err := db.GetModel(schema, name)
 	if err != nil {
 		return nil, err
 	}

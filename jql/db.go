@@ -134,11 +134,11 @@ func (s *DB) getSchema(name string) *Schema {
 }
 
 /**
-* newModel
+* NewModel
 * @param schema, name string, version int
 * @return *Model
 **/
-func (s *DB) newModel(schema, name string, version int) (*Model, error) {
+func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
 	if !utility.ValidStr(schema, 0, []string{}) {
 		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, schema)
 	}
@@ -148,11 +148,11 @@ func (s *DB) newModel(schema, name string, version int) (*Model, error) {
 }
 
 /**
-* getModel
+* GetModel
 * @param schema, name string
 * @return *Model
 **/
-func (s *DB) getModel(schema, name string) (*Model, error) {
+func (s *DB) GetModel(schema, name string) (*Model, error) {
 	sch, ok := s.Schemas[schema]
 	if !ok {
 		return nil, fmt.Errorf(MSG_SCHEMA_NOT_FOUND, schema)

@@ -17,7 +17,12 @@ func defineModel(db *DB) error {
 	}
 
 	var err error
-	models, err = db.Define(et.Json{
+	models, err = db.NewModel("core", "models", 1)
+	if err != nil {
+		return err
+	}
+
+	models, err = db.NewModel(et.Json{
 		"schema":  "core",
 		"name":    "models",
 		"version": 1,
