@@ -40,7 +40,6 @@ func (s *Schema) newModel(name string, version int) (*Model, error) {
 		Unique:        make([]string, 0),
 		Required:      make([]string, 0),
 		Hidden:        make([]string, 0),
-		References:    make(map[string]*Detail, 0),
 		Details:       make(map[string]*Detail, 0),
 		Rollups:       make(map[string]*Detail, 0),
 		Relations:     make(map[string]*Detail, 0),

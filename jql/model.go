@@ -32,7 +32,6 @@ type Model struct {
 	Unique        []string               `json:"unique"`
 	Required      []string               `json:"required"`
 	Hidden        []string               `json:"hidden"`
-	References    map[string]*Detail     `json:"references"`
 	Details       map[string]*Detail     `json:"details"`
 	Rollups       map[string]*Detail     `json:"rollups"`
 	Relations     map[string]*Detail     `json:"relations"`
