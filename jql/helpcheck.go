@@ -28,7 +28,7 @@ const (
 * @param query string
 * @return string
 **/
-func TipoSQL(query string) string {
+func tipoSQL(query string) string {
 	q := strings.TrimSpace(strings.ToUpper(query))
 
 	parts := strings.Fields(q)
@@ -195,13 +195,14 @@ func Literal(val any) any {
 }
 
 /**
-* RowsToItems
+* rowsToItems
 * @param rows *sql.Rows
 * @return et.Items
 **/
-func RowsToItems(rows *sql.Rows) et.Items {
-	var result = et.Items{Result: []et.Json{}}
+func rowsToItems(rows *sql.Rows) et.Items {
+	defer rows.Close()
 
+	result := et.Items{Result: []et.Json{}}
 	append := func(item et.Json) {
 		result.Add(item)
 	}

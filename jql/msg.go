@@ -17,6 +17,7 @@ var (
 	MSG_FROM_REQUIRED        string = "from required"
 	MSG_DATA_REQUIRED        string = "data required"
 	MSG_SCHEMA_NOT_FOUND     string = "schema %s not found"
+	MSG_ROLLBACK_ERROR       string = "rollback error: %w: %s"
 )
 
 func loadMsg(language string) {
@@ -36,5 +37,6 @@ func loadMsg(language string) {
 		MSG_FROM_REQUIRED = "from requerido"
 		MSG_DATA_REQUIRED = "data requerida"
 		MSG_SCHEMA_NOT_FOUND = "schema %s no encontrado"
+		MSG_ROLLBACK_ERROR = "rollback error: %w: %s"
 	}
 }

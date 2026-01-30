@@ -176,6 +176,40 @@ func (s *DB) deleteModel(schema, name string) error {
 }
 
 /**
+* sqlTx
+* @param tx *Tx, sql string, arg ...any
+* @return et.Items, error
+**/
+func (s *DB) sqlTx(tx *Tx, _sql string, arg ...any) (et.Items, error) {
+	query := SQLParse(_sql, arg...)
+	if tx != nil {
+		err := tx.Begin(s.db)
+		if err != nil {
+			return et.Items{}, err
+		}
+
+		rows, err := tx.Tx.Query(query)
+		if err != nil {
+			errR := tx.Rollback()
+			if errR != nil {
+				err = fmt.Errorf(MSG_ROLLBACK_ERROR, errR)
+			}
+			return et.Items{}, err
+		}
+		result := rowsToItems(rows)
+		return result, nil
+	}
+
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return et.Items{}, err
+	}
+
+	result := rowsToItems(rows)
+	return result, nil
+}
+
+/**
 * Command
 * @param command *Command
 * @return et.Items, error
@@ -194,7 +228,7 @@ func (s *DB) Command(command *Cmd) (et.Items, error) {
 		return et.Items{}, err
 	}
 
-	return s.SqlTx(command.tx, sql)
+	return s.sqlTx(command.tx, sql)
 }
 
 /**
@@ -208,7 +242,7 @@ func (s *DB) Query(query *Ql) (et.Items, error) {
 	}
 
 	if query.IsDebug {
-		logs.Debugf("command:%s", query.ToJson().ToEscapeHTML())
+		logs.Debugf("query:%s", query.ToJson().ToEscapeHTML())
 	}
 
 	sql, err := s.driver.Query(query)
@@ -216,7 +250,7 @@ func (s *DB) Query(query *Ql) (et.Items, error) {
 		return et.Items{}, err
 	}
 
-	result, err := s.SqlTx(query.tx, sql)
+	result, err := s.sqlTx(query.tx, sql)
 	if err != nil {
 		return et.Items{}, err
 	}
