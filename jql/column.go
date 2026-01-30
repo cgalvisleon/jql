@@ -1,5 +1,7 @@
 package jql
 
+import "fmt"
+
 const (
 	SOURCE     string = "source"
 	ID         string = "id"
@@ -47,54 +49,141 @@ const (
 	GEOMETRY TypeData = "geometry"
 )
 
-type Aggregation string
+type From struct {
+	Database string   `json:"database"`
+	Schema   string   `json:"schema"`
+	Name     string   `json:"name"`
+	As       string   `json:"as"`
+	Fields   []*Field `json:"fields"`
+}
 
-func (s Aggregation) Str() string {
-	return string(s)
+type Field struct {
+	TypeColumn TypeColumn  `json:"type_column"`
+	From       *From       `json:"from"`
+	Name       interface{} `json:"name"`
+	As         string      `json:"as"`
+}
+
+func (s *Field) AS() string {
+	return fmt.Sprintf("%s.%s", s.From.As, s.As)
+}
+
+type Agg struct {
+	Agg    string   `json:"agg"`
+	Fields []*Field `json:"fields"`
+}
+
+type Fld interface {
+	string | *Field | *Agg
 }
 
 /**
-* GetAggregation
-* @param tp string
-* @return Aggregation
+* field
+* @param f T
+* @return *Field
 **/
-func GetAggregation(tp string) Aggregation {
-	aggregation := map[string]Aggregation{
-		"count": COUNT,
-		"sum":   SUM,
-		"avg":   AVG,
-		"max":   MAX,
-		"min":   MIN,
-		"exp":   EXP,
+func field[T Fld](f T) *Field {
+	switch v := any(f).(type) {
+	case string:
+		return &Field{
+			Name: v,
+			As:   v,
+		}
+	case *Field:
+		return v
+	case *Agg:
+		return &Field{
+			Name: v,
+			As:   v.Agg,
+		}
+	default:
+		return nil
+	}
+}
+
+/**
+* agg
+* @param agg string, fields ...Fld
+* @return *Agg
+**/
+func agg[T Fld](agg string, fields ...T) *Agg {
+	result := &Agg{
+		Agg:    agg,
+		Fields: make([]*Field, 0),
 	}
 
-	result, ok := aggregation[tp]
-	if !ok {
-		return EXP
+	for _, f := range fields {
+		result.Fields = append(result.Fields, field(f))
 	}
+
 	return result
 }
 
-const (
-	COUNT Aggregation = "count"
-	SUM   Aggregation = "sum"
-	AVG   Aggregation = "avg"
-	MAX   Aggregation = "max"
-	MIN   Aggregation = "min"
-	EXP   Aggregation = "exp"
-)
+/**
+* COUNT
+* @param fields ...Fld
+* @return *Agg
+**/
+func COUNT[T Fld](fields ...T) *Agg {
+	return agg("count", fields...)
+}
+
+/**
+* SUM
+* @param fields ...Fld
+* @return *Agg
+**/
+func SUM[T Fld](fields ...T) *Agg {
+	return agg("sum", fields...)
+}
+
+/**
+* AVG
+* @param fields ...Fld
+* @return *Agg
+**/
+func AVG[T Fld](fields ...T) *Agg {
+	return agg("avg", fields...)
+}
+
+/**
+* MAX
+* @param fields ...Fld
+* @return *Agg
+**/
+func MAX[T Fld](fields ...T) *Agg {
+	return agg("max", fields...)
+}
+
+/**
+* MIN
+* @param fields ...Fld
+* @return *Agg
+**/
+func MIN[T Fld](fields ...T) *Agg {
+	return agg("min", fields...)
+}
+
+/**
+* MIN
+* @param fields ...Fld
+* @return *Agg
+**/
+func EXP[T Fld](fields ...T) *Agg {
+	return agg("exp", fields...)
+}
 
 type Status string
 
 const (
-	Active    Status = "active"
-	Archived  Status = "archived"
-	Canceled  Status = "canceled"
-	OfSystem  Status = "of_system"
-	ForDelete Status = "for_delete"
-	Pending   Status = "pending"
-	Approved  Status = "approved"
-	Rejected  Status = "rejected"
+	ACTIVE     Status = "active"
+	ARCHIVED   Status = "archived"
+	CANCELED   Status = "canceled"
+	OF_SYSTEM  Status = "of_system"
+	FOR_DELETE Status = "for_delete"
+	PENDING    Status = "pending"
+	APPROVED   Status = "approved"
+	REJECTED   Status = "rejected"
 )
 
 type Column struct {

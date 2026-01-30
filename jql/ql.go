@@ -26,7 +26,7 @@ type Ql struct {
 	DB       *DB                    `json:"-"`
 	Type     TypeQuery              `json:"type"`
 	Froms    []*From                `json:"froms"`
-	Selects  []*Field               `json:"select"`
+	Selects  []interface{}          `json:"select"`
 	Hidden   []*Field               `json:"hidden"`
 	Wheres   *Wheres                `json:"wheres"`
 	Joins    []*Joins               `json:"joins"`
@@ -134,40 +134,29 @@ func (s *Ql) Debug() *Ql {
 * SelectByColumns
 * @return *Ql
 **/
-func (s *Ql) Select(fields ...string) *Ql {
+func (s *Ql) Select(fields ...interface{}) *Ql {
 	if len(s.Froms) == 0 {
 		return s
 	}
 
-	for _, field := range fields {
-		if field == "*" {
-			for _, col := range s.Froms[0].Model.Columns {
-				fld := col.Field()
-				if fld.TypeColumn == TpColumn {
-					s.Selects = append(s.Selects, fld)
+	if len(fields) == 0 {
+		for _, from := range s.Froms {
+			for _, field := range from.Fields {
+				if field.TypeColumn == COLUMN {
+					s.Selects = append(s.Selects, field)
 				}
 			}
-			continue
 		}
+		return s
+	}
 
-		fld := FindField(s.Froms, field)
-		if fld != nil {
-			switch fld.TypeColumn {
-			case TpColumn:
-				s.Selects = append(s.Selects, fld)
-			case TpAtrib:
-				s.Selects = append(s.Selects, fld)
-			case TpDetail:
-				s.Details[fld.Name] = fld
-			case TpRollup:
-				s.Rollups[fld.Name] = fld
-			case TpCalc:
-				fn, ok := fld.Column.From.calcs[fld.Name]
-				if !ok {
-					continue
-				}
-				s.Calcs[fld.Name] = fn
-			}
+	for _, field := range fields {
+		switch v := field.(type) {
+		case Agg:
+			s.Selects = append(s.Selects, v)
+		case string:
+			s.Selects = append(s.Selects, FindField(s.Froms, v))
+
 		}
 	}
 	return s

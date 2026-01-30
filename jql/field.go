@@ -1,29 +1,10 @@
 package jql
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 )
-
-type From struct {
-	Database string `json:"database"`
-	Schema   string `json:"schema"`
-	Name     string `json:"name"`
-	As       string `json:"as"`
-}
-
-type Field struct {
-	TypeColumn TypeColumn  `json:"type_column"`
-	From       *From       `json:"from"`
-	Name       interface{} `json:"name"`
-	As         string      `json:"as"`
-}
-
-func (s *Field) AS() string {
-	return fmt.Sprintf("%s.%s", s.From.As, s.As)
-}
 
 /**
 * FindField

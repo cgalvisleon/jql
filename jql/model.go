@@ -157,12 +157,17 @@ func (s *Model) Stricted() {
 * @return From
 **/
 func (s *Model) from() *From {
-	return &From{
+	result := &From{
 		Database: s.Database,
 		Schema:   s.Schema,
 		Name:     s.Name,
 		As:       s.Name,
+		Fields:   make([]*Field, 0),
 	}
+	for _, column := range s.Columns {
+		result.Fields = append(result.Fields, column.Field())
+	}
+	return result
 }
 
 /**
@@ -363,10 +368,10 @@ func (s *Model) Upsert(data et.Json) *Cmd {
 
 /**
 * Select
-* @param fields ...string
+* @param fields ...interface{}
 * @return *Ql
 **/
-func (s *Model) Selects(fields ...string) *Ql {
+func (s *Model) Selects(fields ...interface{}) *Ql {
 	result := newQuery(s, "A")
 	result.Select(fields...)
 	return result
