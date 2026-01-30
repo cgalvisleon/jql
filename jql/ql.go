@@ -306,8 +306,24 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 
 	for _, fld := range fields {
 		f := s.findField(fld)
-		if f != nil {
+		if f == nil {
+			continue
+		}
+
+		switch f.TypeColumn {
+		case COLUMN:
 			s.Selects = append(s.Selects, f)
+		case AGG:
+			s.Selects = append(s.Selects, f)
+		case ATTRIB:
+			s.Selects = append(s.Selects, f)
+		case DETAIL:
+			if f.From == nil {
+				continue
+			}
+
+			detail := 
+			s.Details[f.AS()] = f		
 		}
 	}
 	return s

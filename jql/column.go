@@ -51,11 +51,15 @@ const (
 )
 
 type From struct {
-	Database string   `json:"database"`
-	Schema   string   `json:"schema"`
-	Name     string   `json:"name"`
-	As       string   `json:"as"`
-	Fields   []*Field `json:"fields"`
+	Database   string             `json:"database"`
+	Schema     string             `json:"schema"`
+	Name       string             `json:"name"`
+	As         string             `json:"as"`
+	Fields     []*Field           `json:"fields"`
+	References map[string]*Detail `json:"references"`
+	Details    map[string]*Detail `json:"details"`
+	Rollups    map[string]*Detail `json:"rollups"`
+	Relations  map[string]*Detail `json:"relations"`
 }
 
 /**
