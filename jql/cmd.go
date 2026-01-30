@@ -74,6 +74,7 @@ func newCommand(s *Model, cmd TypeCommand) *Cmd {
 	result := &Cmd{
 		Type:          cmd,
 		Model:         s,
+		Wheres:        newWhere(),
 		Data:          make([]et.Json, 0),
 		New:           et.Json{},
 		beforeInserts: s.beforeInserts,
@@ -84,7 +85,6 @@ func newCommand(s *Model, cmd TypeCommand) *Cmd {
 		afterDeletes:  s.afterDeletes,
 		db:            s.db,
 	}
-	result.Wheres = newWhere(result)
 
 	return result
 }

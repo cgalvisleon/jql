@@ -65,10 +65,12 @@ func newQuery(model *Model, as string) *Ql {
 		Joins:    make([]*Joins, 0),
 		Selects:  make([]interface{}, 0),
 		Hidden:   make([]string, 0),
+		Wheres:   newWhere(),
 		Details:  make(map[string]*Detail),
 		Rollups:  make(map[string]*Detail),
 		Calcs:    make(map[string]DataContext),
 		GroupsBy: make([]*Field, 0),
+		Havings:  newWhere(),
 		OrdersBy: make([]*Orders, 0),
 		Page:     0,
 		Rows:     0,
@@ -76,8 +78,6 @@ func newQuery(model *Model, as string) *Ql {
 		db:       model.db,
 		tx:       nil,
 	}
-	result.Wheres = newWhere()
-	result.Havings = newWhere()
 
 	return result
 }
