@@ -30,7 +30,7 @@ type Ql struct {
 	Type     TypeQuery              `json:"type"`
 	Froms    []*From                `json:"froms"`
 	Selects  []interface{}          `json:"select"`
-	Hidden   []*Field               `json:"hidden"`
+	Hidden   []string               `json:"hidden"`
 	Wheres   *Wheres                `json:"wheres"`
 	Joins    []*Joins               `json:"joins"`
 	Details  map[string]*Detail     `json:"details"`
@@ -65,7 +65,7 @@ func newQuery(model *Model, as string) *Ql {
 		Froms:    []*From{from},
 		Joins:    make([]*Joins, 0),
 		Selects:  make([]interface{}, 0),
-		Hidden:   make([]*Field, 0),
+		Hidden:   make([]string, 0),
 		Details:  make(map[string]*Detail),
 		Rollups:  make(map[string]*Detail),
 		Calcs:    make(map[string]DataContext),
@@ -76,7 +76,6 @@ func newQuery(model *Model, as string) *Ql {
 		MaxRows:  maxRows,
 	}
 	result.Wheres = newWhere()
-	result.Wheres.setModel(model)
 	result.Havings = newWhere()
 
 	return result
@@ -400,7 +399,7 @@ func (s *Ql) Where(condition *Condition) *Ql {
 * @return *Ql
 **/
 func (s *Ql) And(condition *Condition) *Ql {
-	condition.Connector = And
+	condition.Connector = AND
 	s.Where(condition)
 	return s
 }
@@ -411,7 +410,7 @@ func (s *Ql) And(condition *Condition) *Ql {
 * @return *Ql
 **/
 func (s *Ql) Or(condition *Condition) *Ql {
-	condition.Connector = And
+	condition.Connector = OR
 	s.Where(condition)
 	return s
 }
@@ -423,7 +422,7 @@ func (s *Ql) Or(condition *Condition) *Ql {
 **/
 func (s *Ql) GroupBy(fields ...string) *Ql {
 	for _, name := range fields {
-		fld := FindField(s.Froms, name)
+		fld := s.findField(name)
 		if fld != nil {
 			s.GroupsBy = append(s.GroupsBy, fld)
 		}
@@ -438,18 +437,12 @@ func (s *Ql) GroupBy(fields ...string) *Ql {
 **/
 func (s *Ql) Having(condition []*Condition) *Ql {
 	for _, cnd := range condition {
-		s.Havings.Add(cnd)
+		fld := s.findField(cnd.Field)
+		if fld != nil {
+			cnd.Field = fld
+		}
+		s.Havings.add(cnd)
 	}
-	return s
-}
-
-/**
-* HavingsByJson
-* @param jsons []et.Json
-* @return *Ql
-**/
-func (s *Ql) HavingsByJson(jsons []et.Json) *Ql {
-	s.Havings.ByJson(jsons)
 	return s
 }
 
@@ -460,7 +453,7 @@ func (s *Ql) HavingsByJson(jsons []et.Json) *Ql {
 **/
 func (s *Ql) ordersBy(asc bool, fields ...string) *Ql {
 	for _, name := range fields {
-		fld := FindField(s.Froms, name)
+		fld := s.findField(name)
 		if fld != nil {
 			s.OrdersBy = append(s.OrdersBy, &Orders{Field: fld, Asc: asc})
 		}
@@ -502,9 +495,9 @@ func (s *Ql) OrderByDesc(fields ...string) *Ql {
 **/
 func (s *Ql) Hiddens(fields ...string) *Ql {
 	for _, name := range fields {
-		fld := FindField(s.Froms, name)
+		fld := s.findField(name)
 		if fld != nil {
-			s.Hidden = append(s.Hidden, fld)
+			s.Hidden = append(s.Hidden, fld.AS())
 		}
 	}
 	return s
