@@ -15,13 +15,40 @@ type Wheres struct {
 
 /**
 * newWhere
-* @param owner *Model
 * @return *Wheres
 **/
 func newWhere() *Wheres {
 	return &Wheres{
+		owner:      From{},
 		conditions: make([]*Condition, 0),
 	}
+}
+
+/**
+* setModel
+* @param model *Model
+* @return *Wheres
+**/
+func (s *Wheres) setModel(model *Model) *Wheres {
+	if model == nil {
+		return s
+	}
+	s.owner = From{
+		Database: model.Database,
+		Schema:   model.Schema,
+		Name:     model.Name,
+	}
+	return s
+}
+
+/**
+* setFrom
+* @param from From
+* @return *Wheres
+**/
+func (s *Wheres) setFrom(from From) *Wheres {
+	s.owner = from
+	return s
 }
 
 /**
@@ -46,24 +73,6 @@ func ByJson(jsons []et.Json) *Wheres {
 **/
 func (s *Wheres) IsDebug() *Wheres {
 	s.isDebug = true
-	return s
-}
-
-/**
-* SetOwner
-* @param owner *Model
-* @return *Wheres
-**/
-func (s *Wheres) SetOwner(owner *Model) *Wheres {
-	if owner == nil {
-		return s
-	}
-
-	s.owner = From{
-		Database: owner.Database,
-		Schema:   owner.Schema,
-		Name:     owner.Name,
-	}
 	return s
 }
 
