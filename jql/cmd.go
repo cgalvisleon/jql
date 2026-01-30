@@ -155,6 +155,25 @@ func (s *Cmd) One() (et.Item, error) {
 }
 
 /**
+* findField
+* @param field interface{}
+* @return *Field
+**/
+func (s *Cmd) findField(field interface{}) *Field {
+	switch v := field.(type) {
+	case string:
+		fld := s.Model.findField(v)
+		return findFieldByStr(s.Froms, v)
+	case *Agg:
+		return findFieldByStr(s.Froms, v.Field)
+	case *Field:
+		return v
+	default:
+		return nil
+	}
+}
+
+/**
 * Where
 * @param condition *Condition
 * @return *Cmd
