@@ -218,11 +218,9 @@ func (s *Model) FindField(name string) *Field {
 			}
 		}
 	} else if pattern2.MatchString(name) {
-		as := name
 		column := s.FindColumn(name)
 		if column != nil {
 			result := column.Field()
-			result.As = as
 			return result
 		}
 	}

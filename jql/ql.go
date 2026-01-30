@@ -11,10 +11,10 @@ import (
 type TypeQuery string
 
 const (
-	TpSelect  TypeQuery = "select"
-	TpData    TypeQuery = "data"
-	TpExists  TypeQuery = "exists"
-	TpCounted TypeQuery = "count"
+	SELECT  TypeQuery = "select"
+	DATA    TypeQuery = "data"
+	EXISTS  TypeQuery = "exists"
+	COUNTED TypeQuery = "count"
 )
 
 type Orders struct {
