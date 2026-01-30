@@ -1,6 +1,7 @@
 package jql
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -14,10 +15,14 @@ type From struct {
 }
 
 type Field struct {
-	TypeColumn TypeColumn `json:"type_column"`
-	From       From       `json:"from"`
-	Name       string     `json:"name"`
-	As         string     `json:"as"`
+	TypeColumn TypeColumn  `json:"type_column"`
+	From       From        `json:"from"`
+	Name       interface{} `json:"name"`
+	As         string      `json:"as"`
+}
+
+func (s *Field) AS() string {
+	return fmt.Sprintf("%s.%s", s.From.As, s.As)
 }
 
 /**

@@ -94,7 +94,7 @@ type Condition struct {
 func (s *Condition) ToJson() et.Json {
 	if s.Connector == NaC {
 		return et.Json{
-			s.Field.Name: et.Json{
+			s.Field.AS(): et.Json{
 				s.Operator.Str(): s.Value,
 			},
 		}
@@ -102,7 +102,7 @@ func (s *Condition) ToJson() et.Json {
 
 	return et.Json{
 		s.Connector.Str(): et.Json{
-			s.Field.Name: et.Json{
+			s.Field.AS(): et.Json{
 				s.Operator.Str(): s.Value,
 			},
 		},
@@ -116,7 +116,7 @@ func (s *Condition) ToJson() et.Json {
 **/
 func (s *Condition) fieldValue(data et.Json) (any, error) {
 	array := []et.Json{}
-	fields := strs.Split(s.Field.Name, ">")
+	fields := strs.Split(s.Field.AS(), ">")
 	for _, field := range fields {
 		idx, err := strconv.Atoi(field)
 		if err == nil && len(array) > idx {
@@ -201,10 +201,10 @@ func ToCondition(json et.Json) *Condition {
 
 /**
 * condition
-* @param field string, value interface{}, op string
+* @param field interface{}, value interface{}, op Operator
 * @return *Condition
 **/
-func condition(field string, value interface{}, op Operator) *Condition {
+func condition(field interface{}, value interface{}, op Operator) *Condition {
 	return &Condition{
 		Field:     Field{Name: field},
 		Operator:  op,
@@ -215,135 +215,135 @@ func condition(field string, value interface{}, op Operator) *Condition {
 
 /**
 * Eq
-* @param field string, value interface{}
+* @param field interface{}, value interface{}
 * @return Condition
 **/
-func Eq(field string, value interface{}) *Condition {
+func Eq(field interface{}, value interface{}) *Condition {
 	return condition(field, value, OpEq)
 }
 
 /**
 * Neg
-* @param field string, value interface{}
+* @param field interface{}, value interface{}
 * @return Condition
 **/
-func Neg(field string, value interface{}) *Condition {
+func Neg(field interface{}, value interface{}) *Condition {
 	return condition(field, value, OpNeg)
 }
 
 /**
 * Less
-* @param field string, value interface{}
+* @param field interface{}, value interface{}
 * @return Condition
 **/
-func Less(field string, value interface{}) *Condition {
+func Less(field interface{}, value interface{}) *Condition {
 	return condition(field, value, OpLess)
 }
 
 /**
 * LessEq
-* @param field string, value interface{}
+* @param field interface{}, value interface{}
 * @return Condition
 **/
-func LessEq(field string, value interface{}) *Condition {
+func LessEq(field interface{}, value interface{}) *Condition {
 	return condition(field, value, OpLessEq)
 }
 
 /**
 * More
-* @param field string, value interface{}
+* @param field interface{}, value interface{}
 * @return Condition
 **/
-func More(field string, value interface{}) *Condition {
+func More(field interface{}, value interface{}) *Condition {
 	return condition(field, value, OpMore)
 }
 
 /**
 * MoreEq
-* @param field string, value interface{}
+* @param field interface{}, value interface{}
 * @return Condition
 **/
-func MoreEq(field string, value interface{}) *Condition {
+func MoreEq(field interface{}, value interface{}) *Condition {
 	return condition(field, value, OpMoreEq)
 }
 
 /**
 * Like
-* @param field string, value interface{}
+* @param field interface{}, value interface{}
 * @return Condition
 **/
-func Like(field string, value interface{}) *Condition {
+func Like(field interface{}, value interface{}) *Condition {
 	return condition(field, value, OpLike)
 }
 
 /**
 * In
-* @param field string, value []interface{}
+* @param field interface{}, value []interface{}
 * @return Condition
 **/
-func In(field string, value []interface{}) *Condition {
+func In(field interface{}, value []interface{}) *Condition {
 	return condition(field, value, OpIn)
 }
 
 /**
 * NotIn
-* @param field string, value []interface{}
+* @param field interface{}, value []interface{}
 * @return Condition
 **/
-func NotIn(field string, value []interface{}) *Condition {
+func NotIn(field interface{}, value []interface{}) *Condition {
 	return condition(field, value, OpNotIn)
 }
 
 /**
 * Is
-* @param field string, value interface{}
+* @param field interface{}, value interface{}
 * @return Condition
 **/
-func Is(field string, value interface{}) *Condition {
+func Is(field interface{}, value interface{}) *Condition {
 	return condition(field, value, OpIs)
 }
 
 /**
 * IsNot
-* @param field string, value interface{}
+* @param field interface{}, value interface{}
 * @return Condition
 **/
-func IsNot(field string, value interface{}) *Condition {
+func IsNot(field interface{}, value interface{}) *Condition {
 	return condition(field, value, OpIsNot)
 }
 
 /**
 * Null
-* @param field string
+* @param field interface{}
 * @return Condition
 **/
-func Null(field string) *Condition {
+func Null(field interface{}) *Condition {
 	return condition(field, nil, OpNull)
 }
 
 /**
 * NotNull
-* @param field string
+* @param field interface{}
 * @return Condition
 **/
-func NotNull(field string) *Condition {
+func NotNull(field interface{}) *Condition {
 	return condition(field, nil, OpNotNull)
 }
 
 /**
 * Between
-* @param field string, min any, max any
+* @param field interface{}, min any, max any
 * @return Condition
 **/
-func Between(field string, min, max any) *Condition {
+func Between(field interface{}, min, max any) *Condition {
 	return condition(field, BetweenValue{Min: min, Max: max}, OpBetween)
 }
 
 /**
 * NotBetween
-* @param field string, min any, max any
+* @param field interface{}, min any, max any
 * @return Condition
 **/
-func NotBetween(field string, min, max any) *Condition {
+func NotBetween(field interface{}, min, max any) *Condition {
 	return condition(field, BetweenValue{Min: min, Max: max}, OpNotBetween)
 }
