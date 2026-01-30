@@ -373,7 +373,7 @@ func (s *Model) Upsert(data et.Json) *Cmd {
 **/
 func (s *Model) Select(fields ...interface{}) *Ql {
 	result := newQuery(s, "A")
-	result = selects(result, fields...)
+	result.Select(fields...)
 	return result
 }
 

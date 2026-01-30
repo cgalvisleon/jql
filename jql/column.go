@@ -89,6 +89,8 @@ type Agg struct {
 	Field string `json:"field"`
 }
 
+var Aggs = []string{"count", "sum", "avg", "max", "min", "exp"}
+
 /**
 * agg
 * @param agg string, field string

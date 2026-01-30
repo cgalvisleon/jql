@@ -251,34 +251,36 @@ func findField(froms []*From, name string) *Field {
 }
 
 /**
-* selects
+* Select
 * @return *Ql
 **/
-func selects[T Fld](ql *Ql, fields ...T) *Ql {
-	if len(ql.Froms) == 0 {
-		return ql
+func (s *Ql) Select(fields ...interface{}) *Ql {
+	if len(s.Froms) == 0 {
+		return s
 	}
 
 	if len(fields) == 0 {
-		ql.Selects = make([]interface{}, 0)
-		for _, from := range ql.Froms {
+		s.Selects = make([]interface{}, 0)
+		for _, from := range s.Froms {
 			for _, field := range from.Fields {
 				if field.TypeColumn == COLUMN {
-					ql.Selects = append(ql.Selects, field)
+					field.From = from
+					s.Selects = append(s.Selects, field)
 				}
 			}
 		}
-		return ql
+		return s
 	}
 
 	for _, fld := range fields {
-		f := field(fld)
-		switch v := f.Name.(type) {
+		switch v := fld.(type) {
 		case string:
-			f = findField(ql.Froms, v)
-			ql.Selects = append(ql.Selects, f)
+			f := findField(s.Froms, v)
+			f.From = s.Froms[0]
+			s.Selects = append(s.Selects, f)
 		case *Field:
-			ql.Selects = append(ql.Selects, v)
+			v.From = s.Froms[0]
+			s.Selects = append(s.Selects, v)
 		case *Agg:
 			ql.Selects = append(ql.Selects, v)
 		}
