@@ -379,7 +379,7 @@ func (s *Model) Selects(fields ...string) *Ql {
 **/
 func (s *Model) Join(to *Model, as string, keys map[string]string) *Ql {
 	result := newQuery(s, "A")
-	result.join(TpJoin, to, as, keys)
+	result.join(JOIN, to, as, keys)
 	return result
 }
 

@@ -53,11 +53,13 @@ func newQuery(model *Model, as string) *Ql {
 	if model.SourceField != "" {
 		tp = DATA
 	}
+	from := model.from()
+	from.As = as
 	maxRows := envar.GetInt("MAX_ROWS", 100)
 	result := &Ql{
 		Type:     tp,
 		DB:       model.db,
-		Froms:    []*From{model.from()},
+		Froms:    []*From{from},
 		Joins:    make([]*Joins, 0),
 		Selects:  make([]*Field, 0),
 		Hidden:   make([]*Field, 0),
