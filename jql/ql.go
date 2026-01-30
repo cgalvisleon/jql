@@ -149,7 +149,7 @@ func findFieldByStr(froms []*From, name string) *Field {
 	if len(split) == 2 {
 		name = split[0]
 		limit := split[1]
-		result := findField(froms, name)
+		result := findFieldByStr(froms, name)
 		if result != nil {
 			if pattern5.MatchString(limit) {
 				matches := pattern5.FindStringSubmatch(limit)
