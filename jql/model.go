@@ -153,6 +153,19 @@ func (s *Model) Stricted() {
 }
 
 /**
+* from
+* @return From
+**/
+func (s *Model) from() From {
+	return From{
+		Database: s.Database,
+		Schema:   s.Schema,
+		Name:     s.Name,
+		As:       s.Name,
+	}
+}
+
+/**
 * idxColumn
 * @param name string
 * @return int

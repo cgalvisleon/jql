@@ -15,12 +15,7 @@ type Detail struct {
 **/
 func newDetail(to *Model, keys map[string]string, selecs []string, onDeleteCascade, onUpdateCascade bool) *Detail {
 	return &Detail{
-		To: From{
-			Database: to.Database,
-			Schema:   to.Schema,
-			Name:     to.Name,
-			As:       to.Name,
-		},
+		To:              to.from(),
 		Keys:            keys,
 		Select:          selecs,
 		OnDeleteCascade: onDeleteCascade,

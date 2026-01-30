@@ -33,11 +33,7 @@ func (s *Wheres) setModel(model *Model) *Wheres {
 	if model == nil {
 		return s
 	}
-	s.owner = From{
-		Database: model.Database,
-		Schema:   model.Schema,
-		Name:     model.Name,
-	}
+	s.owner = model.from()
 	return s
 }
 
