@@ -18,11 +18,11 @@ func init() {
 }
 
 type DB struct {
-	Name       string             `json:"name"`
-	Schemas    map[string]*Schema `json:"schemas"`
-	Connection et.Json            `json:"connection"`
-	driver     Driver             `json:"-"`
-	db         *sql.DB            `json:"-"`
+	Name    string             `json:"name"`
+	Schemas map[string]*Schema `json:"schemas"`
+	Params  et.Json            `json:"params"`
+	driver  Driver             `json:"-"`
+	db      *sql.DB            `json:"-"`
 }
 
 /**
@@ -48,10 +48,10 @@ func getDb(name string, params et.Json) (*DB, error) {
 	}
 
 	result = &DB{
-		Name:       name,
-		Schemas:    make(map[string]*Schema),
-		Connection: params,
-		driver:     drv,
+		Name:    name,
+		Schemas: make(map[string]*Schema),
+		Params:  params,
+		driver:  drv,
 	}
 	err := result.load()
 	if err != nil {
@@ -106,6 +106,11 @@ func (s *DB) load() error {
 	db, err := s.driver.Connect(s)
 	if err != nil {
 		return err
+	}
+
+	isCore := s.Params.Bool("is_core")
+	if !isCore {
+		s.initCore()
 	}
 
 	s.db = db
