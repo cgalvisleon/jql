@@ -1,51 +1,23 @@
 package jql
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
+type From struct {
+	Database string `json:"database"`
+	Schema   string `json:"schema"`
+	Name     string `json:"name"`
+	As       string `json:"as"`
+}
+
 type Field struct {
-	TypeColumn  TypeColumn        `json:"type_column"`
-	From        *Froms            `json:"from"`
-	Column      *Column           `json:"column"`
-	SourceField *Column           `json:"source_field"`
-	Name        string            `json:"name"`
-	As          string            `json:"as"`
-	Aggregation TypeAggregation   `json:"agregation"`
-	Expression  string            `json:"expression"`
-	To          *Model            `json:"to"`
-	Keys        map[string]string `json:"keys"`
-	Select      []string          `json:"select"`
-	Page        int               `json:"page"`
-	Rows        int               `json:"rows"`
-}
-
-/**
-* AS
-* @return string
- */
-func (s *Field) AS() string {
-	if s.From == nil {
-		return fmt.Sprintf("%s.%s", s.Column.From.Name, s.As)
-	}
-
-	return fmt.Sprintf("%s.%s", s.From.As, s.As)
-}
-
-/**
-* Levels
-* @return []string
- */
-func (s *Field) Levels() []string {
-	if s.Column.TypeColumn != TpAtrib {
-		return []string{s.Column.Name}
-	}
-
-	name := fmt.Sprintf("%s>%s", s.Column.From.SourceField.Name, s.Column.Name)
-	return strings.Split(name, ">")
+	TypeColumn TypeColumn `json:"type_column"`
+	From       From       `json:"from"`
+	Name       string     `json:"name"`
+	As         string     `json:"as"`
 }
 
 /**
