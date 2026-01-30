@@ -27,6 +27,7 @@ const (
 	ROLLUP   TypeColumn = "rollup"
 	RELATION TypeColumn = "relation"
 	CALC     TypeColumn = "calc"
+	AGG      TypeColumn = "agg"
 )
 
 type TypeData string
@@ -64,7 +65,7 @@ type From struct {
 **/
 func (s *From) findField(name string) *Field {
 	for _, fld := range s.Fields {
-		if fld.Name == name {
+		if fld.Field == name {
 			return fld
 		}
 	}
@@ -72,21 +73,36 @@ func (s *From) findField(name string) *Field {
 }
 
 type Field struct {
-	TypeColumn TypeColumn `json:"type_column"`
-	From       *From      `json:"from"`
-	Name       string     `json:"name"`
-	As         string     `json:"as"`
-	Page       int        `json:"page"`
-	Rows       int        `json:"rows"`
+	TypeColumn TypeColumn  `json:"type_column"`
+	From       *From       `json:"from"`
+	Field      interface{} `json:"field"`
+	As         string      `json:"as"`
+	Page       int         `json:"page"`
+	Rows       int         `json:"rows"`
 }
 
 func (s *Field) AS() string {
-	return fmt.Sprintf(`%s.%s`, s.From.As, s.Name)
+	switch v := s.Field.(type) {
+	case string:
+		return fmt.Sprintf(`%s.%s:%s`, s.From.As, v, s.As)
+	case *Agg:
+		return fmt.Sprintf(`%s:%s`, v.AS(), s.As)
+	default:
+		return fmt.Sprintf(`%v:%s`, v, s.As)
+	}
 }
 
 type Agg struct {
 	Agg   string `json:"agg"`
 	Field string `json:"field"`
+}
+
+/**
+* AS
+* @return string
+**/
+func (s *Agg) AS() string {
+	return fmt.Sprintf(`%s(%s):%s`, s.Agg, s.Field)
 }
 
 var Aggs = []string{"count", "sum", "avg", "max", "min", "exp"}
@@ -187,7 +203,7 @@ func (s *Column) Field() *Field {
 	return &Field{
 		TypeColumn: s.TypeColumn,
 		From:       s.model.from(),
-		Name:       s.Name,
+		Field:      s.Name,
 		As:         s.Name,
 	}
 }

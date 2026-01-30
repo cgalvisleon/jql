@@ -215,6 +215,9 @@ func findField(froms []*From, name string) *Field {
 			agg := matches[1]
 			name = matches[2]
 			as := matches[3]
+			if !slices.Contains(Aggs, agg) {
+				return nil
+			}
 			result := findField(froms, name)
 			if result != nil {
 				result.TypeColumn = TpAggregation
