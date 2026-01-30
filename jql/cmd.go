@@ -10,14 +10,13 @@ import (
 type TypeCommand string
 
 const (
-	TypeInsert TypeCommand = "insert"
-	TypeUpdate TypeCommand = "update"
-	TypeDelete TypeCommand = "delete"
-	TypeUpsert TypeCommand = "upsert"
+	INSERT TypeCommand = "insert"
+	UPDATE TypeCommand = "update"
+	DELETE TypeCommand = "delete"
+	UPSERT TypeCommand = "upsert"
 )
 
 type Cmd struct {
-	DB            *DB               `json:"-"`
 	Type          TypeCommand       `json:"type"`
 	Model         *Model            `json:"model"`
 	Wheres        *Wheres           `json:"wheres"`
@@ -31,6 +30,7 @@ type Cmd struct {
 	afterInserts  []TriggerFunction `json:"-"`
 	afterUpdates  []TriggerFunction `json:"-"`
 	afterDeletes  []TriggerFunction `json:"-"`
+	db            *DB               `json:"-"`
 }
 
 /**
