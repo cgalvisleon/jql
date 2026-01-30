@@ -72,3 +72,18 @@ func (s *Wheres) add(condition *Condition) *Wheres {
 	s.conditions = append(s.conditions, condition)
 	return s
 }
+
+/**
+* byPk
+* @param model *Model, data et.Json
+* @return *Wheres
+**/
+func (s *Wheres) byPk(model *Model, data et.Json) *Wheres {
+	for _, key := range model.PrimaryKeys {
+		if _, ok := data[key]; !ok {
+			continue
+		}
+		s.add(Eq(key, data[key]))
+	}
+	return s
+}

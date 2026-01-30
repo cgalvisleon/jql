@@ -8,13 +8,19 @@ func (s *Cmd) upsert() (et.Items, error) {
 	}
 
 	from := s.Model
-	data := s.Data[0]
-	exists, err := from.
-		WhereByPrimaryKeys(data).
-		SetDebug(s.IsDebug).
-		ItExists()
-	if err != nil {
-		return et.Items{}, err
+	for _, data := range s.Data {
+		exists, err := from.
+			ItExists(data).
+			ItExists()
+		if err != nil {
+			return et.Items{}, err
+		}
+
+		if exists {
+			s.Type = UPDATE
+			s.WhereByPrimaryKeys(data)
+			return s.update()
+		}
 	}
 
 	if exists {

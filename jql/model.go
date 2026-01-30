@@ -390,9 +390,10 @@ func (s *Model) Counted() *Ql {
 * ItExists
 * @return *Ql
 **/
-func (s *Model) ItExists() *Ql {
+func (s *Model) ItExists(data et.Json) *Ql {
 	result := newQuery(s, "A")
 	result.Type = EXISTS
+	result.Wheres.byPk(s, data)
 	return result
 }
 
@@ -408,11 +409,6 @@ func (s *Model) Current(data et.Json) *Ql {
 			result.Selects = append(result.Selects, field)
 		}
 	}
-	for _, key := range s.PrimaryKeys {
-		if _, ok := data[key]; !ok {
-			continue
-		}
-		result.Wheres.add(Eq(key, data[key]))
-	}
+	result.Wheres.byPk(s, data)
 	return result
 }
