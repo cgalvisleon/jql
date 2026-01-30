@@ -4,13 +4,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"slices"
 	"sync"
 
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/logs"
 	"github.com/cgalvisleon/et/utility"
-	"github.com/cgalvisleon/josefina/pkg/msg"
 )
 
 var dbs map[string]*DB
@@ -34,7 +32,7 @@ type DB struct {
 **/
 func getDb(name string, params et.Json) (*DB, error) {
 	if !utility.ValidStr(name, 0, []string{""}) {
-		return nil, fmt.Errorf(msg.MSG_ARG_REQUIRED, "name")
+		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, "name")
 	}
 
 	name = utility.Normalize(name)
@@ -110,25 +108,22 @@ func (s *DB) load() error {
 		return err
 	}
 
-	s.Db = db
-	if s.UseCore {
-		err := s.initCore()
-		if err != nil {
-			logs.Panic(err)
-		}
-	}
-	loadMsg(s.Language)
-
+	s.db = db
 	return nil
 }
 
 /**
-* idxModel
-* @param name string
-* @return int
+* getModel
+* @param schema, name string
+* @return *Model
 **/
-func (s *DB) idxModel(name string) int {
-	return slices.IndexFunc(s.Models, func(model *Model) bool { return model.Name == name })
+func (s *DB) getModel(schema, name string) (*Model, error) {
+	sch, ok := s.Schemas[schema]
+	if !ok {
+		return nil, fmt.Errorf(MSG_SCHEMA_NOT_FOUND, schema)
+	}
+
+	return sch.getModel(name)
 }
 
 /**

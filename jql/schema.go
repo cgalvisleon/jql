@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/cgalvisleon/et/utility"
-	"github.com/cgalvisleon/josefina/pkg/msg"
 )
 
 type Schema struct {
@@ -13,9 +12,14 @@ type Schema struct {
 	Models   map[string]*Model `json:"models"`
 }
 
+/**
+* newModel
+* @param name string, isCore bool, version int
+* @return (*Model, error)
+**/
 func (s *Schema) newModel(name string, isCore bool, version int) (*Model, error) {
 	if !utility.ValidStr(name, 0, []string{""}) {
-		return nil, fmt.Errorf(msg.MSG_ARG_REQUIRED, "name")
+		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, "name")
 	}
 
 	result, ok := s.Models[name]
@@ -56,6 +60,20 @@ func (s *Schema) newModel(name string, isCore bool, version int) (*Model, error)
 		calcs:         make(map[string]DataContext),
 	}
 	s.Models[name] = result
+
+	return result, nil
+}
+
+/**
+* getModel
+* @param name string
+* @return (*Model, error)
+**/
+func (s *Schema) getModel(name string) (*Model, error) {
+	result, ok := s.Models[name]
+	if !ok {
+		return nil, fmt.Errorf(MSG_MODEL_NOT_FOUND, name)
+	}
 
 	return result, nil
 }

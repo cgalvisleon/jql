@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/cgalvisleon/et/envar"
 	"github.com/cgalvisleon/et/logs"
 	"github.com/cgalvisleon/jql/jql"
 )
@@ -12,12 +11,12 @@ import (
 var driver = "postgres"
 
 func init() {
-	jql.Register(driver, newDriver)
+	jql.Register(driver, new)
 }
 
 type Driver struct {
 	name       string      `json:"-"`
-	database   *jql.DB     `json:"-"`
+	db         *jql.DB     `json:"-"`
 	connection *Connection `json:"-"`
 }
 
@@ -26,23 +25,8 @@ type Driver struct {
 * @param database *jql.DB
 * @return jql.Driver
 **/
-func newDriver(database *jql.DB) jql.Driver {
-	result := &Driver{
-		database: database,
-		name:     database.Name,
-		connection: &Connection{
-			Database: envar.GetStr("DB_NAME", "jdb"),
-			Host:     envar.GetStr("DB_HOST", "localhost"),
-			Port:     envar.GetInt("DB_PORT", 5432),
-			Username: envar.GetStr("DB_USER", "admin"),
-			Password: envar.GetStr("DB_PASSWORD", "admin"),
-			App:      envar.GetStr("APP_NAME", "jdb"),
-			Version:  envar.GetInt("DB_VERSION", 13),
-		},
-	}
-
-	result.connection.Load(result.database.Connection)
-
+func new() jql.Driver {
+	result := &Driver{}
 	return result
 }
 

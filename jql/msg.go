@@ -16,6 +16,7 @@ var (
 	MSG_COMMAND_INVALID      string = "invalid command: %s"
 	MSG_FROM_REQUIRED        string = "from required"
 	MSG_DATA_REQUIRED        string = "data required"
+	MSG_SCHEMA_NOT_FOUND     string = "schema %s not found"
 )
 
 func loadMsg(language string) {
@@ -34,5 +35,6 @@ func loadMsg(language string) {
 		MSG_COMMAND_INVALID = "comando invalido: %s"
 		MSG_FROM_REQUIRED = "from requerido"
 		MSG_DATA_REQUIRED = "data requerida"
+		MSG_SCHEMA_NOT_FOUND = "schema %s no encontrado"
 	}
 }
