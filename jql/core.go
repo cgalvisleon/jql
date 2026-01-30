@@ -19,48 +19,11 @@ func defineModel(db *DB) error {
 	}
 	models.defineCreatedAtField()
 	models.defineUpdatedAtField()
-	models.definePrimaryKeyField()
+	models.DefineColumn("name", TEXT, "")
+	models.DefineColumn("version", INT, 0)
+	models.DefineColumn("definition", BYTES, []byte{})
+	models.DefinePrimaryKeys("name")
 	models.IsCore = true
-
-	models, err = db.NewModel(et.Json{
-		"schema":  "core",
-		"name":    "models",
-		"version": 1,
-		"columns": []et.Json{
-			{
-				"name": "created_at",
-				"type": "datetime",
-			},
-			{
-				"name": "updated_at",
-				"type": "datetime",
-			},
-			{
-				"name": "name",
-				"type": "text",
-			},
-			{
-				"name": "version",
-				"type": "int",
-			},
-			{
-				"name": "definition",
-				"type": "bytes",
-			},
-			{
-				"name": IDX,
-				"type": "key",
-			},
-		},
-		"record_field": IDX,
-		"primary_keys": []string{"name"},
-		"indexes":      []string{"version", IDX},
-		"is_core":      true,
-	})
-	if err != nil {
-		return err
-	}
-
 	if err = models.Init(); err != nil {
 		return err
 	}
@@ -68,6 +31,11 @@ func defineModel(db *DB) error {
 	return nil
 }
 
+/**
+* initCore
+* @param db *DB
+* @return error
+**/
 func (s *DB) initCore() error {
 	if err := defineModel(s); err != nil {
 		return err
