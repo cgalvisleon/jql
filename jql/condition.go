@@ -81,7 +81,7 @@ type BetweenValue struct {
 }
 
 type Condition struct {
-	Field     Field     `json:"field"`
+	Field     *Field    `json:"field"`
 	Operator  Operator  `json:"operator"`
 	Value     any       `json:"value"`
 	Connector Connector `json:"connector"`
@@ -206,7 +206,7 @@ func ToCondition(json et.Json) *Condition {
 **/
 func condition(field interface{}, value interface{}, op Operator) *Condition {
 	return &Condition{
-		Field:     Field{Name: field},
+		Field:     &Field{Field: field},
 		Operator:  op,
 		Value:     value,
 		Connector: NaC,

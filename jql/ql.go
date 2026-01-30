@@ -386,7 +386,11 @@ func (s *Ql) FullJoin(model *Model, as string, keys map[string]string) *Ql {
 * @return *Ql
 **/
 func (s *Ql) Where(condition *Condition) *Ql {
-	s.Wheres.Add(condition)
+	fld := s.findField(condition.Field)
+	if fld != nil {
+		condition.Field = fld
+	}
+	s.Wheres.add(condition)
 	return s
 }
 
