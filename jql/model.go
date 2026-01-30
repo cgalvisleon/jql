@@ -158,30 +158,14 @@ func (s *Model) Stricted() {
 **/
 func (s *Model) from() *From {
 	result := &From{
-		Database:   s.Database,
-		Schema:     s.Schema,
-		Name:       s.Name,
-		As:         s.Name,
-		Fields:     make([]*Field, 0),
-		References: make(map[string]*Detail),
-		Details:    make(map[string]*Detail),
-		Rollups:    make(map[string]*Detail),
-		Relations:  make(map[string]*Detail),
+		Database: s.Database,
+		Schema:   s.Schema,
+		Name:     s.Name,
+		As:       s.Name,
+		Fields:   make([]*Field, 0),
 	}
 	for _, column := range s.Columns {
 		result.Fields = append(result.Fields, column.Field())
-	}
-	for name, detail := range s.References {
-		result.References[name] = detail
-	}
-	for name, detail := range s.Details {
-		result.Details[name] = detail
-	}
-	for name, detail := range s.Rollups {
-		result.Rollups[name] = detail
-	}
-	for name, detail := range s.Relations {
-		result.Relations[name] = detail
 	}
 	return result
 }

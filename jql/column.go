@@ -85,6 +85,25 @@ type Field struct {
 	Rows       int         `json:"rows"`
 }
 
+/**
+* Name
+* @return string
+**/
+func (s *Field) Name() string {
+	switch v := s.Field.(type) {
+	case string:
+		return v
+	case *Agg:
+		return v.Field
+	default:
+		return ""
+	}
+}
+
+/**
+* AS
+* @return string
+**/
 func (s *Field) AS() string {
 	switch v := s.Field.(type) {
 	case string:

@@ -322,8 +322,16 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 				continue
 			}
 
-			detail := 
-			s.Details[f.AS()] = f		
+			details, err := s.db.getModel(f.From.Database, f.From.Schema)
+			if err != nil {
+				continue
+			}
+
+			detail, ok := details.Details[f.Name()]
+			if !ok {
+				continue
+			}
+			s.Details[f.AS()] = detail
 		}
 	}
 	return s
