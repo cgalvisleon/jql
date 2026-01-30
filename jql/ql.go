@@ -61,7 +61,7 @@ func newQuery(model *Model, as string) *Ql {
 		DB:       model.db,
 		Froms:    []*From{from},
 		Joins:    make([]*Joins, 0),
-		Selects:  make([]*Field, 0),
+		Selects:  make([]interface{}, 0),
 		Hidden:   make([]*Field, 0),
 		Details:  make(map[string]*Detail),
 		Rollups:  make(map[string]*Detail),
@@ -134,32 +134,35 @@ func (s *Ql) Debug() *Ql {
 * SelectByColumns
 * @return *Ql
 **/
-func (s *Ql) Select(fields ...interface{}) *Ql {
-	if len(s.Froms) == 0 {
-		return s
+func Select[T Fld](ql *Ql, fields ...T) *Ql {
+	if len(ql.Froms) == 0 {
+		return ql
 	}
 
 	if len(fields) == 0 {
-		for _, from := range s.Froms {
+		ql.Selects = make([]interface{}, 0)
+		for _, from := range ql.Froms {
 			for _, field := range from.Fields {
 				if field.TypeColumn == COLUMN {
-					s.Selects = append(s.Selects, field)
+					ql.Selects = append(ql.Selects, field)
 				}
 			}
 		}
-		return s
+		return ql
 	}
 
-	for _, field := range fields {
-		switch v := field.(type) {
-		case Agg:
-			s.Selects = append(s.Selects, v)
+	for _, fld := range fields {
+		f := field(fld)
+		switch v := f.Name.(type) {
 		case string:
-			s.Selects = append(s.Selects, FindField(s.Froms, v))
-
+			ql.Selects = append(ql.Selects, FindField(ql.Froms, v))
+		case *Field:
+			ql.Selects = append(ql.Selects, v)
+		case *Agg:
+			ql.Selects = append(ql.Selects, v)
 		}
 	}
-	return s
+	return ql
 }
 
 /**

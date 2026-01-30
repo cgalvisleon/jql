@@ -371,7 +371,7 @@ func (s *Model) Upsert(data et.Json) *Cmd {
 * @param fields ...interface{}
 * @return *Ql
 **/
-func (s *Model) Selects(fields ...interface{}) *Ql {
+func (s *Model) Select(fields ...interface{}) *Ql {
 	result := newQuery(s, "A")
 	result.Select(fields...)
 	return result
