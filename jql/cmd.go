@@ -23,13 +23,13 @@ type Cmd struct {
 	Data          []et.Json         `json:"data"`
 	New           et.Json           `json:"new"`
 	IsDebug       bool              `json:"is_debug"`
-	tx            *Tx               `json:"-"`
 	beforeInserts []TriggerFunction `json:"-"`
 	beforeUpdates []TriggerFunction `json:"-"`
 	beforeDeletes []TriggerFunction `json:"-"`
 	afterInserts  []TriggerFunction `json:"-"`
 	afterUpdates  []TriggerFunction `json:"-"`
 	afterDeletes  []TriggerFunction `json:"-"`
+	tx            *Tx               `json:"-"`
 	db            *DB               `json:"-"`
 }
 
@@ -37,7 +37,7 @@ type Cmd struct {
 * Serialize
 * @return []byte, error
 **/
-func (s *Cmd) Serialize() ([]byte, error) {
+func (s *Cmd) serialize() ([]byte, error) {
 	bt, err := json.Marshal(s)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (s *Cmd) Serialize() ([]byte, error) {
 * @return et.Json
 **/
 func (s *Cmd) ToJson() et.Json {
-	bt, err := s.Serialize()
+	bt, err := s.serialize()
 	if err != nil {
 		return et.Json{}
 	}
@@ -73,7 +73,6 @@ func (s *Cmd) ToJson() et.Json {
 func newCommand(s *Model, cmd TypeCommand) *Cmd {
 	result := &Cmd{
 		Type:          cmd,
-		DB:            s.DB,
 		Model:         s,
 		Data:          make([]et.Json, 0),
 		New:           et.Json{},
@@ -83,6 +82,7 @@ func newCommand(s *Model, cmd TypeCommand) *Cmd {
 		afterInserts:  s.afterInserts,
 		afterUpdates:  s.afterUpdates,
 		afterDeletes:  s.afterDeletes,
+		db:            s.db,
 	}
 	result.Wheres = newWhere(result)
 

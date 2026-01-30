@@ -329,7 +329,7 @@ func (s *Model) AfterInsertOrUpdate(fn TriggerFunction) *Model {
 * @return *Cmd
 **/
 func (s *Model) Insert(data et.Json) *Cmd {
-	result := newCommand(s, TypeInsert)
+	result := newCommand(s, INSERT)
 	result.Data = append(result.Data, data)
 	return result
 }
@@ -340,7 +340,7 @@ func (s *Model) Insert(data et.Json) *Cmd {
 * @return *Cmd
 **/
 func (s *Model) Update(data et.Json) *Cmd {
-	result := newCommand(s, TypeUpdate)
+	result := newCommand(s, UPDATE)
 	result.Data = append(result.Data, data)
 	return result
 }
@@ -350,7 +350,7 @@ func (s *Model) Update(data et.Json) *Cmd {
 * @return *Cmd
 **/
 func (s *Model) Delete() *Cmd {
-	result := newCommand(s, TypeDelete)
+	result := newCommand(s, DELETE)
 	return result
 }
 
@@ -360,7 +360,7 @@ func (s *Model) Delete() *Cmd {
 * @return *Cmd
 **/
 func (s *Model) Upsert(data et.Json) *Cmd {
-	result := newCommand(s, TypeUpsert)
+	result := newCommand(s, UPSERT)
 	result.Data = append(result.Data, data)
 	return result
 }
