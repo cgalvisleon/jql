@@ -162,10 +162,7 @@ func (s *Cmd) One() (et.Item, error) {
 func (s *Cmd) findField(field interface{}) *Field {
 	switch v := field.(type) {
 	case string:
-		fld := s.Model.findField(v)
-		return findFieldByStr(s.Froms, v)
-	case *Agg:
-		return findFieldByStr(s.Froms, v.Field)
+		return s.Model.findField(v)
 	case *Field:
 		return v
 	default:
