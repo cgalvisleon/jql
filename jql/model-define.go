@@ -31,7 +31,7 @@ func (s *Model) defineColumn(name string, tpColumn TypeColumn, tpData TypeData, 
 		return s.Columns[idx], nil
 	}
 
-	result := newColumn(s, name, tpColumn, tpData, defaultValue, definition)
+	result := newColumn(name, tpColumn, tpData, defaultValue, definition)
 	s.Columns = append(s.Columns, result)
 	if hidden {
 		s.Hidden = append(s.Hidden, name)
@@ -46,13 +46,13 @@ func (s *Model) defineColumn(name string, tpColumn TypeColumn, tpData TypeData, 
 **/
 func (s *Model) DefineIndex(names ...string) error {
 	for _, name := range names {
-		idx := slices.Index(s.Indexes, name)
-		if idx != -1 {
+		idx := s.idxColumn(name)
+		if idx == -1 {
 			continue
 		}
 
-		idx = s.idxColumn(name)
-		if idx == -1 {
+		idx = slices.Index(s.Indexes, name)
+		if idx != -1 {
 			continue
 		}
 
@@ -68,7 +68,7 @@ func (s *Model) DefineIndex(names ...string) error {
 * @return *Column
 **/
 func (s *Model) DefineColumn(name string, tpData TypeData) (*Column, error) {
-	return s.defineColumn(name, TpColumn, tpData, false, nil, []byte{})
+	return s.defineColumn(name, COLUMN, tpData, false, nil, []byte{})
 }
 
 /**
