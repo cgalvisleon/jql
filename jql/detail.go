@@ -40,13 +40,13 @@ type Joins struct {
 
 /**
 * newJoins
-* @param tp TypeJoin, from *From, keys map[string]string
+* @param tp TypeJoin, from *Model, keys map[string]string
 * @return *Joins
 **/
-func newJoins(tp TypeJoin, from *From, keys map[string]string) *Joins {
+func newJoins(tp TypeJoin, from *Model, keys map[string]string) *Joins {
 	return &Joins{
 		Type: tp,
-		To:   from,
+		To:   from.from(),
 		Keys: keys,
 	}
 }
