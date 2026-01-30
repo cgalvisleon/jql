@@ -127,6 +127,7 @@ func (s *DB) getSchema(name string) *Schema {
 		Database: s.Name,
 		Name:     name,
 		Models:   make(map[string]*Model),
+		db:       s,
 	}
 	s.Schemas[name] = result
 	return result
@@ -165,41 +166,41 @@ func (s *DB) newModel(schema, name string, isCore bool, version int) (*Model, er
 * @param name string
 * @return *Model
 **/
-func (s *DB) loadModel(name string) (*Model, error) {
+func (s *DB) loadModel(schema, name string, dest *Model) (bool, error) {
 	if models == nil {
-		return nil, ErrModelNotFound
+		return false, ErrModelNotFound
 	}
 
 	items, err := models.
-		Where(Eq("A.name", name)).
+		Select().
+		Where(Eq("name", name)).
 		One()
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
 	if !items.Ok {
-		return nil, ErrModelNotFound
+		return false, ErrModelNotFound
 	}
 
 	scr, err := items.Byte("definition")
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	var result *Model
-	err = json.Unmarshal(scr, &result)
+	err = json.Unmarshal(scr, &dest)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
-	result.DB = s
-	result.beforeInserts = make([]TriggerFunction, 0)
-	result.beforeUpdates = make([]TriggerFunction, 0)
-	result.beforeDeletes = make([]TriggerFunction, 0)
-	result.afterInserts = make([]TriggerFunction, 0)
-	result.afterUpdates = make([]TriggerFunction, 0)
-	result.afterDeletes = make([]TriggerFunction, 0)
-	s.Models = append(s.Models, result)
+	dest.DB = s
+	dest.beforeInserts = make([]TriggerFunction, 0)
+	dest.beforeUpdates = make([]TriggerFunction, 0)
+	dest.beforeDeletes = make([]TriggerFunction, 0)
+	dest.afterInserts = make([]TriggerFunction, 0)
+	dest.afterUpdates = make([]TriggerFunction, 0)
+	dest.afterDeletes = make([]TriggerFunction, 0)
+
 	return result, nil
 }
 

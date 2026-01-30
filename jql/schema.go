@@ -1,6 +1,7 @@
 package jql
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/cgalvisleon/et/utility"
@@ -10,6 +11,7 @@ type Schema struct {
 	Database string            `json:"-"`
 	Name     string            `json:"name"`
 	Models   map[string]*Model `json:"models"`
+	db       *DB               `json:"-"`
 }
 
 /**
@@ -71,9 +73,50 @@ func (s *Schema) newModel(name string, isCore bool, version int) (*Model, error)
 **/
 func (s *Schema) getModel(name string) (*Model, error) {
 	result, ok := s.Models[name]
-	if !ok {
-		return nil, fmt.Errorf(MSG_MODEL_NOT_FOUND, name)
+	if ok {
+		return result, nil
 	}
 
+	if models == nil {
+		return nil, ErrModelNotFound
+	}
+
+	items, err := models.
+		Select().
+		Where(Eq("name", name)).
+		One()
+	if err != nil {
+		return nil, err
+	}
+
+	if !items.Ok {
+		return nil, ErrModelNotFound
+	}
+
+	scr, err := items.Byte("definition")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(scr, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	result.beforeInserts = make([]TriggerFunction, 0)
+	result.beforeUpdates = make([]TriggerFunction, 0)
+	result.beforeDeletes = make([]TriggerFunction, 0)
+	result.afterInserts = make([]TriggerFunction, 0)
+	result.afterUpdates = make([]TriggerFunction, 0)
+	result.afterDeletes = make([]TriggerFunction, 0)
+	result.calcs = make(map[string]DataContext)
+	result.db = s.db
+
+	err = result.Init()
+	if err != nil {
+		return nil, err
+	}
+
+	s.Models[name] = result
 	return result, nil
 }
