@@ -16,7 +16,7 @@ type From struct {
 
 type Field struct {
 	TypeColumn TypeColumn  `json:"type_column"`
-	From       From        `json:"from"`
+	From       *From       `json:"from"`
 	Name       interface{} `json:"name"`
 	As         string      `json:"as"`
 }
@@ -30,7 +30,7 @@ func (s *Field) AS() string {
 * @param froms []*From, name string // from.name:as|1:30
 * @return *Field
 **/
-func FindField(froms []*Froms, name string) *Field {
+func FindField(froms []*From, name string) *Field {
 	pattern1 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+):([A-Za-z0-9]+)$`) // from.name:as
 	pattern2 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+)$`)                // from.name
 	pattern3 := regexp.MustCompile(`^([A-Za-z]+)\((.+)\):([A-Za-z0-9]+)$`)            // args(field):as

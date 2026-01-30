@@ -31,7 +31,7 @@ func (s *Model) defineColumn(name string, tpColumn TypeColumn, tpData TypeData, 
 		return s.Columns[idx], nil
 	}
 
-	result := newColumn(name, tpColumn, tpData, defaultValue, definition)
+	result := newColumn(s, name, tpColumn, tpData, defaultValue, definition)
 	s.Columns = append(s.Columns, result)
 	return result, nil
 }
@@ -199,23 +199,23 @@ func (s *Model) DefineAttribute(name string, tpData TypeData, defaultValue inter
 * @return *Column
 **/
 func (s *Model) DefineDetail(name string, keys map[string]string, version int) (*Model, error) {
-	_, err := s.defineColumn(name, TpDetail, TpJson, false, []et.Json{}, []byte{})
+	_, err := s.defineColumn(name, DETAIL, JSON, []et.Json{}, []byte{})
 	if err != nil {
 		return nil, err
 	}
 
-	to, err := s.DB.NewModel(s.Schema, fmt.Sprintf("%s_%s", s.Name, name), version)
+	to, err := s.db.newModel(s.Schema, fmt.Sprintf("%s_%s", s.Name, name), version)
 	if err != nil {
 		return nil, err
 	}
 
 	for fk, pk := range keys {
-		_, err = s.defineColumn(pk, TpColumn, TpKey, false, "", []byte{})
+		_, err = s.DefineColumn(pk, KEY, "")
 		if err != nil {
 			return nil, err
 		}
 
-		_, err = to.defineColumn(fk, TpColumn, TpKey, false, "", []byte{})
+		_, err = to.DefineColumn(fk, KEY, "")
 		if err != nil {
 			return nil, err
 		}

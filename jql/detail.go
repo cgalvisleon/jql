@@ -1,7 +1,7 @@
 package jql
 
 type Detail struct {
-	To              From              `json:"to"`
+	To              *From             `json:"to"`
 	Keys            map[string]string `json:"keys"`
 	Select          []string          `json:"select"`
 	OnDeleteCascade bool              `json:"on_delete_cascade"`

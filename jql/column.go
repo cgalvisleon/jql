@@ -103,19 +103,34 @@ type Column struct {
 	TypeData   TypeData    `json:"type_data"`
 	Default    interface{} `json:"default"`
 	Definition []byte      `json:"definition"`
+	model      *Model      `json:"-"`
+}
+
+/**
+* Field
+* @return Field
+**/
+func (s *Column) Field() Field {
+	return Field{
+		TypeColumn: s.TypeColumn,
+		From:       s.model.from(),
+		Name:       s.Name,
+		As:         s.Name,
+	}
 }
 
 /**
 * newColumn
-* @param name string, tpColumn TypeColumn, tpData TypeData, defaultValue interface{}, definition []byte
+* @param model *Model, name string, tpColumn TypeColumn, tpData TypeData, defaultValue interface{}, definition []byte
 * @return *Column
 **/
-func newColumn(name string, tpColumn TypeColumn, tpData TypeData, defaultValue interface{}, definition []byte) *Column {
+func newColumn(model *Model, name string, tpColumn TypeColumn, tpData TypeData, defaultValue interface{}, definition []byte) *Column {
 	return &Column{
 		Name:       name,
 		TypeColumn: tpColumn,
 		TypeData:   tpData,
 		Default:    defaultValue,
 		Definition: definition,
+		model:      model,
 	}
 }

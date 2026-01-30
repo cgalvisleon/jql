@@ -156,8 +156,8 @@ func (s *Model) Stricted() {
 * from
 * @return From
 **/
-func (s *Model) from() From {
-	return From{
+func (s *Model) from() *From {
+	return &From{
 		Database: s.Database,
 		Schema:   s.Schema,
 		Name:     s.Name,
@@ -193,7 +193,7 @@ func (s *Model) FindColumn(name string) *Column {
 		return nil
 	}
 
-	return newColumn(name, ATTRIB, ANY, "", []byte{})
+	return newColumn(s, name, ATTRIB, ANY, "", []byte{})
 }
 
 /**
