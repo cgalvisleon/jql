@@ -124,7 +124,7 @@ func TriggerRecords(db *sql.DB) error {
     END IF;
 	END;
 	$$ LANGUAGE plpgsql;
-	`, jql.IDX, jql.SOURCE, jql.ForDelete)
+	`, jql.IDX, jql.SOURCE, jql.FOR_DELETE)
 
 	_, err := db.Exec(sql)
 	if err != nil {
