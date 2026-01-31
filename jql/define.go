@@ -147,6 +147,28 @@ func (s *Model) DefineColumn(name string, tpData TypeData, defaultValue interfac
 }
 
 /**
+* DefineTable
+* @param name string
+* @return error
+**/
+func (s *Model) DefineForeignKey(to *Model, keys map[string]string, onDeleteCascade, onUpdateCascade bool) error {
+	detail := newDetail(to, keys, []interface{}{}, onDeleteCascade, onUpdateCascade)
+	for fk, pk := range keys {
+		fld := s.findField(pk)
+		if fld == nil {
+			return fmt.Errorf(MSG_FIELD_NOT_FOUND, pk)
+		}
+
+		fld = to.findField(fk)
+		if fld == nil {
+			return fmt.Errorf(MSG_FIELD_NOT_FOUND, fk)
+		}
+	}
+	s.ForeignKeys = append(s.ForeignKeys, detail)
+	return nil
+}
+
+/**
 * DefineSourceField
 * @param name string
 * @return error
