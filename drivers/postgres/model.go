@@ -282,7 +282,7 @@ func (s *Driver) buildUniqueIndex(model *jql.Model) (string, error) {
 * @return (string, error)
 **/
 func (s *Driver) buildTriggerBeforeInsert(model *jql.Model) (string, error) {
-	if model.IndexField == nil {
+	if model.IdxField == "" {
 		return "", nil
 	}
 
