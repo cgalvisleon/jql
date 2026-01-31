@@ -82,7 +82,7 @@ func (s *Driver) buildSchema(model *jql.Model) (string, error) {
 		return "", fmt.Errorf(MSG_ATRIB_REQUIRED, "schema")
 	}
 
-	exist, err := ExistSchema(s.database.Db, model.Schema)
+	exist, err := ExistSchema(model.Db(), model.Schema)
 	if err != nil {
 		return "", err
 	}
@@ -102,17 +102,17 @@ func (s *Driver) buildSchema(model *jql.Model) (string, error) {
 func (s *Driver) buildTable(model *jql.Model) (string, error) {
 	getType := func(tp jql.TypeData) string {
 		types := map[jql.TypeData]string{
-			jql.TpAny:      "VARCHAR(250)",
-			jql.TpBytes:    "BYTEA",
-			jql.TpInt:      "BIGINT",
-			jql.TpFloat:    "DOUBLE PRECISION",
-			jql.TpKey:      "VARCHAR(80)",
-			jql.TpText:     "VARCHAR(250)",
-			jql.TpMemo:     "TEXT",
-			jql.TpJson:     "JSONB",
-			jql.TpDateTime: "TIMESTAMP",
-			jql.TpBoolean:  "BOOLEAN",
-			jql.TpGeometry: "JSONB",
+			jql.ANY:      "VARCHAR(250)",
+			jql.BYTES:    "BYTEA",
+			jql.INT:      "BIGINT",
+			jql.FLOAT:    "DOUBLE PRECISION",
+			jql.KEY:      "VARCHAR(80)",
+			jql.TEXT:     "VARCHAR(250)",
+			jql.MEMO:     "TEXT",
+			jql.JSON:     "JSONB",
+			jql.DATETIME: "TIMESTAMP",
+			jql.BOOLEAN:  "BOOLEAN",
+			jql.GEOMETRY: "JSONB",
 		}
 
 		if t, ok := types[tp]; ok {
@@ -124,17 +124,17 @@ func (s *Driver) buildTable(model *jql.Model) (string, error) {
 
 	defaultValue := func(tp jql.TypeData) string {
 		values := map[jql.TypeData]string{
-			jql.TpAny:      "",
-			jql.TpBytes:    "''",
-			jql.TpInt:      "0",
-			jql.TpFloat:    "0.0",
-			jql.TpKey:      "''",
-			jql.TpText:     "''",
-			jql.TpMemo:     "''",
-			jql.TpJson:     "'{}'",
-			jql.TpDateTime: "NOW()",
-			jql.TpBoolean:  "FALSE",
-			jql.TpGeometry: "'{}'",
+			jql.ANY:      "",
+			jql.BYTES:    "''",
+			jql.INT:      "0",
+			jql.FLOAT:    "0.0",
+			jql.KEY:      "''",
+			jql.TEXT:     "''",
+			jql.MEMO:     "''",
+			jql.JSON:     "'{}'",
+			jql.DATETIME: "NOW()",
+			jql.BOOLEAN:  "FALSE",
+			jql.GEOMETRY: "'{}'",
 		}
 
 		if t, ok := values[tp]; ok {
