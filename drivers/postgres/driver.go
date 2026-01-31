@@ -31,52 +31,52 @@ func new() jql.Driver {
 * @param connection jql.ConnectParams
 * @return *sql.DB, error
 **/
-func (s *Driver) Connect(database *jql.DB) (*sql.DB, error) {
-	s.database = database
-	s.name = database.Name
-
-	defaultChain, err := s.connection.defaultChain()
+func (s *Driver) Connect(db *jql.DB) (*sql.DB, error) {
+	params := db.Params
+	defaultChain, err := defaultChain(params)
 	if err != nil {
 		return nil, err
 	}
 
-	db, err := connectTo(defaultChain)
+	result, err := connectTo(defaultChain)
 	if err != nil {
 		return nil, err
 	}
 
-	err = CreateDatabase(db, database.Name)
+	err = CreateDatabase(result, db.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	if db != nil {
-		err := db.Close()
+	if result != nil {
+		err := result.Close()
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	s.connection.Database = database.Name
-	chain, err := s.connection.chain()
+	chain, err := chain(params)
 	if err != nil {
 		return nil, err
 	}
 
-	db, err = connectTo(chain)
+	result, err = connectTo(chain)
 	if err != nil {
 		return nil, err
 	}
 
-	if database.UseCore {
-		if err := TriggerRecords(db); err != nil {
+	isCore := params.Bool("is_core")
+	if isCore {
+		if err := TriggerRecords(result); err != nil {
 			return nil, err
 		}
 	}
 
-	logs.Logf(driver, `Connected to %s:%s:%d`, s.connection.Host, s.connection.Database, s.connection.Port)
+	host := params.Str("host")
+	port := params.Int("port")
+	logs.Logf(driver, `Connected to %s:%s:%d`, host, db.Name, port)
 
-	return db, nil
+	return result, nil
 }
 
 /**
