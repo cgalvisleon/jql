@@ -11,7 +11,7 @@ type Schema struct {
 	Database string            `json:"-"`
 	Name     string            `json:"name"`
 	Models   map[string]*Model `json:"models"`
-	db       *DB               `json:"-"`
+	Db       *DB               `json:"-"`
 }
 
 /**
@@ -108,7 +108,7 @@ func (s *Schema) getModel(name string) (*Model, error) {
 	result.afterUpdates = make([]TriggerFunction, 0)
 	result.afterDeletes = make([]TriggerFunction, 0)
 	result.calcs = make(map[string]DataContext)
-	result.db = s.db
+	result.Db = s.Db
 	err = result.Init()
 	if err != nil {
 		return nil, err
