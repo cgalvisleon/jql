@@ -148,7 +148,7 @@ func (s *Driver) buildTable(model *jql.Model) (string, error) {
 	columnsDef := ""
 	for _, column := range columns {
 		tpColumn := column.TypeColumn
-		if tpColumn != jql.TpColumn {
+		if tpColumn != jql.COLUMN {
 			continue
 		}
 		tpData := column.TypeData

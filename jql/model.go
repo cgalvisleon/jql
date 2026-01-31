@@ -30,6 +30,7 @@ type Model struct {
 	IdxField      string                 `json:"idx_field"`
 	Indexes       []string               `json:"indexes"`
 	PrimaryKeys   []string               `json:"primary_keys"`
+	ForeignKeys   []string               `json:"foreign_keys"`
 	Unique        []string               `json:"unique"`
 	Required      []string               `json:"required"`
 	Hidden        []string               `json:"hidden"`
