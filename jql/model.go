@@ -170,6 +170,7 @@ func (s *Model) from() *From {
 		Database: s.Database,
 		Schema:   s.Schema,
 		Name:     s.Name,
+		Table:    s.Table,
 		As:       s.Name,
 		Fields:   make([]*Field, 0),
 	}

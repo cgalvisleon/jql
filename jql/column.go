@@ -54,6 +54,7 @@ type From struct {
 	Database   string             `json:"database"`
 	Schema     string             `json:"schema"`
 	Name       string             `json:"name"`
+	Table      string             `json:"table"`
 	As         string             `json:"as"`
 	Fields     []*Field           `json:"fields"`
 	References map[string]*Detail `json:"references"`
