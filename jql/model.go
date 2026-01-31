@@ -1,6 +1,7 @@
 package jql
 
 import (
+	"database/sql"
 	"encoding/json"
 	"regexp"
 	"slices"
@@ -149,6 +150,14 @@ func (s *Model) Init() error {
 **/
 func (s *Model) Stricted() {
 	s.IsStrict = true
+}
+
+/**
+* Db
+* @return *sql.DB
+**/
+func (s *Model) Db() *sql.DB {
+	return s.db.db
 }
 
 /**

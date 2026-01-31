@@ -201,7 +201,7 @@ func (s *DB) sqlTx(tx *Tx, _sql string, arg ...any) (et.Items, error) {
 			}
 			return et.Items{}, err
 		}
-		result := rowsToItems(rows)
+		result := RowsToItems(rows)
 		return result, nil
 	}
 
@@ -210,7 +210,7 @@ func (s *DB) sqlTx(tx *Tx, _sql string, arg ...any) (et.Items, error) {
 		return et.Items{}, err
 	}
 
-	result := rowsToItems(rows)
+	result := RowsToItems(rows)
 	return result, nil
 }
 

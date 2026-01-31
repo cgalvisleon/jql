@@ -213,11 +213,11 @@ func insertBeforeLast[T any](s []T, v T) []T {
 }
 
 /**
-* rowsToItems
+* RowsToItems
 * @param rows *sql.Rows
 * @return et.Items
 **/
-func rowsToItems(rows *sql.Rows) et.Items {
+func RowsToItems(rows *sql.Rows) et.Items {
 	defer rows.Close()
 
 	result := et.Items{Result: []et.Json{}}
