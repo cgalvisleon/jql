@@ -14,11 +14,7 @@ func init() {
 	jql.Register(driver, new)
 }
 
-type Driver struct {
-	name       string      `json:"-"`
-	db         *jql.DB     `json:"-"`
-	connection *Connection `json:"-"`
-}
+type Driver struct{}
 
 /**
 * newDriver
