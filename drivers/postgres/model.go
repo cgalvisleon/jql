@@ -19,7 +19,7 @@ func (s *Driver) buildModel(model *jql.Model) (string, error) {
 		logs.Debug("model:", model.ToJson().ToString())
 	}
 
-	exists, err := ExistTable(model.db, model.Schema, model.Name)
+	exists, err := ExistTable(model.Db, model.Schema, model.Name)
 	if err != nil {
 		return "", err
 	}

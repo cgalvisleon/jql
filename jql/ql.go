@@ -75,7 +75,7 @@ func newQuery(model *Model, as string) *Ql {
 		Page:     0,
 		Rows:     0,
 		MaxRows:  maxRows,
-		db:       model.Db,
+		db:       model.db,
 		tx:       nil,
 	}
 

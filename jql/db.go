@@ -132,7 +132,7 @@ func (s *DB) getSchema(name string) *Schema {
 		Database: s.Name,
 		Name:     name,
 		Models:   make(map[string]*Model),
-		Db:       s,
+		db:       s,
 	}
 	s.Schemas[name] = result
 	return result

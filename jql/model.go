@@ -53,7 +53,7 @@ type Model struct {
 	afterUpdates  []TriggerFunction      `json:"-"`
 	afterDeletes  []TriggerFunction      `json:"-"`
 	calcs         map[string]DataContext `json:"-"`
-	Db            *DB                    `json:"-"`
+	db            *DB                    `json:"-"`
 }
 
 /**
