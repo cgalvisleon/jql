@@ -15,12 +15,14 @@ type Driver interface {
 	Command(command *Cmd) (string, error)
 }
 
-var drivers map[string]Driver
+type DriverFn func() Driver
+
+var drivers map[string]DriverFn
 
 func init() {
-	drivers = make(map[string]Driver)
+	drivers = make(map[string]DriverFn)
 }
 
-func Register(name string, driver Driver) {
+func Register(name string, driver DriverFn) {
 	drivers[name] = driver
 }

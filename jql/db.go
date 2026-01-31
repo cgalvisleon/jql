@@ -51,7 +51,7 @@ func getDb(name string, params et.Json) (*DB, error) {
 		Name:    name,
 		Schemas: make(map[string]*Schema),
 		Params:  params,
-		driver:  drv,
+		driver:  drv(),
 	}
 	err := result.load()
 	if err != nil {
