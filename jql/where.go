@@ -8,7 +8,7 @@ import (
 * Wheres
 **/
 type Wheres struct {
-	conditions []*Condition `json:"-"`
+	Conditions []*Condition `json:"-"`
 	isDebug    bool         `json:"-"`
 }
 
@@ -18,7 +18,7 @@ type Wheres struct {
 **/
 func newWhere() *Wheres {
 	return &Wheres{
-		conditions: make([]*Condition, 0),
+		Conditions: make([]*Condition, 0),
 	}
 }
 
@@ -53,7 +53,7 @@ func (s *Wheres) IsDebug() *Wheres {
 **/
 func (s *Wheres) ToJson() []et.Json {
 	result := []et.Json{}
-	for _, condition := range s.conditions {
+	for _, condition := range s.Conditions {
 		result = append(result, condition.ToJson())
 	}
 
@@ -66,10 +66,10 @@ func (s *Wheres) ToJson() []et.Json {
 * @return *Wheres
 **/
 func (s *Wheres) add(condition *Condition) *Wheres {
-	if len(s.conditions) > 0 && condition.Connector == NAC {
+	if len(s.Conditions) > 0 && condition.Connector == NAC {
 		condition.Connector = AND
 	}
-	s.conditions = append(s.conditions, condition)
+	s.Conditions = append(s.Conditions, condition)
 	return s
 }
 
