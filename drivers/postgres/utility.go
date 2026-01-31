@@ -8,8 +8,8 @@ import (
 
 func FieldAs(field *jql.Field) string {
 	if field.From == nil {
-		return field.Name
+		return field.As
 	}
 
-	return fmt.Sprintf(`%s.%s`, field.From.As, field.Name)
+	return fmt.Sprintf(`%s.%s`, field.From.As, field.As)
 }
