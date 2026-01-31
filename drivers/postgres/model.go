@@ -203,12 +203,8 @@ func (s *Driver) buildPrimaryKeys(model *jql.Model) (string, error) {
 * @return (string, error)
 **/
 func (s *Driver) buildForeignKeys(model *jql.Model) (string, error) {
-	if len(model.Master) == 0 {
-		return "", nil
-	}
-
 	result := ""
-	for name, foreignKey := range model.Master {
+	for name, foreignKey := range model.ForeignKeys {
 		to := foreignKey.To.Table
 		fks := ""
 		ks := ""

@@ -37,7 +37,7 @@ func (s *Schema) newModel(name string, version int) (*Model, error) {
 		Columns:       make([]*Column, 0),
 		Indexes:       make([]string, 0),
 		PrimaryKeys:   make([]string, 0),
-		ForeignKeys:   make([]string, 0),
+		ForeignKeys:   make([]*Detail, 0),
 		Unique:        make([]string, 0),
 		Required:      make([]string, 0),
 		Hidden:        make([]string, 0),
