@@ -211,7 +211,7 @@ func (s *Driver) buildFrom(ql *jql.Ql) (string, error) {
 
 	for _, from := range ql.Froms {
 		as := from.As
-		table := from.Model.Table
+		table := from.Table
 		def := fmt.Sprintf("%s AS %s", table, as)
 		if as == table {
 			def = fmt.Sprintf("%s", table)
@@ -246,11 +246,11 @@ func (s *Driver) buildJoins(ql *jql.Ql) (string, error) {
 			}
 		}
 
-		if join.Type == jql.TpLeft {
+		if join.Type == jql.LEFT {
 			result = strs.Append(result, def, "\nLEFT JOIN ")
-		} else if join.Type == jql.TpRight {
+		} else if join.Type == jql.RIGHT {
 			result = strs.Append(result, def, "\nRIGHT JOIN ")
-		} else if join.Type == jql.TpFull {
+		} else if join.Type == jql.FULL {
 			result = strs.Append(result, def, "\nFULL JOIN ")
 		} else {
 			result = strs.Append(result, def, "\nJOIN ")
@@ -317,7 +317,7 @@ func (s *Driver) buildWhere(wheres []*jql.Condition) (string, error) {
 	for i, cond := range wheres {
 		if i == 0 {
 			result = s.buildCondition(cond)
-		} else if cond.Connector == jql.Or {
+		} else if cond.Connector == jql.OR {
 			result = fmt.Sprintf("%s\nOR %s", result, s.buildCondition(cond))
 		} else {
 			result = fmt.Sprintf("%s\nAND %s", result, s.buildCondition(cond))
