@@ -121,18 +121,18 @@ func NotNull(field string) *jql.Condition {
 
 /**
 * Between
-* @param field string, value []interface{}
+* @param field string, min, max interface{}
 * @return jql.Condition
 **/
-func Between(field string, value []interface{}) *jql.Condition {
-	return jql.Between(field, value)
+func Between(field string, min, max interface{}) *jql.Condition {
+	return jql.Between(field, min, max)
 }
 
 /**
 * NotBetween
-* @param field string, value []interface{}
+* @param field string, min, max interface{}
 * @return jql.Condition
 **/
-func NotBetween(field string, value []interface{}) *jql.Condition {
-	return jql.NotBetween(field, value)
+func NotBetween(field string, min, max interface{}) *jql.Condition {
+	return jql.NotBetween(field, min, max)
 }
