@@ -107,17 +107,17 @@ func GetModel(tenantId string, name string) (*jql.Model, bool) {
 
 /**
 * LoadDb
-* @param tenantId string, dbName string, connection et.Json
+* @param tenantId string, name string, params et.Json
 * @return (*DB, error)
 **/
-func LoadDb(tenantId, dbName string, connection et.Json) (*jql.DB, error) {
+func LoadDb(tenantId, name string, params et.Json) (*jql.DB, error) {
 	tenant, ok := tenants[tenantId]
 	if ok {
 		return tenant.DB, nil
 	}
 
-	driver := connection.String("driver")
-	db, err := jql.ConnectTo(tenantId, dbName, driver, true, connection)
+	params.Set("database", name)
+	db, err := jql.ConnectTo(tenantId, params)
 	if err != nil {
 		return nil, err
 	}
