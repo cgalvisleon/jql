@@ -167,20 +167,6 @@ func (s *DB) GetModel(schema, name string) (*Model, error) {
 }
 
 /**
-* deleteModel
-* @param name string
-* @return error
-**/
-func (s *DB) deleteModel(schema, name string) error {
-	sch, ok := s.Schemas[schema]
-	if !ok {
-		return fmt.Errorf(MSG_SCHEMA_NOT_FOUND, schema)
-	}
-
-	return sch.deleteModel(name)
-}
-
-/**
 * sqlTx
 * @param tx *Tx, sql string, arg ...any
 * @return et.Items, error

@@ -14,46 +14,6 @@ import (
 	"github.com/cgalvisleon/et/strs"
 )
 
-const (
-	COMMAND     = "command"
-	QUERY       = "query"
-	DEFINITION  = "definition"
-	CONTROL     = "control"
-	TRANSACTION = "transaction"
-	OTHER       = "other"
-)
-
-/**
-* tipoSQL
-* @param query string
-* @return string
-**/
-func tipoSQL(query string) string {
-	q := strings.TrimSpace(strings.ToUpper(query))
-
-	parts := strings.Fields(q)
-	if len(parts) == 0 {
-		return OTHER
-	}
-
-	cmd := parts[0]
-
-	switch cmd {
-	case "SELECT":
-		return QUERY
-	case "INSERT", "UPDATE", "DELETE", "MERGE":
-		return COMMAND
-	case "CREATE", "ALTER", "DROP", "TRUNCATE":
-		return DEFINITION
-	case "GRANT", "REVOKE":
-		return CONTROL
-	case "COMMIT", "ROLLBACK", "SAVEPOINT", "SET":
-		return TRANSACTION
-	default:
-		return OTHER
-	}
-}
-
 /**
 * SQLParse
 * @param sql string

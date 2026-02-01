@@ -1,18 +1,11 @@
 package jql
 
 import (
-	"errors"
-	"strconv"
-
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/strs"
 )
 
 type Operator string
-
-var (
-	errorFieldNotFound = errors.New("field not found")
-)
 
 const (
 	OpEq         Operator = "eq"
@@ -107,46 +100,6 @@ func (s *Condition) ToJson() et.Json {
 			},
 		},
 	}
-}
-
-/**
-* fieldValue
-* @param data et.Json
-* @return any, error
-**/
-func (s *Condition) fieldValue(data et.Json) (any, error) {
-	array := []et.Json{}
-	fields := strs.Split(s.Field.AS(), ">")
-	for _, field := range fields {
-		idx, err := strconv.Atoi(field)
-		if err == nil && len(array) > idx {
-			data = array[idx]
-			array = []et.Json{}
-			continue
-		}
-
-		val, ok := data[field]
-		if !ok {
-			return nil, errorFieldNotFound
-		}
-
-		switch v := val.(type) {
-		case et.Json:
-			data = v
-		case map[string]interface{}:
-			data = v
-		case []et.Json:
-			array = v
-		case []map[string]interface{}:
-			for _, item := range v {
-				array = append(array, item)
-			}
-		default:
-			return v, nil
-		}
-	}
-
-	return nil, errorFieldNotFound
 }
 
 /**
