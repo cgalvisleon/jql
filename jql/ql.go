@@ -371,6 +371,16 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 }
 
 /**
+* Data
+* @return *Ql
+**/
+func (s *Ql) Data(fields ...interface{}) *Ql {
+	s.Select(fields...)
+	s.Type = DATA
+	return s
+}
+
+/**
 * getDetails
 * @param tx *Tx, data et.Json
 **/
