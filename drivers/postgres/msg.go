@@ -1,5 +1,7 @@
 package postgres
 
+import "github.com/cgalvisleon/et/envar"
+
 var (
 	MSG_ATRIB_REQUIRED = "Atrib required (%s)"
 	MSG_CREATE_MODEL   = "Create model:%s v:%d"
@@ -7,7 +9,8 @@ var (
 	MSG_LOAD_MODEL     = "Load model:%s v:%d"
 )
 
-func loadMsg(language string) {
+func init() {
+	language := envar.Get("LANG", "en")
 	switch language {
 	case "es":
 		MSG_ATRIB_REQUIRED = "Atributo requerido (%s)"

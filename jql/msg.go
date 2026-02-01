@@ -1,6 +1,10 @@
 package jql
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/cgalvisleon/et/envar"
+)
 
 var (
 	ErrModelNotFound         error  = errors.New("model not found")
@@ -21,7 +25,8 @@ var (
 	MSG_FIELD_NOT_FOUND      string = "field %s not found"
 )
 
-func loadMsg(language string) {
+func init() {
+	language := envar.Get("LANG", "en")
 	switch language {
 	case "es":
 		ErrModelNotFound = errors.New("modelo no encontrado")

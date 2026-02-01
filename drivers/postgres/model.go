@@ -56,6 +56,11 @@ func (s *Driver) buildModel(model *jql.Model) (string, error) {
 		return "", err
 	}
 
+	def, err = s.buildForeignKeys(model)
+	if err != nil {
+		return "", err
+	}
+
 	if def != "" {
 		sql = strs.Append(sql, def, "\n")
 	}
@@ -302,13 +307,4 @@ func (s *Driver) buildTriggerBeforeInsert(model *jql.Model) (string, error) {
 	`, table, table)
 
 	return result, nil
-}
-
-/**
-* mutateModel
-* @param model *jql.Model
-* @return (string, error)
-**/
-func (s *Driver) mutateModel(model *jql.Model) (string, error) {
-	return "", nil
 }
