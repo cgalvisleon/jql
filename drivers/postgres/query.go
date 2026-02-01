@@ -94,7 +94,7 @@ func (s *Driver) buildQuery(ql *jql.Ql) (string, error) {
 		sql = strs.Append(sql, def, "\n")
 	}
 
-	if ql.Type == jql.TpExists {
+	if ql.Type == jql.EXISTS {
 		return fmt.Sprintf("SELECT EXISTS(%s);", sql), nil
 	} else {
 		return fmt.Sprintf("%s;", sql), nil
@@ -107,16 +107,16 @@ func (s *Driver) buildQuery(ql *jql.Ql) (string, error) {
 * @return (string, error)
 **/
 func (s *Driver) buildSelect(ql *jql.Ql) (string, error) {
-	if ql.Type == jql.TpExists {
+	if ql.Type == jql.EXISTS {
 		return "", nil
 	}
 
-	if ql.Type == jql.TpCounted {
-		return "COUNT(*) AS all", nil
+	if ql.Type == jql.COUNTED {
+		return "COUNT(*) AS count", nil
 	}
 
 	result := ""
-	if ql.Type == jql.TpData {
+	if ql.Type == jql.DATA {
 		if len(ql.Selects) == 0 {
 			hiddens := make([]string, 0)
 			for _, fld := range ql.Hidden {
@@ -130,10 +130,10 @@ func (s *Driver) buildSelect(ql *jql.Ql) (string, error) {
 			selects := map[string]string{}
 			atribs := map[string]string{}
 			for _, fld := range ql.Selects {
-				if fld.TypeColumn == jql.TpColumn {
+				if fld.TypeColumn == jql.COLUMN {
 					as := FieldAs(fld)
 					selects[fld.As] = as
-				} else if fld.TypeColumn == jql.TpAtrib {
+				} else if fld.TypeColumn == jql.ATTRIB {
 					as := FieldAs(fld)
 					atribs[fld.As] = as
 				}
@@ -183,7 +183,7 @@ func (s *Driver) buildSelect(ql *jql.Ql) (string, error) {
 	} else {
 		selects := map[string]string{}
 		for _, fld := range ql.Selects {
-			if fld.TypeColumn == jql.TpColumn {
+			if fld.TypeColumn == jql.COLUMN {
 				as := FieldAs(fld)
 				selects[fld.As] = as
 			}
