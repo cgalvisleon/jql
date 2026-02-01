@@ -10,7 +10,7 @@ const (
 	DriverSqlite   = jql.DriverSqlite
 	// Field names
 	SOURCE     = jql.SOURCE
-	KEY        = jql.KEY
+	ID         = jql.ID
 	IDX        = jql.IDX
 	STATUS     = jql.STATUS
 	VERSION    = jql.VERSION
@@ -19,33 +19,33 @@ const (
 	CREATED_AT = jql.CREATED_AT
 	UPDATED_AT = jql.UPDATED_AT
 	// Data types
-	TpAny      = jql.TpAny
-	TpBytes    = jql.TpBytes
-	TpInt      = jql.TpInt
-	TpFloat    = jql.TpFloat
-	TpKey      = jql.TpKey
-	TpText     = jql.TpText
-	TpMemo     = jql.TpMemo
-	TpJson     = jql.TpJson
-	TpDateTime = jql.TpDateTime
-	TpBoolean  = jql.TpBoolean
-	TpGeometry = jql.TpGeometry
-	TpCalc     = jql.TpCalc
+	ANY      = jql.ANY
+	BYTES    = jql.BYTES
+	INT      = jql.INT
+	FLOAT    = jql.FLOAT
+	KEY      = jql.KEY
+	TEXT     = jql.TEXT
+	MEMO     = jql.MEMO
+	JSON     = jql.JSON
+	DATETIME = jql.DATETIME
+	BOOLEAN  = jql.BOOLEAN
+	GEOMETRY = jql.GEOMETRY
+	CALC     = jql.CALC
 	// Column types
-	TpColumn      = jql.TpColumn
-	TpAtrib       = jql.TpAtrib
-	TpDetail      = jql.TpDetail
-	TpRollup      = jql.TpRollup
-	TpAggregation = jql.TpAggregation
+	COLUMN = jql.COLUMN
+	ATTRIB = jql.ATTRIB
+	DETAIL = jql.DETAIL
+	ROLLUP = jql.ROLLUP
+	AGG    = jql.AGG
 	// Status record
-	Active    = jql.Active
-	Archived  = jql.Archived
-	Canceled  = jql.Canceled
-	OfSystem  = jql.OfSystem
-	ForDelete = jql.ForDelete
-	Pending   = jql.Pending
-	Approved  = jql.Approved
-	Rejected  = jql.Rejected
+	ACTIVE     = jql.ACTIVE
+	ARCHIVED   = jql.ARCHIVED
+	CANCELED   = jql.CANCELED
+	OF_SYSTEM  = jql.OF_SYSTEM
+	FOR_DELETE = jql.FOR_DELETE
+	PENDING    = jql.PENDING
+	APPROVED   = jql.APPROVED
+	REJECTED   = jql.REJECTED
 )
 
 var (
@@ -88,11 +88,11 @@ func NewModel(db *DB, schema, name string, version int) (*Model, error) {
 
 /**
 * ConnectTo
-* @param tenantId, name, driver string, userCore bool, params et.Json
+* @param name string, params et.Json
 * @return (*DB, error)
 **/
-func ConnectTo(tenantId, name, driver string, userCore bool, params et.Json) (*DB, error) {
-	return jql.ConnectTo(tenantId, name, driver, userCore, params)
+func ConnectTo(name string, params et.Json) (*DB, error) {
+	return jql.ConnectTo(name, params)
 }
 
 /**
@@ -119,15 +119,6 @@ func Load() (*DB, error) {
 **/
 func Define(definition et.Json) (*Model, error) {
 	return jql.Define(definition)
-}
-
-/**
-* From
-* @param model *Model, as string
-* @return *Ql
-**/
-func From(model *Model, as string) *Ql {
-	return jql.From(model, as)
 }
 
 /**
