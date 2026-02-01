@@ -170,19 +170,15 @@ func (s *Driver) buildSelect(ql *jql.Ql) (string, error) {
 	}
 
 	if len(ql.Selects) == 0 {
-		hiddens := make([]string, 0)
-		for _, fld := range ql.Hidden {
-			as := FieldAs(fld)
-			hiddens = append(hiddens, as)
-		}
-		if len(hiddens) > 0 {
-			result += fmt.Sprintf("to_jsonb(A) - ARRAY[%s]", strings.Join(hiddens, ", "))
+		if len(ql.Hidden) > 0 {
+			result += fmt.Sprintf("to_jsonb(A) - ARRAY[%s]", strings.Join(ql.Hidden, ", "))
 		} else {
 			result += "A.*"
 		}
 	} else {
 		selects := map[string]string{}
 		for _, fld := range ql.Selects {
+
 			if fld.TypeColumn == jql.COLUMN {
 				as := FieldAs(fld)
 				selects[fld.As] = as

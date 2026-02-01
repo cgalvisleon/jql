@@ -28,7 +28,7 @@ type Orders struct {
 type Ql struct {
 	Type     TypeQuery              `json:"type"`
 	Froms    []*From                `json:"froms"`
-	Selects  []interface{}          `json:"select"`
+	Selects  []*Field               `json:"select"`
 	Hidden   []string               `json:"hidden"`
 	Wheres   *Wheres                `json:"wheres"`
 	Joins    []*Joins               `json:"joins"`
@@ -63,7 +63,7 @@ func newQuery(model *Model, as string) *Ql {
 		Type:     tp,
 		Froms:    []*From{from},
 		Joins:    make([]*Joins, 0),
-		Selects:  make([]interface{}, 0),
+		Selects:  make([]*Field, 0),
 		Hidden:   make([]string, 0),
 		Wheres:   newWhere(),
 		Details:  make(map[string]*Detail),
@@ -292,7 +292,7 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 	}
 
 	if len(fields) == 0 {
-		s.Selects = make([]interface{}, 0)
+		s.Selects = make([]*Field, 0)
 		for _, from := range s.Froms {
 			for _, field := range from.Fields {
 				if field.TypeColumn == COLUMN {
