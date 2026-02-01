@@ -204,7 +204,7 @@ func (s *Driver) buildPrimaryKeys(model *jql.Model) (string, error) {
 **/
 func (s *Driver) buildForeignKeys(model *jql.Model) (string, error) {
 	result := ""
-	for name, foreignKey := range model.ForeignKeys {
+	for _, foreignKey := range model.ForeignKeys {
 		to := foreignKey.To.Table
 		fks := ""
 		ks := ""
