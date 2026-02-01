@@ -128,7 +128,7 @@ func (s *Driver) buildDelete(cmd *jql.Cmd) (string, error) {
 	from := cmd.Model
 	table := from.Table
 	where := ""
-	useAtribs := from.SourceField != nil && !from.IsLocked
+	useAtribs := from.SourceField != "" && !from.IsStrict
 	returning := fmt.Sprintf(`to_jsonb(%s.*) AS result`, table)
 	if len(cmd.Wheres.Conditions) > 0 {
 		def, err := s.buildWhere(cmd.Wheres.Conditions)
@@ -140,7 +140,7 @@ func (s *Driver) buildDelete(cmd *jql.Cmd) (string, error) {
 	}
 
 	if useAtribs {
-		returning = fmt.Sprintf("to_jsonb(%s.*) - '%s' AS result", table, from.SourceField.Name)
+		returning = fmt.Sprintf("to_jsonb(%s.*) - '%s' AS result", table, from.SourceField)
 	}
 
 	sql := fmt.Sprintf(`DELETE FROM %s`, table)
