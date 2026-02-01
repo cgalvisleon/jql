@@ -37,12 +37,12 @@ func (s *Driver) buildInsert(cmd *jql.Cmd) (string, error) {
 	data := cmd.New
 	into := ""
 	values := ""
-	useAtribs := from.SourceField != nil && !from.IsLocked
+	useAtribs := from.SourceField != "" && !from.IsStrict
 	atribs := et.Json{}
 	returning := fmt.Sprintf(`to_jsonb(%s.*) AS result`, table)
 	for k, v := range data {
 		col := from.FindColumn(k)
-		if col != nil && col.TypeColumn == jql.TpColumn {
+		if col != nil && col.TypeColumn == jql.COLUMN {
 			val := fmt.Sprintf(`%v`, jql.Quoted(v))
 			into = strs.Append(into, k, ", ")
 			values = strs.Append(values, val, ", ")
@@ -55,9 +55,9 @@ func (s *Driver) buildInsert(cmd *jql.Cmd) (string, error) {
 	}
 
 	if useAtribs {
-		into = strs.Append(into, from.SourceField.Name, ", ")
+		into = strs.Append(into, from.SourceField, ", ")
 		values = strs.Append(values, fmt.Sprintf(`'%v'::jsonb`, atribs.ToString()), ", ")
-		returning = fmt.Sprintf("to_jsonb(%s.*) - '%s' AS result", table, from.SourceField.Name)
+		returning = fmt.Sprintf("to_jsonb(%s.*) - '%s' AS result", table, from.SourceField)
 	}
 
 	sql := fmt.Sprintf("INSERT INTO %s(%s)\nVALUES(%s)\nRETURNING %s;", table, into, values, returning)
@@ -77,10 +77,10 @@ func (s *Driver) buildUpdate(cmd *jql.Cmd) (string, error) {
 	atribs := ""
 	where := ""
 	returning := fmt.Sprintf(`to_jsonb(%s.*) AS result`, table)
-	useAtribs := from.SourceField != nil && !from.IsLocked
+	useAtribs := from.SourceField != "" && !from.IsStrict
 	for k, v := range data {
 		col := from.FindColumn(k)
-		if col != nil && col.TypeColumn == jql.TpColumn {
+		if col != nil && col.TypeColumn == jql.COLUMN {
 			val := fmt.Sprintf(`%v`, jql.Quoted(v))
 			sets = strs.Append(sets, fmt.Sprintf(`%s = %s`, k, val), ",\n")
 			continue
@@ -89,7 +89,7 @@ func (s *Driver) buildUpdate(cmd *jql.Cmd) (string, error) {
 		if useAtribs {
 			val := fmt.Sprintf(`%v`, jql.Literal(v))
 			if len(atribs) == 0 {
-				atribs = fmt.Sprintf("COALESCE(%s, '{}')", from.SourceField.Name)
+				atribs = fmt.Sprintf("COALESCE(%s, '{}')", from.SourceField)
 				atribs = strs.Format("jsonb_set(%s, '{%s}', '%v'::jsonb, true)", atribs, k, val)
 			} else {
 				atribs = strs.Format("jsonb_set(\n%s, \n'{%s}', '%v'::jsonb, true)", atribs, k, val)
@@ -99,9 +99,9 @@ func (s *Driver) buildUpdate(cmd *jql.Cmd) (string, error) {
 
 	if useAtribs {
 		if len(atribs) > 0 {
-			sets = strs.Append(sets, fmt.Sprintf(`%s = %s`, from.SourceField.Name, atribs), ",")
+			sets = strs.Append(sets, fmt.Sprintf(`%s = %s`, from.SourceField, atribs), ",")
 		}
-		returning = fmt.Sprintf("to_jsonb(%s.*) - '%s' AS result", table, from.SourceField.Name)
+		returning = fmt.Sprintf("to_jsonb(%s.*) - '%s' AS result", table, from.SourceField)
 	}
 
 	if len(cmd.Wheres.Conditions) > 0 {
