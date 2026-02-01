@@ -205,6 +205,7 @@ func (s *Driver) buildPrimaryKeys(model *jql.Model) (string, error) {
 func (s *Driver) buildForeignKeys(model *jql.Model) (string, error) {
 	result := ""
 	for _, foreignKey := range model.ForeignKeys {
+		name := fmt.Sprintf("fk_%s_%s", model.Name, foreignKey.To.Name)
 		to := foreignKey.To.Table
 		fks := ""
 		ks := ""
@@ -212,7 +213,7 @@ func (s *Driver) buildForeignKeys(model *jql.Model) (string, error) {
 			fks = strs.Append(fks, fmt.Sprintf("%s", k), ", ")
 			ks = strs.Append(ks, fmt.Sprintf("%s", fk), ", ")
 		}
-		def := fmt.Sprintf("ALTER TABLE IF EXISTS %s ADD CONSTRAINT fk_%s_%s FOREIGN KEY(%s) REFERENCES %s(%s)", model.Table, model.Name, name, fks, to, ks)
+		def := fmt.Sprintf("ALTER TABLE IF EXISTS %s ADD CONSTRAINT %s FOREIGN KEY(%s) REFERENCES %s(%s)", model.Table, name, fks, to, ks)
 		onDelete := foreignKey.OnDeleteCascade
 		onUpdate := foreignKey.OnUpdateCascade
 		if onDelete {
