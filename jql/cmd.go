@@ -21,6 +21,7 @@ type Cmd struct {
 	Model         *Model            `json:"model"`
 	Wheres        *Wheres           `json:"wheres"`
 	Data          []et.Json         `json:"data"`
+	New           et.Json           `json:"new"`
 	IsDebug       bool              `json:"is_debug"`
 	beforeInserts []TriggerFunction `json:"-"`
 	beforeUpdates []TriggerFunction `json:"-"`
@@ -75,6 +76,7 @@ func newCommand(s *Model, cmd TypeCommand) *Cmd {
 		Model:         s,
 		Wheres:        newWhere(),
 		Data:          make([]et.Json, 0),
+		New:           et.Json{},
 		beforeInserts: s.beforeInserts,
 		beforeUpdates: s.beforeUpdates,
 		beforeDeletes: s.beforeDeletes,
@@ -198,6 +200,7 @@ func (s *Cmd) insert() (et.Items, error) {
 			continue
 		}
 
+		s.New = new
 		result, err := s.db.Command(s)
 		if err != nil {
 			return et.Items{}, err
@@ -249,6 +252,7 @@ func (s *Cmd) update() (et.Items, error) {
 				}
 			}
 
+			s.New = new
 			result, err := s.db.Command(s)
 			if err != nil {
 				return et.Items{}, err

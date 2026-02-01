@@ -15,11 +15,11 @@ import (
 **/
 func (s *Driver) buildCommand(cmd *jql.Cmd) (string, error) {
 	switch cmd.Type {
-	case jql.TypeInsert:
+	case jql.INSERT:
 		return s.buildInsert(cmd)
-	case jql.TypeUpdate:
+	case jql.UPDATE:
 		return s.buildUpdate(cmd)
-	case jql.TypeDelete:
+	case jql.DELETE:
 		return s.buildDelete(cmd)
 	}
 
