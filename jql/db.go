@@ -127,7 +127,7 @@ func (s *DB) init() error {
 	}
 
 	s.db = db
-	return nil
+	return s.save()
 }
 
 /**
