@@ -109,7 +109,7 @@ func Define(definition et.Json) (*Model, error) {
 		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, "database")
 	}
 
-	db, err := GetDatabase(database)
+	db, err := GetDb(database)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func Query(query et.Json) (et.Items, error) {
 		return et.Items{}, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, "database")
 	}
 
-	db, err := GetDatabase(database)
+	db, err := GetDb(database)
 	if err != nil {
 		return et.Items{}, err
 	}
