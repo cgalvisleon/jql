@@ -160,12 +160,53 @@ func (s *DB) getSchema(name string) *Schema {
 * @return *Model
 **/
 func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
-	if !utility.ValidStr(schema, 0, []string{}) {
-		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, schema)
+	key := name
+	key = strs.Append(schema, key, ".")
+	key = strs.Append(s.Name, key, ".")
+
+	result, ok := models[key]
+	if ok {
+		return result, nil
 	}
 
+	schema = utility.Normalize(schema)
+	name = utility.Normalize(name)
+	result = &Model{
+		Database:      s.Name,
+		Schema:        schema,
+		Name:          name,
+		Columns:       make([]*Column, 0),
+		Indexes:       make([]string, 0),
+		PrimaryKeys:   make([]string, 0),
+		ForeignKeys:   make([]*Detail, 0),
+		Unique:        make([]string, 0),
+		Required:      make([]string, 0),
+		Hidden:        make([]string, 0),
+		Details:       make(map[string]*Detail, 0),
+		Rollups:       make(map[string]*Detail, 0),
+		Relations:     make(map[string]*Detail, 0),
+		BeforeInserts: make([]*Trigger, 0),
+		BeforeUpdates: make([]*Trigger, 0),
+		BeforeDeletes: make([]*Trigger, 0),
+		AfterInserts:  make([]*Trigger, 0),
+		AfterUpdates:  make([]*Trigger, 0),
+		AfterDeletes:  make([]*Trigger, 0),
+		Version:       version,
+		beforeInserts: make([]TriggerFunction, 0),
+		beforeUpdates: make([]TriggerFunction, 0),
+		beforeDeletes: make([]TriggerFunction, 0),
+		afterInserts:  make([]TriggerFunction, 0),
+		afterUpdates:  make([]TriggerFunction, 0),
+		afterDeletes:  make([]TriggerFunction, 0),
+		calcs:         make(map[string]DataContext),
+	}
+	result.defineIdxField()
+
 	sch := s.getSchema(schema)
-	return sch.newModel(name, version)
+	sch.Models[name] = result.From()
+	models[key] = result
+
+	return result, nil
 }
 
 /**
