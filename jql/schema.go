@@ -83,9 +83,13 @@ func (s *Schema) getModel(name string) (*Model, error) {
 	key := name
 	key = strs.Append(s.Name, key, ".")
 	key = strs.Append(s.Database, key, ".")
-	err := getCatalog("model", key, &result)
+	exists, err := getCatalog("model", key, &result)
 	if err != nil {
 		return nil, err
+	}
+
+	if !exists {
+		return nil, ErrModelNotFound
 	}
 
 	result.beforeInserts = make([]TriggerFunction, 0)

@@ -81,24 +81,33 @@ func setCatalog(tp, id string, version int, obj any) error {
 /**
 * getCatalog
 * @param tp, id string, dest any
-* @return error
+* @return bool, error
 **/
-func getCatalog(tp, id string, dest any) error {
+func getCatalog(tp, id string, dest any) (bool, error) {
 	item, err := catalog.
 		Select().
 		Where(Eq("type", tp)).
 		And(Eq("id", id)).
 		One()
 	if err != nil {
-		return err
+		return false, err
+	}
+
+	if !item.Ok {
+		return false, nil
 	}
 
 	bt, err := item.Byte("definition")
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return json.Unmarshal(bt, dest)
+	err = json.Unmarshal(bt, dest)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 /**
