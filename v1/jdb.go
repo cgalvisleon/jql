@@ -97,11 +97,11 @@ func ConnectTo(name string, params et.Json) (*DB, error) {
 
 /**
 * LoadTo
-* @param name string
+* @param name string, host string, port int
 * @return (*DB, error)
 **/
-func LoadTo(name string) (*DB, error) {
-	return jql.LoadTo(name)
+func LoadTo(name, host string, port int) (*DB, error) {
+	return jql.LoadTo(name, host, port)
 }
 
 /**
