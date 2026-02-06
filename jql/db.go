@@ -260,10 +260,34 @@ func (s *DB) GetModel(schema, name string) (*Model, error) {
 }
 
 /**
+* deleteModel
+* @param schema, name string
+* @return error
+**/
+func (s *DB) deleteModel(schema, name string) error {
+	key := name
+	key = strs.Append(schema, key, ".")
+	key = strs.Append(s.Name, key, ".")
+
+	_, ok := models[key]
+	if ok {
+		delete(models, key)
+	}
+
+	err := deleteCatalog("model", key)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/**
 * sqlTx
 * @param tx *Tx, sql string, arg ...any
 * @return et.Items, error
-**/
+*
+ */
 func (s *DB) sqlTx(tx *Tx, _sql string, arg ...any) (et.Items, error) {
 	query := SQLParse(_sql, arg...)
 	if tx != nil {

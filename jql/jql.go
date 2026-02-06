@@ -63,7 +63,7 @@ func Load() (*DB, error) {
 * @param name string, host string, port int
 * @return (*DB, error)
 **/
-func NewDb(name string, host string, port int) (*DB, error) {	
+func NewDb(name string, host string, port int) (*DB, error) {
 	result, err := LoadTo(name, host, port)
 	if err != nil {
 		return nil, err
@@ -112,6 +112,44 @@ func GetModel(database, schema, name string) (*Model, error) {
 	}
 
 	return result, nil
+}
+
+/**
+* DeleteDb
+* @param name string
+* @return error
+**/
+func DeleteDb(name string) error {
+	_, ok := dbs[name]
+	if ok {
+		delete(dbs, name)
+	}
+
+	err := deleteCatalog("db", name)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/**
+* DeleteModel
+* @param database, schema, name string
+* @return error
+**/
+func DeleteModel(database, schema, name string) error {
+	db, err := GetDb(database)
+	if err != nil {
+		return err
+	}
+
+	err = db.deleteModel(schema, name)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 /**
@@ -208,6 +246,12 @@ func HttpQuery(w http.ResponseWriter, r *http.Request) {
 	result, err := Query(body)
 	if err != nil {
 		response.HTTPError(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	response.ITEMS(w, r, http.StatusOK, result)
+}
+
 		return
 	}
 
