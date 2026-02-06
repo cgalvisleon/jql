@@ -20,6 +20,12 @@ func init() {
 	models = make(map[string]*Model)
 }
 
+type Schema struct {
+	Database string           `json:"-"`
+	Name     string           `json:"name"`
+	Models   map[string]*From `json:"models"`
+}
+
 type DB struct {
 	Name    string             `json:"name"`
 	Schemas map[string]*Schema `json:"schemas"`
@@ -148,7 +154,6 @@ func (s *DB) getSchema(name string) *Schema {
 		Database: s.Name,
 		Name:     name,
 		Models:   make(map[string]*From),
-		db:       s,
 	}
 	s.Schemas[name] = result
 	return result
