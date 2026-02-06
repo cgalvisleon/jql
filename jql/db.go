@@ -140,26 +140,6 @@ func (s *DB) init() error {
 }
 
 /**
-* getSchema
-* @param name string
-* @return *Schema
-**/
-func (s *DB) getSchema(name string) *Schema {
-	result, ok := s.Schemas[name]
-	if ok {
-		return result
-	}
-
-	result = &Schema{
-		Database: s.Name,
-		Name:     name,
-		Models:   make(map[string]*From),
-	}
-	s.Schemas[name] = result
-	return result
-}
-
-/**
 * NewModel
 * @param schema, name string, version int
 * @return *Model
@@ -212,6 +192,26 @@ func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
 	models[key] = result
 
 	return result, nil
+}
+
+/**
+* getSchema
+* @param name string
+* @return *Schema
+**/
+func (s *DB) getSchema(name string) *Schema {
+	result, ok := s.Schemas[name]
+	if ok {
+		return result
+	}
+
+	result = &Schema{
+		Database: s.Name,
+		Name:     name,
+		Models:   make(map[string]*From),
+	}
+	s.Schemas[name] = result
+	return result
 }
 
 /**
