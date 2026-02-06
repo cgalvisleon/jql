@@ -2,6 +2,7 @@ package jql
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/timezone"
@@ -72,11 +73,16 @@ func setCatalog(tp, id string, version int, obj any) error {
 			return nil
 		}).
 		BeforeUpdate(func(tx *Tx, old, new et.Json) error {
+			oldVersion := old.Int("version")
+			if oldVersion == version {
+				return ErrNotUpdated
+			}
+
 			new.Set("updated_at", now)
 			return nil
 		}).
 		Exec()
-	if err != nil {
+	if err != nil && !errors.Is(err, ErrNotUpdated) {
 		return err
 	}
 

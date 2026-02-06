@@ -80,12 +80,19 @@ func Delete(tenantId string) {
 * @return (*DB, error)
 **/
 func GetDb(tenantId string) (*jql.DB, error) {
-	result, ok := tenants[tenantId]
+	tenant, ok := tenants[tenantId]
 	if ok {
-		return result.DB, nil
+		return tenant.DB, nil
 	}
 
-	return nil, false
+	result, err := jql.GetDb(tenantId)
+	if err != nil {
+		return nil, jql.ErrDbNotFound
+	}
+
+	tenants[tenantId] = newTenant(result)
+	save(tenantId)
+	return result, nil
 }
 
 /**
