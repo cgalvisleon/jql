@@ -147,7 +147,7 @@ func (s *DB) getSchema(name string) *Schema {
 	result = &Schema{
 		Database: s.Name,
 		Name:     name,
-		Models:   make(map[string]*Froms),
+		Models:   make(map[string]*From),
 		db:       s,
 	}
 	s.Schemas[name] = result
@@ -208,6 +208,7 @@ func (s *DB) GetModel(schema, name string) (*Model, error) {
 
 	sch := s.getSchema(schema)
 	sch.Models[name] = result.From()
+	models[key] = result
 
 	return result, nil
 }

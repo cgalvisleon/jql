@@ -39,6 +39,11 @@ func defineCatalog(db *DB) error {
 	return nil
 }
 
+/**
+* setCatalog
+* @param tp, id string, version int, obj any
+* @return error
+**/
 func setCatalog(tp, id string, version int, obj any) error {
 	if catalog == nil {
 		return nil
