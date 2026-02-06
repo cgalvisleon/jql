@@ -251,9 +251,3 @@ func HttpQuery(w http.ResponseWriter, r *http.Request) {
 
 	response.ITEMS(w, r, http.StatusOK, result)
 }
-
-		return
-	}
-
-	response.ITEMS(w, r, http.StatusOK, result)
-}
