@@ -59,6 +59,20 @@ func Load() (*DB, error) {
 }
 
 /**
+* NewDb
+* @param name string, host string, port int
+* @return (*DB, error)
+**/
+func NewDb(name string, host string, port int) (*DB, error) {	
+	result, err := LoadTo(name, host, port)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+/**
 * GetDb
 * @param name string
 * @return (*DB, error)
