@@ -32,15 +32,15 @@ func ConnectTo(name string, params et.Json) (*DB, error) {
 * @param name string
 * @return (*DB, error)
 **/
-func LoadTo(name string) (*DB, error) {
+func LoadTo(name string, host string, port int) (*DB, error) {
 	params := et.Json{
 		"driver":   envar.GetStr("DB_DRIVER", "postgres"),
 		"database": name,
-		"host":     envar.GetStr("DB_HOST", "localhost"),
-		"port":     envar.GetInt("DB_PORT", 5432),
+		"host":     host,
+		"port":     port,
 		"username": envar.GetStr("DB_USERNAME", "test"),
 		"password": envar.GetStr("DB_PASSWORD", "test"),
-		"app":      envar.GetStr("DB_APP", "test"),
+		"app":      envar.GetStr("DB_APP", "jql"),
 		"version":  envar.GetInt("DB_VERSION", 15),
 	}
 
@@ -53,7 +53,9 @@ func LoadTo(name string) (*DB, error) {
 **/
 func Load() (*DB, error) {
 	name := envar.GetStr("DB_NAME", "josephine")
-	return LoadTo(name)
+	host := envar.GetStr("DB_HOST", "localhost")
+	port := envar.GetInt("DB_PORT", 5432)
+	return LoadTo(name, host, port)
 }
 
 /**

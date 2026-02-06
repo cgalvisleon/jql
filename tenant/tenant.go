@@ -1,6 +1,7 @@
 package tenant
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/cgalvisleon/et/cache"
@@ -106,4 +107,15 @@ func GetModel(tenantId, schema, name string) (*jql.Model, bool) {
 
 	tenant.Models[key] = result
 	return result, true
+}
+
+func NewDb(tenantId string) (*jql.DB, error) {
+	result, err := jql.GetDb(tenantId)
+	if err != nil && !errors.Is(err, jql.ErrDbNotFound) {
+		return nil, err
+	}
+
+	jql.NewDb(tenantId)
+	tenants[tenantId] = newTenant(result)
+	return result, nil
 }
