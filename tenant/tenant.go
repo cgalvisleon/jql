@@ -1,7 +1,6 @@
 package tenant
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/cgalvisleon/et/cache"
@@ -109,13 +108,22 @@ func GetModel(tenantId, schema, name string) (*jql.Model, bool) {
 	return result, true
 }
 
-func NewDb(tenantId string) (*jql.DB, error) {
-	result, err := jql.GetDb(tenantId)
-	if err != nil && !errors.Is(err, jql.ErrDbNotFound) {
+/**
+* NewDb
+* @param tenantId string
+* @return (*DB, error)
+**/
+func NewDb(tenantId, host string, port int) (*jql.DB, error) {
+	tenant, ok := tenants[tenantId]
+	if ok {
+		return tenant.DB, nil
+	}
+
+	result, err := jql.NewDb(tenantId, host, port)
+	if err != nil {
 		return nil, err
 	}
 
-	jql.NewDb(tenantId)
 	tenants[tenantId] = newTenant(result)
 	return result, nil
 }
