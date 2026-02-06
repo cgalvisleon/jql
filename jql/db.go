@@ -8,13 +8,16 @@ import (
 
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/logs"
+	"github.com/cgalvisleon/et/strs"
 	"github.com/cgalvisleon/et/utility"
 )
 
 var dbs map[string]*DB
+var models map[string]*Model
 
 func init() {
 	dbs = make(map[string]*DB)
+	models = make(map[string]*Model)
 }
 
 type DB struct {
@@ -144,7 +147,7 @@ func (s *DB) getSchema(name string) *Schema {
 	result = &Schema{
 		Database: s.Name,
 		Name:     name,
-		Models:   make(map[string]*Model),
+		Models:   make(map[string]*Froms),
 		db:       s,
 	}
 	s.Schemas[name] = result
@@ -171,12 +174,42 @@ func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
 * @return *Model
 **/
 func (s *DB) GetModel(schema, name string) (*Model, error) {
-	sch, ok := s.Schemas[schema]
-	if !ok {
-		return nil, fmt.Errorf(MSG_SCHEMA_NOT_FOUND, schema)
+	key := name
+	key = strs.Append(schema, key, ".")
+	key = strs.Append(s.Name, key, ".")
+
+	result, ok := models[key]
+	if ok {
+		return result, nil
 	}
 
-	return sch.getModel(name)
+	exists, err := getCatalog("model", key, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		return nil, ErrModelNotFound
+	}
+
+	result.beforeInserts = make([]TriggerFunction, 0)
+	result.beforeUpdates = make([]TriggerFunction, 0)
+	result.beforeDeletes = make([]TriggerFunction, 0)
+	result.afterInserts = make([]TriggerFunction, 0)
+	result.afterUpdates = make([]TriggerFunction, 0)
+	result.afterDeletes = make([]TriggerFunction, 0)
+	result.calcs = make(map[string]DataContext)
+	result.db = s
+
+	err = result.Init()
+	if err != nil {
+		return nil, err
+	}
+
+	sch := s.getSchema(schema)
+	sch.Models[name] = result.From()
+
+	return result, nil
 }
 
 /**

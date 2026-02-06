@@ -57,17 +57,26 @@ func Load() (*DB, error) {
 }
 
 /**
-* GetDatabase
+* GetDb
 * @param name string
 * @return (*DB, error)
 **/
-func GetDatabase(name string) (*DB, error) {
+func GetDb(name string) (*DB, error) {
 	result, ok := dbs[name]
 	if ok {
 		return result, nil
 	}
 
-	return nil, fmt.Errorf(MSG_DATABASE_NOT_FOUND, name)
+	exists, err := getCatalog("db", name, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		return nil, ErrDbNotFound
+	}
+
+	return result, nil
 }
 
 /**
@@ -76,7 +85,7 @@ func GetDatabase(name string) (*DB, error) {
 * @return (*Model, error)
 **/
 func GetModel(database, schema, name string) (*Model, error) {
-	db, err := GetDatabase(database)
+	db, err := GetDb(database)
 	if err != nil {
 		return nil, err
 	}

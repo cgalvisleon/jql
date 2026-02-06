@@ -79,12 +79,13 @@ func Delete(tenantId string) {
 * @param tenantId string
 * @return (*DB, error)
 **/
-func GetDb(tenantId string) (*jql.DB, bool) {
-	if _, ok := tenants[tenantId]; !ok {
-		return nil, false
+func GetDb(tenantId string) (*jql.DB, error) {
+	result, ok := tenants[tenantId]
+	if ok {
+		return result.DB, nil
 	}
 
-	return tenants[tenantId].DB, true
+	return nil, false
 }
 
 /**

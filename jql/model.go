@@ -91,6 +91,18 @@ func (s *Model) ToJson() et.Json {
 }
 
 /**
+* From
+* @return *From
+**/
+func (s *Model) From() *From {
+	return &From{
+		Database: s.Database,
+		Schema:   s.Schema,
+		Name:     s.Name,
+	}
+}
+
+/**
 * Key
 * @return string
 **/

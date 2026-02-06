@@ -8,6 +8,7 @@ import (
 
 var (
 	ErrModelNotFound         error  = errors.New("model not found")
+	ErrDbNotFound            error  = errors.New("database not found")
 	MSG_DRIVER_NOT_FOUND     string = "driver not found"
 	MSG_NAME_REQUIRED        string = "name required"
 	MSG_COLUMN_EXISTS        string = "column %s already exists"
@@ -30,6 +31,7 @@ func init() {
 	switch language {
 	case "es":
 		ErrModelNotFound = errors.New("modelo no encontrado")
+		ErrDbNotFound = errors.New("base de datos no encontrada")
 		MSG_DRIVER_NOT_FOUND = "driver no encontrado"
 		MSG_NAME_REQUIRED = "nombre requerido"
 		MSG_COLUMN_EXISTS = "columna %s ya existe"
