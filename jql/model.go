@@ -8,7 +8,7 @@ import (
 
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/reg"
-	"github.com/cgalvisleon/et/timezone"
+	"github.com/cgalvisleon/et/strs"
 )
 
 type Trigger struct {
@@ -91,14 +91,21 @@ func (s *Model) ToJson() et.Json {
 }
 
 /**
+* Key
+* @return string
+**/
+func (s *Model) Key() string {
+	result := s.Name
+	result = strs.Append(s.Schema, result, ".")
+	result = strs.Append(s.Database, result, ".")
+	return result
+}
+
+/**
 * save
 * @return error
 **/
 func (s *Model) save() error {
-	if models == nil {
-		return nil
-	}
-
 	if s.IsCore {
 		return nil
 	}
@@ -108,28 +115,8 @@ func (s *Model) save() error {
 		return err
 	}
 
-	now := timezone.Now()
-	_, err = models.
-		Upsert(et.Json{
-			"name":       s.Name,
-			"version":    s.Version,
-			"definition": serialize,
-		}).
-		BeforeInsertOrUpdate(func(tx *Tx, old, new et.Json) error {
-			new.Set("created_at", now)
-			new.Set("updated_at", now)
-			return nil
-		}).
-		BeforeUpdate(func(tx *Tx, old, new et.Json) error {
-			new.Set("updated_at", now)
-			return nil
-		}).
-		Exec()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	key := s.Key()
+	return setCatalog("model", key, s.Version, serialize)
 }
 
 /**

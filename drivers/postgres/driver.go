@@ -65,13 +65,6 @@ func (s *Driver) Connect(db *jql.DB) (*sql.DB, error) {
 		return nil, err
 	}
 
-	isCore := params.Bool("is_core")
-	if isCore {
-		if err := TriggerRecords(result); err != nil {
-			return nil, err
-		}
-	}
-
 	host := params.Str("host")
 	port := params.Int("port")
 	logs.Logf(driver, `Connected to %s:%s:%d`, host, db.Name, port)

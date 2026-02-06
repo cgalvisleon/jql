@@ -95,10 +95,23 @@ func (s *DB) ToJson() et.Json {
 }
 
 /**
-* load
+* save
 * @return error
 **/
-func (s *DB) load() error {
+func (s *DB) save() error {
+	bt, err := s.serialize()
+	if err != nil {
+		return err
+	}
+
+	return setCatalog("db", s.Name, 1, bt)
+}
+
+/**
+* init
+* @return error
+**/
+func (s *DB) init() error {
 	if s.driver == nil {
 		return fmt.Errorf(MSG_DRIVER_NOT_FOUND)
 	}

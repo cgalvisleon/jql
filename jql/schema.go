@@ -76,13 +76,16 @@ func (s *Schema) getModel(name string) (*Model, error) {
 		return result, nil
 	}
 
-	if models == nil {
+	if catalog == nil {
 		return nil, ErrModelNotFound
 	}
 
-	items, err := models.
+	items, err := catalog.
 		Select().
+		Where(Eq("type", "model")).
 		Where(Eq("name", name)).
+		Where(Eq("schema", s.Name)).
+		Where(Eq("database", s.Database)).
 		One()
 	if err != nil {
 		return nil, err
