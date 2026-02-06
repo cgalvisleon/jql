@@ -53,7 +53,7 @@ func getDb(name string, params et.Json) (*DB, error) {
 		Params:  params,
 		driver:  drv(),
 	}
-	err := result.load()
+	err := result.init()
 	if err != nil {
 		return nil, err
 	}
