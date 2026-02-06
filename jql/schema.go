@@ -1,9 +1,9 @@
 package jql
 
 import (
-	"encoding/json"
 	"fmt"
 
+	"github.com/cgalvisleon/et/strs"
 	"github.com/cgalvisleon/et/utility"
 )
 
@@ -59,7 +59,7 @@ func (s *Schema) newModel(name string, version int) (*Model, error) {
 		afterDeletes:  make([]TriggerFunction, 0),
 		calcs:         make(map[string]DataContext),
 	}
-	result.DefineIdxField(IDX)
+	result.defineIdxField()
 	s.Models[name] = result
 
 	return result, nil
@@ -80,27 +80,10 @@ func (s *Schema) getModel(name string) (*Model, error) {
 		return nil, ErrModelNotFound
 	}
 
-	items, err := catalog.
-		Select().
-		Where(Eq("type", "model")).
-		Where(Eq("name", name)).
-		Where(Eq("schema", s.Name)).
-		Where(Eq("database", s.Database)).
-		One()
-	if err != nil {
-		return nil, err
-	}
-
-	if !items.Ok {
-		return nil, ErrModelNotFound
-	}
-
-	scr, err := items.Byte("definition")
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(scr, &result)
+	key := name
+	key = strs.Append(s.Name, key, ".")
+	key = strs.Append(s.Database, key, ".")
+	err := getCatalog("model", key, &result)
 	if err != nil {
 		return nil, err
 	}

@@ -185,18 +185,17 @@ func (s *Model) DefineSourceField(name string) (*Column, error) {
 }
 
 /**
-* DefineIdxField
-* @param name string
+* defineIdxField
 * @return error
 **/
-func (s *Model) DefineIdxField(name string) (*Column, error) {
-	result, err := s.DefineColumn(name, KEY, "")
+func (s *Model) defineIdxField() (*Column, error) {
+	result, err := s.DefineColumn(IDX, KEY, "")
 	if err != nil {
 		return nil, err
 	}
 
-	s.IdxField = name
-	s.DefineIndex(name)
+	s.IdxField = IDX
+	s.DefineIndex(IDX)
 	return result, nil
 }
 
@@ -360,7 +359,7 @@ func (s *Model) DefineProjectModel() *Model {
 	s.definePrimaryKeyField()
 	s.DefineColumn(PROJECT_ID, KEY, "")
 	s.defineSourceFieldDefault()
-	s.DefineIdxField(IDX)
+	s.defineIdxField()
 	s.DefineIndex(PROJECT_ID)
 	return s
 }
