@@ -5,6 +5,7 @@ import (
 
 	"github.com/cgalvisleon/et/cache"
 	"github.com/cgalvisleon/et/et"
+	"github.com/cgalvisleon/et/strs"
 	"github.com/cgalvisleon/jql/jql"
 )
 
@@ -53,20 +54,6 @@ func init() {
 }
 
 /**
-* save
-* @param tenantId string
-**/
-func save(tenantId string) {
-	tenant, ok := tenants[tenantId]
-	if !ok {
-		return
-	}
-
-	scr := tenant.ToJson()
-	cache.ObjetSet("tenant", tenantId, scr)
-}
-
-/**
 * Delete
 * @param tenantId string
 **/
@@ -91,63 +78,32 @@ func GetDb(tenantId string) (*jql.DB, error) {
 	}
 
 	tenants[tenantId] = newTenant(result)
-	save(tenantId)
 	return result, nil
 }
 
 /**
 * GetModel
-* @param tenantId string, name string
+* @param tenantId, schema,name string
 * @return (*Model, error)
 **/
-func GetModel(tenantId string, name string) (*jql.Model, bool) {
+func GetModel(tenantId, schema, name string) (*jql.Model, bool) {
 	tenant, ok := tenants[tenantId]
 	if !ok {
 		return nil, false
 	}
 
-	if _, ok := tenant.Models[name]; !ok {
-		return nil, false
-	}
-
-	return tenant.Models[name], true
-}
-
-/**
-* LoadDb
-* @param tenantId string, name string, params et.Json
-* @return (*DB, error)
-**/
-func LoadDb(tenantId, name string, params et.Json) (*jql.DB, error) {
-	tenant, ok := tenants[tenantId]
+	key := name
+	key = strs.Append(schema, key, ".")
+	result, ok := tenant.Models[key]
 	if ok {
-		return tenant.DB, nil
+		return result, true
 	}
 
-	params.Set("database", name)
-	db, err := jql.ConnectTo(tenantId, params)
+	result, err := tenant.DB.GetModel(schema, name)
 	if err != nil {
-		return nil, err
+		return nil, false
 	}
 
-	tenants[tenantId] = newTenant(db)
-	save(tenantId)
-	return db, nil
-}
-
-/**
-* LoadModel
-* @param tenantId string, model *Model
-* @return (*Model, error)
-**/
-func LoadModel(tenantId string, model *jql.Model) (*jql.Model, error) {
-	tenant, ok := tenants[tenantId]
-	if !ok {
-		return nil, ErrTenantNotFound
-	}
-
-	tenant.Models[model.Name] = model
-
-	save(tenantId)
-	return model, nil
+	tenant.Models[key] = result
+	return result, true
 }
