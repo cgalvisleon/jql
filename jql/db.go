@@ -3,6 +3,7 @@ package jql
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -122,7 +123,7 @@ func (s *DB) save() error {
 **/
 func (s *DB) init() error {
 	if s.driver == nil {
-		return fmt.Errorf(MSG_DRIVER_NOT_FOUND)
+		return errors.New(MSG_DRIVER_NOT_FOUND)
 	}
 
 	db, err := s.driver.Connect(s)
@@ -324,7 +325,7 @@ func (s *DB) sqlTx(tx *Tx, _sql string, arg ...any) (et.Items, error) {
 **/
 func (s *DB) Command(command *Cmd) (et.Items, error) {
 	if s.driver == nil {
-		return et.Items{}, fmt.Errorf(MSG_DRIVER_NOT_FOUND)
+		return et.Items{}, errors.New(MSG_DRIVER_NOT_FOUND)
 	}
 
 	if command.IsDebug {
@@ -346,7 +347,7 @@ func (s *DB) Command(command *Cmd) (et.Items, error) {
 **/
 func (s *DB) Query(query *Ql) (et.Items, error) {
 	if s.driver == nil {
-		return et.Items{}, fmt.Errorf(MSG_DRIVER_NOT_FOUND)
+		return et.Items{}, errors.New(MSG_DRIVER_NOT_FOUND)
 	}
 
 	if query.IsDebug {

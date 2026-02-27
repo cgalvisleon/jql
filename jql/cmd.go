@@ -2,6 +2,7 @@ package jql
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/cgalvisleon/et/et"
@@ -360,7 +361,7 @@ func (s *Cmd) upsert() (et.Items, error) {
 **/
 func (s *Cmd) ExecTx(tx *Tx) (et.Items, error) {
 	if s.db == nil {
-		return et.Items{}, fmt.Errorf(MSG_DATABASE_REQUIRED)
+		return et.Items{}, errors.New(MSG_DATABASE_REQUIRED)
 	}
 
 	s.setTx(tx)

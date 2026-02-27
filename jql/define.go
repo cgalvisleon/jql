@@ -1,6 +1,7 @@
 package jql
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 
@@ -15,15 +16,15 @@ import (
 **/
 func (s *Model) defineColumn(name string, tpColumn TypeColumn, tpData TypeData, defaultValue interface{}, definition []byte) (*Column, error) {
 	if !utility.ValidStr(name, 0, []string{}) {
-		return nil, fmt.Errorf(MSG_NAME_REQUIRED)
+		return nil, errors.New(MSG_NAME_REQUIRED)
 	}
 
 	if !utility.ValidStr(tpColumn.Str(), 0, []string{}) {
-		return nil, fmt.Errorf(MSG_TYPE_COLUMN_REQUIRED)
+		return nil, errors.New(MSG_TYPE_COLUMN_REQUIRED)
 	}
 
 	if !utility.ValidStr(tpData.Str(), 0, []string{}) {
-		return nil, fmt.Errorf(MSG_TYPE_DATA_REQUIRED)
+		return nil, errors.New(MSG_TYPE_DATA_REQUIRED)
 	}
 
 	idx := s.idxColumn(name)
