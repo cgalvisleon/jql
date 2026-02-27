@@ -1,9 +1,9 @@
 ## Requirements
 
-- Go 1.24
+- Go 1.23
 
 ```bash
-go get github.com/cgalvisleon/et@v1.0.17
+go get github.com/cgalvisleon/et@v1.0.19
 ```
 
 ## Installation
