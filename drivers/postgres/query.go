@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -206,7 +207,7 @@ func (s *Driver) buildFrom(ql *jql.Ql) (string, error) {
 	result := ""
 
 	if len(ql.Froms) == 0 {
-		return result, fmt.Errorf(jql.MSG_FROM_REQUIRED)
+		return result, errors.New(jql.MSG_FROM_REQUIRED)
 	}
 
 	for _, from := range ql.Froms {

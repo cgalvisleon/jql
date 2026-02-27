@@ -65,11 +65,6 @@ func (s *Driver) buildModel(model *jql.Model) (string, error) {
 		sql = strs.Append(sql, def, "\n")
 	}
 
-	def, err = s.buildTriggerBeforeInsert(model)
-	if err != nil {
-		return "", err
-	}
-
 	if def != "" {
 		sql = strs.Append(sql, def, "\n")
 	}
@@ -278,33 +273,6 @@ func (s *Driver) buildUniqueIndex(model *jql.Model) (string, error) {
 		def = fmt.Sprintf("CREATE UNIQUE INDEX IF NOT EXISTS %s ON %s(%s);", def, table, v)
 		result = strs.Append(result, def, "\n")
 	}
-
-	return result, nil
-}
-
-/**
-* buildTriggerBeforeInsert
-* @param model *jql.Model
-* @return (string, error)
-**/
-func (s *Driver) buildTriggerBeforeInsert(model *jql.Model) (string, error) {
-	if model.IdxField == "" {
-		return "", nil
-	}
-
-	isCore := model.IsCore
-	if isCore {
-		return "", nil
-	}
-
-	table := model.Table
-	result := fmt.Sprintf(`
-	DROP TRIGGER IF EXISTS RECORDS_SET ON %s CASCADE;
-	CREATE TRIGGER RECORDS_SET
-	AFTER INSERT OR UPDATE OR DELETE ON %s
-	FOR EACH ROW
-	EXECUTE FUNCTION core.after_records();
-	`, table, table)
 
 	return result, nil
 }

@@ -3,7 +3,7 @@ module github.com/cgalvisleon/jql
 go 1.24.0
 
 require (
-	github.com/cgalvisleon/et v1.0.16
+	github.com/cgalvisleon/et v1.0.17
 	github.com/lib/pq v1.10.9
 )
 

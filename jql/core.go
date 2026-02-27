@@ -9,6 +9,9 @@ func (s *DB) initCore() error {
 	if err := defineCatalog(s); err != nil {
 		return err
 	}
+	if err := defineSeries(s); err != nil {
+		return err
+	}
 
 	return nil
 }
