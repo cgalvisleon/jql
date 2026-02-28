@@ -201,20 +201,16 @@ func (s *DB) getSchema(name string) *Schema {
 
 /**
 * GetModel
-* @param schema, name string
+* @param name string
 * @return *Model
 **/
-func (s *DB) GetModel(schema, name string) (*Model, error) {
-	key := name
-	key = strs.Append(schema, key, ".")
-	key = strs.Append(s.Name, key, ".")
-
-	result, ok := models[key]
+func (s *DB) GetModel(name string) (*Model, error) {
+	result, ok := models[name]
 	if ok {
 		return result, nil
 	}
 
-	exists, err := getCatalog("model", key, &result)
+	exists, err := getCatalog("model", name, &result)
 	if err != nil {
 		return nil, err
 	}
@@ -237,9 +233,7 @@ func (s *DB) GetModel(schema, name string) (*Model, error) {
 		return nil, err
 	}
 
-	sch := s.getSchema(schema)
-	sch.Models[name] = result.From()
-	models[key] = result
+	models[name] = result
 
 	return result, nil
 }

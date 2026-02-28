@@ -60,16 +60,16 @@ func Load() (*jdb.DB, error) {
 
 /**
 * GetModel
-* @param database, schema, name string
+* @param database, name string
 * @return *jdb.Model, error
 **/
-func GetModel(database, schema, name string) (*jdb.Model, error) {
+func GetModel(database, name string) (*jdb.Model, error) {
 	db, err := jdb.GetDb(database)
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := db.GetModel(schema, name)
+	result, err := db.GetModel(name)
 	if err != nil {
 		return nil, err
 	}
@@ -117,68 +117,57 @@ func Define(params et.Json) (*jdb.Model, error) {
 
 /**
 * Insert
-* @param params et.Json
-* @return (et.Items, error)
+* @param name string, data et.Json
+* @return (jdb.Cmd, error)
 **/
-func Insert(params et.Json) (et.Items, error) {
-	return et.Items{}, nil
+func Insert(name string, data et.Json) jdb.Cmd {
+	return jdb.Cmd{}
 }
 
 /**
 * Update
-* @param params et.Json
-* @return (et.Items, error)
+* @param name string, data et.Json
+* @return (jdb.Cmd, error)
 **/
-func Update(params et.Json) (et.Items, error) {
-	return et.Items{}, nil
+func Update(name string, data et.Json) jdb.Cmd {
+	return jdb.Cmd{}
 }
 
-func Delete(params et.Json) (et.Items, error) {
-	return et.Items{}, nil
+/**
+* Delete
+* @param name string
+* @return jdb.Cmd
+**/
+func Delete(name string) jdb.Cmd {
+	return jdb.Cmd{}
 }
 
-func Upsert(params et.Json) (et.Items, error) {
-	return et.Items{}, nil
+/**
+* Upsert
+* @param name string, data et.Json
+* @return jdb.Cmd
+**/
+func Upsert(name string, data et.Json) jdb.Cmd {
+	return jdb.Cmd{}
 }
 
 /**
 * From
-* @param query et.Json
-* @return (et.Items, error)
+* @param name, as string
+* @return jdb.Ql
 *
  */
-func From(query et.Json) (et.Items, error) {
-	database := query.String("database")
-	if !utility.ValidStr(database, 0, []string{}) {
-		return et.Items{}, fmt.Errorf(jdb.MSG_ATTRIBUTE_REQUIRED, "database")
-	}
+func From(name, as string) jdb.Ql {
+	return jdb.Ql{}
+}
 
-	db, err := jdb.GetDb(database)
-	if err != nil {
-		return et.Items{}, err
-	}
-
-	insert := query.Json("insert")
-	if !insert.IsEmpty() {
-		return db.Insert(insert)
-	}
-
-	update := query.Json("update")
-	if !update.IsEmpty() {
-		return db.Update(update)
-	}
-
-	delete := query.Json("delete")
-	if !delete.IsEmpty() {
-		return db.Delete(delete)
-	}
-
-	upsert := query.Json("upsert")
-	if !upsert.IsEmpty() {
-		return db.Upsert(upsert)
-	}
-
-	return db.Select(query)
+/**
+* Query
+* @param params et.Json
+* @return (et.Items, error)
+**/
+func Query(params et.Json) (et.Items, error) {
+	return et.Items{}, nil
 }
 
 /**

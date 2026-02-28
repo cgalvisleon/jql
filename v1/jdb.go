@@ -2,70 +2,67 @@ package jql
 
 import (
 	"github.com/cgalvisleon/et/et"
+	"github.com/cgalvisleon/jql/jdb"
 	"github.com/cgalvisleon/jql/jql"
 )
 
 const (
-	DriverPostgres = jql.DriverPostgres
-	DriverSqlite   = jql.DriverSqlite
+	DriverPostgres = jdb.DriverPostgres
+	DriverSqlite   = jdb.DriverSqlite
 	// Field names
-	SOURCE     = jql.SOURCE
-	ID         = jql.ID
-	IDX        = jql.IDX
-	STATUS     = jql.STATUS
-	VERSION    = jql.VERSION
-	PROJECT_ID = jql.PROJECT_ID
-	TENANT_ID  = jql.TENANT_ID
-	CREATED_AT = jql.CREATED_AT
-	UPDATED_AT = jql.UPDATED_AT
+	SOURCE     = jdb.SOURCE
+	ID         = jdb.ID
+	IDX        = jdb.IDX
+	STATUS     = jdb.STATUS
+	VERSION    = jdb.VERSION
+	PROJECT_ID = jdb.PROJECT_ID
+	TENANT_ID  = jdb.TENANT_ID
+	CREATED_AT = jdb.CREATED_AT
+	UPDATED_AT = jdb.UPDATED_AT
 	// Data types
-	ANY      = jql.ANY
-	BYTES    = jql.BYTES
-	INT      = jql.INT
-	FLOAT    = jql.FLOAT
-	KEY      = jql.KEY
-	TEXT     = jql.TEXT
-	MEMO     = jql.MEMO
-	JSON     = jql.JSON
-	DATETIME = jql.DATETIME
-	BOOLEAN  = jql.BOOLEAN
-	GEOMETRY = jql.GEOMETRY
-	CALC     = jql.CALC
+	ANY      = jdb.ANY
+	BYTES    = jdb.BYTES
+	INT      = jdb.INT
+	FLOAT    = jdb.FLOAT
+	KEY      = jdb.KEY
+	TEXT     = jdb.TEXT
+	MEMO     = jdb.MEMO
+	JSON     = jdb.JSON
+	DATETIME = jdb.DATETIME
+	BOOLEAN  = jdb.BOOLEAN
+	GEOMETRY = jdb.GEOMETRY
+	CALC     = jdb.CALC
 	// Column types
-	COLUMN = jql.COLUMN
-	ATTRIB = jql.ATTRIB
-	DETAIL = jql.DETAIL
-	ROLLUP = jql.ROLLUP
-	AGG    = jql.AGG
+	COLUMN = jdb.COLUMN
+	ATTRIB = jdb.ATTRIB
+	DETAIL = jdb.DETAIL
+	ROLLUP = jdb.ROLLUP
+	AGG    = jdb.AGG
 	// Status record
-	ACTIVE     = jql.ACTIVE
-	ARCHIVED   = jql.ARCHIVED
-	CANCELED   = jql.CANCELED
-	OF_SYSTEM  = jql.OF_SYSTEM
-	FOR_DELETE = jql.FOR_DELETE
-	PENDING    = jql.PENDING
-	APPROVED   = jql.APPROVED
-	REJECTED   = jql.REJECTED
+	ACTIVE     = jdb.ACTIVE
+	ARCHIVED   = jdb.ARCHIVED
+	CANCELED   = jdb.CANCELED
+	OF_SYSTEM  = jdb.OF_SYSTEM
+	FOR_DELETE = jdb.FOR_DELETE
+	PENDING    = jdb.PENDING
+	APPROVED   = jdb.APPROVED
+	REJECTED   = jdb.REJECTED
 )
 
 var (
 	// Error
-	ErrDuplicate   = jql.ErrDuplicate
-	ErrNotInserted = jql.ErrNotInserted
-	ErrNotUpdated  = jql.ErrNotUpdated
-	ErrNotFound    = jql.ErrNotFound
-	ErrNotUpserted = jql.ErrNotUpserted
+	ErrNotUpdated = jdb.ErrNotUpdated
 )
 
-type TypeColumn = jql.TypeColumn
-type TypeData = jql.TypeData
-type Driver = jql.Driver
-type DB = jql.DB
-type Model = jql.Model
-type Tx = jql.Tx
-type Condition = jql.Condition
-type Ql = jql.Ql
-type Cmd = jql.Cmd
+type TypeColumn = jdb.TypeColumn
+type TypeData = jdb.TypeData
+type Driver = jdb.Driver
+type DB = jdb.DB
+type Model = jdb.Model
+type Tx = jdb.Tx
+type Condition = jdb.Condition
+type Ql = jdb.Ql
+type Cmd = jdb.Cmd
 
 /**
 * NewModel

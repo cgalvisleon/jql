@@ -1,138 +1,138 @@
 package jql
 
-import "github.com/cgalvisleon/jql/jql"
+import "github.com/cgalvisleon/jql/jdb"
 
 /**
 * Eq
 * @param field string, value interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func Eq(field string, value interface{}) *jql.Condition {
-	return jql.Eq(field, value)
+func Eq(field string, value interface{}) *jdb.Condition {
+	return jdb.Eq(field, value)
 }
 
 /**
 * Neg
 * @param field string, value interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func Neg(field string, value interface{}) *jql.Condition {
-	return jql.Neg(field, value)
+func Neg(field string, value interface{}) *jdb.Condition {
+	return jdb.Neg(field, value)
 }
 
 /**
 * Less
 * @param field string, value interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func Less(field string, value interface{}) *jql.Condition {
-	return jql.Less(field, value)
+func Less(field string, value interface{}) *jdb.Condition {
+	return jdb.Less(field, value)
 }
 
 /**
 * LessEq
 * @param field string, value interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func LessEq(field string, value interface{}) *jql.Condition {
-	return jql.LessEq(field, value)
+func LessEq(field string, value interface{}) *jdb.Condition {
+	return jdb.LessEq(field, value)
 }
 
 /**
 * More
 * @param field string, value interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func More(field string, value interface{}) *jql.Condition {
-	return jql.More(field, value)
+func More(field string, value interface{}) *jdb.Condition {
+	return jdb.More(field, value)
 }
 
 /**
 * MoreEq
 * @param field string, value interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func MoreEq(field string, value interface{}) *jql.Condition {
-	return jql.MoreEq(field, value)
+func MoreEq(field string, value interface{}) *jdb.Condition {
+	return jdb.MoreEq(field, value)
 }
 
 /**
 * Like
 * @param field string, value interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func Like(field string, value interface{}) *jql.Condition {
-	return jql.Like(field, value)
+func Like(field string, value interface{}) *jdb.Condition {
+	return jdb.Like(field, value)
 }
 
 /**
 * In
 * @param field string, value []interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func In(field string, value []interface{}) *jql.Condition {
-	return jql.In(field, value)
+func In(field string, value []interface{}) *jdb.Condition {
+	return jdb.In(field, value)
 }
 
 /**
 * NotIn
 * @param field string, value []interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func NotIn(field string, value []interface{}) *jql.Condition {
-	return jql.NotIn(field, value)
+func NotIn(field string, value []interface{}) *jdb.Condition {
+	return jdb.NotIn(field, value)
 }
 
 /**
 * Is
 * @param field string, value []interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func Is(field string, value []interface{}) *jql.Condition {
-	return jql.Is(field, value)
+func Is(field string, value []interface{}) *jdb.Condition {
+	return jdb.Is(field, value)
 }
 
 /**
 * IsNot
 * @param field string, value []interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func IsNot(field string, value []interface{}) *jql.Condition {
-	return jql.IsNot(field, value)
+func IsNot(field string, value []interface{}) *jdb.Condition {
+	return jdb.IsNot(field, value)
 }
 
 /**
 * Null
 * @param field string
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func Null(field string) *jql.Condition {
-	return jql.Null(field)
+func Null(field string) *jdb.Condition {
+	return jdb.Null(field)
 }
 
 /**
 * NotNull
 * @param field string
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func NotNull(field string) *jql.Condition {
-	return jql.NotNull(field)
+func NotNull(field string) *jdb.Condition {
+	return jdb.NotNull(field)
 }
 
 /**
 * Between
 * @param field string, min, max interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func Between(field string, min, max interface{}) *jql.Condition {
-	return jql.Between(field, min, max)
+func Between(field string, min, max interface{}) *jdb.Condition {
+	return jdb.Between(field, min, max)
 }
 
 /**
 * NotBetween
 * @param field string, min, max interface{}
-* @return jql.Condition
+* @return jdb.Condition
 **/
-func NotBetween(field string, min, max interface{}) *jql.Condition {
-	return jql.NotBetween(field, min, max)
+func NotBetween(field string, min, max interface{}) *jdb.Condition {
+	return jdb.NotBetween(field, min, max)
 }

@@ -322,7 +322,7 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 				continue
 			}
 
-			details, err := s.db.GetModel(f.From.Database, f.From.Schema)
+			details, err := s.db.GetModel(f.From.Key())
 			if err != nil {
 				continue
 			}
@@ -338,7 +338,7 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 				continue
 			}
 
-			details, err := s.db.GetModel(f.From.Database, f.From.Schema)
+			details, err := s.db.GetModel(f.From.Key())
 			if err != nil {
 				continue
 			}
@@ -354,7 +354,7 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 				continue
 			}
 
-			details, err := s.db.GetModel(f.From.Database, f.From.Schema)
+			details, err := s.db.GetModel(f.From.Key())
 			if err != nil {
 				continue
 			}
@@ -387,7 +387,7 @@ func (s *Ql) Data(fields ...interface{}) *Ql {
 func (s *Ql) getDetails(tx *Tx, data et.Json) {
 	for name, dtl := range s.Details {
 		to := dtl.To
-		model, err := s.db.GetModel(to.Schema, to.Name)
+		model, err := s.db.GetModel(to.Key())
 		if err != nil {
 			return
 		}
@@ -415,7 +415,7 @@ func (s *Ql) getDetails(tx *Tx, data et.Json) {
 func (s *Ql) getRollups(tx *Tx, data et.Json) {
 	for name, dtl := range s.Rollups {
 		to := dtl.To
-		model, err := s.db.GetModel(to.Schema, to.Name)
+		model, err := s.db.GetModel(to.Name)
 		if err != nil {
 			return
 		}

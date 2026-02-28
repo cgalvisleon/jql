@@ -1,12 +1,11 @@
 package tenant
 
 import (
+	"encoding/json"
 	"fmt"
 
-	"github.com/cgalvisleon/et/cache"
 	"github.com/cgalvisleon/et/et"
-	"github.com/cgalvisleon/et/strs"
-	"github.com/cgalvisleon/jql/jql"
+	"github.com/cgalvisleon/jql/jdb"
 )
 
 const (
@@ -18,19 +17,21 @@ var (
 )
 
 type Tenant struct {
-	DB     *jql.DB               `json:"db"`
-	Models map[string]*jql.Model `json:"models"`
+	ID     string                `json:"id"`
+	DB     *jdb.DB               `json:"db"`
+	Models map[string]*jdb.Model `json:"models"`
 }
 
 /**
 * newTenant
-* @param db *jql.DB
+* @param id string, db *jdb.DB
 * @return *Tenant
 **/
-func newTenant(db *jql.DB) *Tenant {
+func newTenant(id string, db *jdb.DB) *Tenant {
 	return &Tenant{
+		ID:     id,
 		DB:     db,
-		Models: make(map[string]*jql.Model),
+		Models: make(map[string]*jdb.Model),
 	}
 }
 
@@ -38,13 +39,19 @@ func newTenant(db *jql.DB) *Tenant {
 * ToJson
 * @return et.Json
 **/
-func (s *Tenant) ToJson() et.Json {
-	result := et.Json{
-		"database": s.DB.Name,
-		"models":   s.Models,
+func (s *Tenant) ToJson() (et.Json, error) {
+	bt, err := json.Marshal(s)
+	if err != nil {
+		return nil, err
 	}
 
-	return result
+	var result et.Json
+	err = json.Unmarshal(bt, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 var tenants map[string]*Tenant
@@ -54,76 +61,66 @@ func init() {
 }
 
 /**
-* Delete
-* @param tenantId string
-**/
-func Delete(tenantId string) {
-	cache.ObjetDelete("tenant", tenantId)
-}
-
-/**
 * GetDb
-* @param tenantId string
+* @param id string
 * @return (*DB, error)
 **/
-func GetDb(tenantId string) (*jql.DB, error) {
-	tenant, ok := tenants[tenantId]
+func GetDb(id string) (*jdb.DB, error) {
+	tenant, ok := tenants[id]
 	if ok {
 		return tenant.DB, nil
 	}
 
-	result, err := jql.GetDb(tenantId)
+	result, err := jdb.GetDb(id)
 	if err != nil {
-		return nil, jql.ErrDbNotFound
+		return nil, jdb.ErrDbNotFound
 	}
 
-	tenants[tenantId] = newTenant(result)
+	tenants[id] = newTenant(id, result)
 	return result, nil
 }
 
 /**
 * GetModel
-* @param tenantId, schema,name string
+* @param tenantId, name string
 * @return (*Model, error)
 **/
-func GetModel(tenantId, schema, name string) (*jql.Model, bool) {
+func GetModel(tenantId, name string) (*jdb.Model, error) {
 	tenant, ok := tenants[tenantId]
 	if !ok {
-		return nil, false
+		return nil, ErrTenantNotFound
 	}
 
-	key := name
-	key = strs.Append(schema, key, ".")
-	result, ok := tenant.Models[key]
+	result, ok := tenant.Models[name]
 	if ok {
-		return result, true
+		return result, nil
 	}
 
-	result, err := tenant.DB.GetModel(schema, name)
+	result, err := tenant.DB.GetModel(name)
 	if err != nil {
-		return nil, false
+		return nil, err
 	}
 
-	tenant.Models[key] = result
-	return result, true
+	tenant.Models[name] = result
+	return result, nil
 }
 
 /**
 * NewDb
-* @param tenantId string
-* @return (*DB, error)
+* @param tenantId string, params et.Json
+* @return *jdb.DB, error
 **/
-func NewDb(tenantId, host string, port int) (*jql.DB, error) {
+func NewDb(tenantId string, params et.Json) (*jdb.DB, error) {
 	tenant, ok := tenants[tenantId]
 	if ok {
 		return tenant.DB, nil
 	}
 
-	result, err := jql.NewDb(tenantId, host, port)
+	result, err := jdb.LoadDb(tenantId, params)
 	if err != nil {
 		return nil, err
 	}
 
-	tenants[tenantId] = newTenant(result)
+	tenants[tenantId] = newTenant(tenantId, result)
 	return result, nil
 }

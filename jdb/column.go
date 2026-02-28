@@ -1,6 +1,10 @@
 package jdb
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/cgalvisleon/et/strs"
+)
 
 const (
 	SOURCE     string = "source"
@@ -61,6 +65,12 @@ type From struct {
 	Details    map[string]*Detail `json:"details"`
 	Rollups    map[string]*Detail `json:"rollups"`
 	Relations  map[string]*Detail `json:"relations"`
+}
+
+func (s *From) Key() string {
+	result := s.Name
+	result = strs.Append(s.Schema, result, ".")
+	return result
 }
 
 /**
