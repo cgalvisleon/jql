@@ -3,10 +3,10 @@ package postgres
 import (
 	"fmt"
 
-	"github.com/cgalvisleon/jql/jql"
+	"github.com/cgalvisleon/jql/jdb"
 )
 
-func FieldAs(field *jql.Field) string {
+func FieldAs(field *jdb.Field) string {
 	if field.From == nil {
 		return field.As
 	}

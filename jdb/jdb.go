@@ -1,7 +1,6 @@
 package jdb
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/cgalvisleon/et/et"
@@ -16,6 +15,43 @@ var (
 func init() {
 	dbs = make(map[string]*DB)
 	models = make(map[string]*Model)
+}
+
+/**
+* LoadDb
+* @param name string, params et.Json
+* @return *DB, error
+**/
+func LoadDb(name string, params et.Json) (*DB, error) {
+	if !utility.ValidStr(name, 0, []string{""}) {
+		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, "name")
+	}
+
+	name = utility.Normalize(name)
+	result, ok := dbs[name]
+	if ok {
+		return result, nil
+	}
+
+	driver := params.Str("driver")
+	drv, ok := drivers[driver]
+	if !ok {
+		return nil, fmt.Errorf(MSG_DRIVER_NOT_FOUND, driver)
+	}
+
+	result = &DB{
+		Name:    name,
+		Schemas: make(map[string]*Schema),
+		Params:  params,
+		driver:  drv(),
+	}
+	err := result.init()
+	if err != nil {
+		return nil, err
+	}
+
+	dbs[name] = result
+	return result, nil
 }
 
 /**
@@ -49,43 +85,7 @@ func GetDb(name string) (*DB, error) {
 		return result, nil
 	}
 
-	return nil, errors.New(MSG_DB_NOT_FOUND)
-}
-
-/**
-* NewDb
-* @param name string, params et.Json
-* @return *DB, error
-**/
-func NewDb(name string, params et.Json) (*DB, error) {
-	result, err := GetDb(name)
-	if err != nil {
-		return nil, err
-	}
-
-	if result != nil {
-		return result, nil
-	}
-
-	driver := params.Str("driver")
-	drv, ok := drivers[driver]
-	if !ok {
-		return nil, fmt.Errorf(MSG_DRIVER_NOT_FOUND, driver)
-	}
-
-	result = &DB{
-		Name:    name,
-		Schemas: make(map[string]*Schema),
-		Params:  params,
-		driver:  drv(),
-	}
-	err = result.init()
-	if err != nil {
-		return nil, err
-	}
-
-	dbs[name] = result
-	return result, nil
+	return nil, ErrDbNotFound
 }
 
 /**

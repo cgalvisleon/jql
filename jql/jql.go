@@ -24,7 +24,7 @@ var (
 * @return (*DB, error)
 **/
 func ConnectTo(name string, params et.Json) (*jdb.DB, error) {
-	return jdb.GetDb(name, params)
+	return jdb.LoadDb(name, params)
 }
 
 /**
@@ -64,7 +64,7 @@ func Load() (*jdb.DB, error) {
 * @return *jdb.Model, error
 **/
 func GetModel(database, schema, name string) (*jdb.Model, error) {
-	db, err := GetDb(database)
+	db, err := jdb.GetDb(database)
 	if err != nil {
 		return nil, err
 	}
@@ -83,12 +83,12 @@ func GetModel(database, schema, name string) (*jdb.Model, error) {
 * @return error
 **/
 func DeleteModel(database, schema, name string) error {
-	db, err := GetDb(database)
+	db, err := jdb.GetDb(database)
 	if err != nil {
 		return err
 	}
 
-	err = db.deleteModel(schema, name)
+	err = db.DeleteModel(schema, name)
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func Define(params et.Json) (*jdb.Model, error) {
 		return nil, fmt.Errorf(jdb.MSG_ATTRIBUTE_REQUIRED, "database")
 	}
 
-	db, err := GetDb(database)
+	db, err := jdb.GetDb(database)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func From(query et.Json) (et.Items, error) {
 		return et.Items{}, fmt.Errorf(jdb.MSG_ATTRIBUTE_REQUIRED, "database")
 	}
 
-	db, err := GetDb(database)
+	db, err := jdb.GetDb(database)
 	if err != nil {
 		return et.Items{}, err
 	}

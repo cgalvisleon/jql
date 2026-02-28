@@ -5,21 +5,21 @@ import (
 
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/strs"
-	"github.com/cgalvisleon/jql/jql"
+	"github.com/cgalvisleon/jql/jdb"
 )
 
 /**
 * buildCommand
-* @param cmd *jql.Cmd
+* @param cmd *jdb.Cmd
 * @return (string, error)
 **/
-func (s *Driver) buildCommand(cmd *jql.Cmd) (string, error) {
+func (s *Driver) buildCommand(cmd *jdb.Cmd) (string, error) {
 	switch cmd.Type {
-	case jql.INSERT:
+	case jdb.INSERT:
 		return s.buildInsert(cmd)
-	case jql.UPDATE:
+	case jdb.UPDATE:
 		return s.buildUpdate(cmd)
-	case jql.DELETE:
+	case jdb.DELETE:
 		return s.buildDelete(cmd)
 	}
 
@@ -28,10 +28,10 @@ func (s *Driver) buildCommand(cmd *jql.Cmd) (string, error) {
 
 /**
 * buildInsert
-* @param cmd *jql.Cmd
+* @param cmd *jdb.Cmd
 * @return (string, error)
 **/
-func (s *Driver) buildInsert(cmd *jql.Cmd) (string, error) {
+func (s *Driver) buildInsert(cmd *jdb.Cmd) (string, error) {
 	from := cmd.Model
 	table := from.Table
 	data := cmd.New
@@ -42,8 +42,8 @@ func (s *Driver) buildInsert(cmd *jql.Cmd) (string, error) {
 	returning := fmt.Sprintf(`to_jsonb(%s.*) AS result`, table)
 	for k, v := range data {
 		col := from.FindColumn(k)
-		if col != nil && col.TypeColumn == jql.COLUMN {
-			val := fmt.Sprintf(`%v`, jql.Quoted(v))
+		if col != nil && col.TypeColumn == jdb.COLUMN {
+			val := fmt.Sprintf(`%v`, jdb.Quoted(v))
 			into = strs.Append(into, k, ", ")
 			values = strs.Append(values, val, ", ")
 			continue
@@ -66,10 +66,10 @@ func (s *Driver) buildInsert(cmd *jql.Cmd) (string, error) {
 
 /**
 * buildUpdate
-* @param cmd *jql.Cmd
+* @param cmd *jdb.Cmd
 * @return (string, error)
 **/
-func (s *Driver) buildUpdate(cmd *jql.Cmd) (string, error) {
+func (s *Driver) buildUpdate(cmd *jdb.Cmd) (string, error) {
 	from := cmd.Model
 	table := from.Table
 	data := cmd.New
@@ -80,14 +80,14 @@ func (s *Driver) buildUpdate(cmd *jql.Cmd) (string, error) {
 	useAtribs := from.SourceField != "" && !from.IsStrict
 	for k, v := range data {
 		col := from.FindColumn(k)
-		if col != nil && col.TypeColumn == jql.COLUMN {
-			val := fmt.Sprintf(`%v`, jql.Quoted(v))
+		if col != nil && col.TypeColumn == jdb.COLUMN {
+			val := fmt.Sprintf(`%v`, jdb.Quoted(v))
 			sets = strs.Append(sets, fmt.Sprintf(`%s = %s`, k, val), ",\n")
 			continue
 		}
 
 		if useAtribs {
-			val := fmt.Sprintf(`%v`, jql.Literal(v))
+			val := fmt.Sprintf(`%v`, jdb.Literal(v))
 			if len(atribs) == 0 {
 				atribs = fmt.Sprintf("COALESCE(%s, '{}')", from.SourceField)
 				atribs = strs.Format("jsonb_set(%s, '{%s}', '%v'::jsonb, true)", atribs, k, val)
@@ -121,10 +121,10 @@ func (s *Driver) buildUpdate(cmd *jql.Cmd) (string, error) {
 
 /**
 * buildDelete
-* @param cmd *jql.Cmd
+* @param cmd *jdb.Cmd
 * @return (string, error)
 **/
-func (s *Driver) buildDelete(cmd *jql.Cmd) (string, error) {
+func (s *Driver) buildDelete(cmd *jdb.Cmd) (string, error) {
 	from := cmd.Model
 	table := from.Table
 	where := ""

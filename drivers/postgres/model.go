@@ -6,15 +6,15 @@ import (
 	"github.com/cgalvisleon/et/logs"
 	"github.com/cgalvisleon/et/strs"
 	"github.com/cgalvisleon/et/utility"
-	"github.com/cgalvisleon/jql/jql"
+	"github.com/cgalvisleon/jql/jdb"
 )
 
 /**
 * buildModel
-* @param model *jql.Model
+* @param model *jdb.Model
 * @return (string, error)
 **/
-func (s *Driver) buildModel(model *jql.Model) (string, error) {
+func (s *Driver) buildModel(model *jdb.Model) (string, error) {
 	if model.IsDebug {
 		logs.Debug("model:", model.ToJson().ToString())
 	}
@@ -74,10 +74,10 @@ func (s *Driver) buildModel(model *jql.Model) (string, error) {
 
 /**
 * buildSchema
-* @param model *jql.Model
+* @param model *jdb.Model
 * @return (string, error)
 **/
-func (s *Driver) buildSchema(model *jql.Model) (string, error) {
+func (s *Driver) buildSchema(model *jdb.Model) (string, error) {
 	if !utility.ValidStr(model.Schema, 0, []string{}) {
 		return "", fmt.Errorf(MSG_ATRIB_REQUIRED, "schema")
 	}
@@ -96,23 +96,23 @@ func (s *Driver) buildSchema(model *jql.Model) (string, error) {
 
 /**
 * buildTable
-* @param model *jql.Model
+* @param model *jdb.Model
 * @return (string, error)
 **/
-func (s *Driver) buildTable(model *jql.Model) (string, error) {
-	getType := func(tp jql.TypeData) string {
-		types := map[jql.TypeData]string{
-			jql.ANY:      "VARCHAR(250)",
-			jql.BYTES:    "BYTEA",
-			jql.INT:      "BIGINT",
-			jql.FLOAT:    "DOUBLE PRECISION",
-			jql.KEY:      "VARCHAR(80)",
-			jql.TEXT:     "VARCHAR(250)",
-			jql.MEMO:     "TEXT",
-			jql.JSON:     "JSONB",
-			jql.DATETIME: "TIMESTAMP",
-			jql.BOOLEAN:  "BOOLEAN",
-			jql.GEOMETRY: "JSONB",
+func (s *Driver) buildTable(model *jdb.Model) (string, error) {
+	getType := func(tp jdb.TypeData) string {
+		types := map[jdb.TypeData]string{
+			jdb.ANY:      "VARCHAR(250)",
+			jdb.BYTES:    "BYTEA",
+			jdb.INT:      "BIGINT",
+			jdb.FLOAT:    "DOUBLE PRECISION",
+			jdb.KEY:      "VARCHAR(80)",
+			jdb.TEXT:     "VARCHAR(250)",
+			jdb.MEMO:     "TEXT",
+			jdb.JSON:     "JSONB",
+			jdb.DATETIME: "TIMESTAMP",
+			jdb.BOOLEAN:  "BOOLEAN",
+			jdb.GEOMETRY: "JSONB",
 		}
 
 		if t, ok := types[tp]; ok {
@@ -122,19 +122,19 @@ func (s *Driver) buildTable(model *jql.Model) (string, error) {
 		return "VARCHAR(250)"
 	}
 
-	defaultValue := func(tp jql.TypeData) string {
-		values := map[jql.TypeData]string{
-			jql.ANY:      "",
-			jql.BYTES:    "''",
-			jql.INT:      "0",
-			jql.FLOAT:    "0.0",
-			jql.KEY:      "''",
-			jql.TEXT:     "''",
-			jql.MEMO:     "''",
-			jql.JSON:     "'{}'",
-			jql.DATETIME: "NOW()",
-			jql.BOOLEAN:  "FALSE",
-			jql.GEOMETRY: "'{}'",
+	defaultValue := func(tp jdb.TypeData) string {
+		values := map[jdb.TypeData]string{
+			jdb.ANY:      "",
+			jdb.BYTES:    "''",
+			jdb.INT:      "0",
+			jdb.FLOAT:    "0.0",
+			jdb.KEY:      "''",
+			jdb.TEXT:     "''",
+			jdb.MEMO:     "''",
+			jdb.JSON:     "'{}'",
+			jdb.DATETIME: "NOW()",
+			jdb.BOOLEAN:  "FALSE",
+			jdb.GEOMETRY: "'{}'",
 		}
 
 		if t, ok := values[tp]; ok {
@@ -148,7 +148,7 @@ func (s *Driver) buildTable(model *jql.Model) (string, error) {
 	columnsDef := ""
 	for _, column := range columns {
 		tpColumn := column.TypeColumn
-		if tpColumn != jql.COLUMN {
+		if tpColumn != jdb.COLUMN {
 			continue
 		}
 		tpData := column.TypeData
@@ -178,10 +178,10 @@ func (s *Driver) buildTable(model *jql.Model) (string, error) {
 
 /**
 * buildPrimaryKeys
-* @param model *jql.Model
+* @param model *jdb.Model
 * @return (string, error)
 **/
-func (s *Driver) buildPrimaryKeys(model *jql.Model) (string, error) {
+func (s *Driver) buildPrimaryKeys(model *jdb.Model) (string, error) {
 	if len(model.PrimaryKeys) == 0 {
 		return "", nil
 	}
@@ -199,10 +199,10 @@ func (s *Driver) buildPrimaryKeys(model *jql.Model) (string, error) {
 
 /**
 * buildForeignKeys
-* @param model *jql.Model
+* @param model *jdb.Model
 * @return (string, error)
 **/
-func (s *Driver) buildForeignKeys(model *jql.Model) (string, error) {
+func (s *Driver) buildForeignKeys(model *jdb.Model) (string, error) {
 	result := ""
 	for _, foreignKey := range model.ForeignKeys {
 		name := fmt.Sprintf("fk_%s_%s", model.Name, foreignKey.To.Name)
@@ -231,10 +231,10 @@ func (s *Driver) buildForeignKeys(model *jql.Model) (string, error) {
 
 /**
 * buildIndexes
-* @param model *jql.Model
+* @param model *jdb.Model
 * @return (string, error)
 **/
-func (s *Driver) buildIndexes(model *jql.Model) (string, error) {
+func (s *Driver) buildIndexes(model *jdb.Model) (string, error) {
 	if len(model.Indexes) == 0 {
 		return "", nil
 	}
@@ -244,7 +244,7 @@ func (s *Driver) buildIndexes(model *jql.Model) (string, error) {
 	result := ""
 	for _, v := range model.Indexes {
 		def := fmt.Sprintf("idx_%s_%s", name, v)
-		if v == jql.SOURCE {
+		if v == jdb.SOURCE {
 			def = fmt.Sprintf("CREATE INDEX IF NOT EXISTS %s ON %s USING GIN (%s);", def, table, v)
 		} else {
 			def = fmt.Sprintf("CREATE INDEX IF NOT EXISTS %s ON %s(%s);", def, table, v)
@@ -257,10 +257,10 @@ func (s *Driver) buildIndexes(model *jql.Model) (string, error) {
 
 /**
 * buildUniqueIndex
-* @param model *jql.Model
+* @param model *jdb.Model
 * @return (string, error)
 **/
-func (s *Driver) buildUniqueIndex(model *jql.Model) (string, error) {
+func (s *Driver) buildUniqueIndex(model *jdb.Model) (string, error) {
 	if len(model.Unique) == 0 {
 		return "", nil
 	}

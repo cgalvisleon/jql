@@ -5,33 +5,33 @@ import (
 	"fmt"
 
 	"github.com/cgalvisleon/et/logs"
-	"github.com/cgalvisleon/jql/jql"
+	"github.com/cgalvisleon/jql/jdb"
 )
 
 var driver = "postgres"
 
 func init() {
-	jql.Register(driver, new)
+	jdb.Register(driver, new)
 }
 
 type Driver struct{}
 
 /**
 * newDriver
-* @param database *jql.DB
-* @return jql.Driver
+* @param database *jdb.DB
+* @return jdb.Driver
 **/
-func new() jql.Driver {
+func new() jdb.Driver {
 	result := &Driver{}
 	return result
 }
 
 /**
 * Connect
-* @param connection jql.ConnectParams
+* @param connection jdb.ConnectParams
 * @return *sql.DB, error
 **/
-func (s *Driver) Connect(db *jql.DB) (*sql.DB, error) {
+func (s *Driver) Connect(db *jdb.DB) (*sql.DB, error) {
 	params := db.Params
 	defaultChain, err := defaultChain(params)
 	if err != nil {
@@ -77,7 +77,7 @@ func (s *Driver) Connect(db *jql.DB) (*sql.DB, error) {
 * @param model *Model
 * @return (string, error)
 **/
-func (s *Driver) Load(model *jql.Model) (string, error) {
+func (s *Driver) Load(model *jdb.Model) (string, error) {
 	model.Table = fmt.Sprintf("%s.%s", model.Schema, model.Name)
 	result, err := s.buildModel(model)
 	if err != nil {
@@ -97,16 +97,16 @@ func (s *Driver) Load(model *jql.Model) (string, error) {
 * @param model *Model
 * @return (string, error)
 **/
-func (s *Driver) Mutate(model *jql.Model) (string, error) {
+func (s *Driver) Mutate(model *jdb.Model) (string, error) {
 	return "", nil
 }
 
 /**
 * Query
-* @param ql *jql.Ql
+* @param ql *jdb.Ql
 * @return (string, error)
 **/
-func (s *Driver) Query(ql *jql.Ql) (string, error) {
+func (s *Driver) Query(ql *jdb.Ql) (string, error) {
 	result, err := s.buildQuery(ql)
 	if err != nil {
 		return "", err
@@ -121,10 +121,10 @@ func (s *Driver) Query(ql *jql.Ql) (string, error) {
 
 /**
 * Cmd
-* @param command *jql.Cmd
+* @param command *jdb.Cmd
 * @return (string, error)
 **/
-func (s *Driver) Command(cmd *jql.Cmd) (string, error) {
+func (s *Driver) Command(cmd *jdb.Cmd) (string, error) {
 	result, err := s.buildCommand(cmd)
 	if err != nil {
 		return "", err

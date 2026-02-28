@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cgalvisleon/et/logs"
-	"github.com/cgalvisleon/jql/jql"
+	"github.com/cgalvisleon/jql/jdb"
 )
 
 /**
@@ -24,7 +24,7 @@ func ExistSchema(db *sql.DB, name string) (bool, error) {
 	}
 	defer rows.Close()
 
-	items := jql.RowsToItems(rows)
+	items := jdb.RowsToItems(rows)
 
 	if items.Count == 0 {
 		return false, nil
