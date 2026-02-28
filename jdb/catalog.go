@@ -1,4 +1,4 @@
-package jql
+package jdb
 
 import (
 	"encoding/json"
@@ -28,10 +28,10 @@ func defineCatalog(db *DB) error {
 	catalog.defineCreatedAtField()
 	catalog.defineUpdatedAtField()
 	catalog.DefineColumn("type", TEXT, "")
-	catalog.DefineColumn("id", KEY, "")
+	catalog.DefineColumn("name", KEY, "")
 	catalog.DefineColumn("version", INT, 0)
 	catalog.DefineColumn("definition", BYTES, []byte{})
-	catalog.DefinePrimaryKeys("type", "id")
+	catalog.DefinePrimaryKeys("type", "name")
 	catalog.IsCore = true
 	if err = catalog.Init(); err != nil {
 		return err
@@ -42,10 +42,10 @@ func defineCatalog(db *DB) error {
 
 /**
 * setCatalog
-* @param tp, id string, version int, obj any
+* @param tp, name string, version int, obj any
 * @return error
 **/
-func setCatalog(tp, id string, version int, obj any) error {
+func setCatalog(tp, name string, version int, obj any) error {
 	if catalog == nil {
 		return nil
 	}
@@ -63,7 +63,7 @@ func setCatalog(tp, id string, version int, obj any) error {
 	_, err := catalog.
 		Upsert(et.Json{
 			"type":       tp,
-			"id":         id,
+			"name":       name,
 			"version":    version,
 			"definition": bt,
 		}).
@@ -91,14 +91,14 @@ func setCatalog(tp, id string, version int, obj any) error {
 
 /**
 * getCatalog
-* @param tp, id string, dest any
+* @param tp, name string, dest any
 * @return bool, error
 **/
-func getCatalog(tp, id string, dest any) (bool, error) {
+func getCatalog(tp, name string, dest any) (bool, error) {
 	item, err := catalog.
 		Select().
 		Where(Eq("type", tp)).
-		And(Eq("id", id)).
+		And(Eq("name", name)).
 		One()
 	if err != nil {
 		return false, err
@@ -123,14 +123,14 @@ func getCatalog(tp, id string, dest any) (bool, error) {
 
 /**
 * deleteCatalog
-* @param tp, id string
+* @param tp, name string
 * @return error
 **/
-func deleteCatalog(tp, id string) error {
+func deleteCatalog(tp, name string) error {
 	_, err := catalog.
 		Delete().
 		Where(Eq("type", tp)).
-		And(Eq("id", id)).
+		And(Eq("name", name)).
 		One()
 	if err != nil {
 		return err

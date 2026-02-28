@@ -1,4 +1,4 @@
-package jql
+package jdb
 
 import (
 	"database/sql"
@@ -37,12 +37,6 @@ type Model struct {
 	Details       map[string]*Detail     `json:"details"`
 	Rollups       map[string]*Detail     `json:"rollups"`
 	Relations     map[string]*Detail     `json:"relations"`
-	BeforeInserts []*Trigger             `json:"before_inserts"`
-	BeforeUpdates []*Trigger             `json:"before_updates"`
-	BeforeDeletes []*Trigger             `json:"before_deletes"`
-	AfterInserts  []*Trigger             `json:"after_inserts"`
-	AfterUpdates  []*Trigger             `json:"after_updates"`
-	AfterDeletes  []*Trigger             `json:"after_deletes"`
 	IsStrict      bool                   `json:"is_strict"`
 	Version       int                    `json:"version"`
 	IsCore        bool                   `json:"is_core"`

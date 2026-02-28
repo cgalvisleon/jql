@@ -1,4 +1,4 @@
-package jql
+package jdb
 
 import (
 	"database/sql"
@@ -12,14 +12,6 @@ import (
 	"github.com/cgalvisleon/et/strs"
 	"github.com/cgalvisleon/et/utility"
 )
-
-var dbs map[string]*DB
-var models map[string]*Model
-
-func init() {
-	dbs = make(map[string]*DB)
-	models = make(map[string]*Model)
-}
 
 type Schema struct {
 	Database string           `json:"-"`
@@ -36,44 +28,7 @@ type DB struct {
 }
 
 /**
-* getDb
-* @param name string, params Connection
-* @return (*DB, error)
-**/
-func getDb(name string, params et.Json) (*DB, error) {
-	if !utility.ValidStr(name, 0, []string{""}) {
-		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, "name")
-	}
-
-	name = utility.Normalize(name)
-	result, ok := dbs[name]
-	if ok {
-		return result, nil
-	}
-
-	driver := params.Str("driver")
-	drv, ok := drivers[driver]
-	if !ok {
-		return nil, fmt.Errorf(MSG_DRIVER_NOT_FOUND, driver)
-	}
-
-	result = &DB{
-		Name:    name,
-		Schemas: make(map[string]*Schema),
-		Params:  params,
-		driver:  drv(),
-	}
-	err := result.init()
-	if err != nil {
-		return nil, err
-	}
-
-	dbs[name] = result
-	return result, nil
-}
-
-/**
-* Serialize
+* serialize
 * @return []byte, error
 **/
 func (s *DB) serialize() ([]byte, error) {
@@ -105,10 +60,10 @@ func (s *DB) ToJson() et.Json {
 }
 
 /**
-* save
+* Save
 * @return error
 **/
-func (s *DB) save() error {
+func (s *DB) Save() error {
 	bt, err := s.serialize()
 	if err != nil {
 		return err
@@ -137,7 +92,7 @@ func (s *DB) init() error {
 	}
 
 	s.db = db
-	return s.save()
+	return s.Save()
 }
 
 /**
@@ -171,12 +126,6 @@ func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
 		Details:       make(map[string]*Detail, 0),
 		Rollups:       make(map[string]*Detail, 0),
 		Relations:     make(map[string]*Detail, 0),
-		BeforeInserts: make([]*Trigger, 0),
-		BeforeUpdates: make([]*Trigger, 0),
-		BeforeDeletes: make([]*Trigger, 0),
-		AfterInserts:  make([]*Trigger, 0),
-		AfterUpdates:  make([]*Trigger, 0),
-		AfterDeletes:  make([]*Trigger, 0),
 		Version:       version,
 		beforeInserts: make([]TriggerFunction, 0),
 		beforeUpdates: make([]TriggerFunction, 0),
@@ -192,6 +141,41 @@ func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
 	sch.Models[name] = result.From()
 	models[key] = result
 
+	return result, nil
+}
+
+/**
+* sqlTx
+* @param tx *Tx, sql string, arg ...any
+* @return et.Items, error
+*
+ */
+func (s *DB) sqlTx(tx *Tx, _sql string, arg ...any) (et.Items, error) {
+	query := SQLParse(_sql, arg...)
+	if tx != nil {
+		err := tx.Begin(s.db)
+		if err != nil {
+			return et.Items{}, err
+		}
+
+		rows, err := tx.Tx.Query(query)
+		if err != nil {
+			errR := tx.Rollback()
+			if errR != nil {
+				err = fmt.Errorf(MSG_ROLLBACK_ERROR, errR)
+			}
+			return et.Items{}, err
+		}
+		result := RowsToItems(rows)
+		return result, nil
+	}
+
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return et.Items{}, err
+	}
+
+	result := RowsToItems(rows)
 	return result, nil
 }
 
@@ -261,11 +245,11 @@ func (s *DB) GetModel(schema, name string) (*Model, error) {
 }
 
 /**
-* deleteModel
+* DeleteModel
 * @param schema, name string
 * @return error
 **/
-func (s *DB) deleteModel(schema, name string) error {
+func (s *DB) DeleteModel(schema, name string) error {
 	key := name
 	key = strs.Append(schema, key, ".")
 	key = strs.Append(s.Name, key, ".")
@@ -281,41 +265,6 @@ func (s *DB) deleteModel(schema, name string) error {
 	}
 
 	return nil
-}
-
-/**
-* sqlTx
-* @param tx *Tx, sql string, arg ...any
-* @return et.Items, error
-*
- */
-func (s *DB) sqlTx(tx *Tx, _sql string, arg ...any) (et.Items, error) {
-	query := SQLParse(_sql, arg...)
-	if tx != nil {
-		err := tx.Begin(s.db)
-		if err != nil {
-			return et.Items{}, err
-		}
-
-		rows, err := tx.Tx.Query(query)
-		if err != nil {
-			errR := tx.Rollback()
-			if errR != nil {
-				err = fmt.Errorf(MSG_ROLLBACK_ERROR, errR)
-			}
-			return et.Items{}, err
-		}
-		result := RowsToItems(rows)
-		return result, nil
-	}
-
-	rows, err := s.db.Query(query)
-	if err != nil {
-		return et.Items{}, err
-	}
-
-	result := RowsToItems(rows)
-	return result, nil
 }
 
 /**
@@ -427,6 +376,6 @@ func (s *DB) Upsert(sql et.Json) (et.Items, error) {
 * @param insert et.Json
 * @return et.Items, error
 **/
-func (s *DB) Select(sql et.Json) (et.Items, error) {
+func (s *DB) From(sql et.Json) (et.Items, error) {
 	return et.Items{}, nil
 }

@@ -1,4 +1,4 @@
-package jql
+package jdb
 
 import (
 	"errors"
@@ -9,6 +9,7 @@ import (
 var (
 	ErrModelNotFound         error  = errors.New("model not found")
 	ErrDbNotFound            error  = errors.New("database not found")
+	ErrNotUpdated            error  = errors.New("record not updated")
 	MSG_DRIVER_NOT_FOUND     string = "driver not found"
 	MSG_NAME_REQUIRED        string = "name required"
 	MSG_COLUMN_EXISTS        string = "column %s already exists"
@@ -24,6 +25,7 @@ var (
 	MSG_SCHEMA_NOT_FOUND     string = "schema %s not found"
 	MSG_ROLLBACK_ERROR       string = "rollback error: %w: %s"
 	MSG_FIELD_NOT_FOUND      string = "field %s not found"
+	MSG_DB_NOT_FOUND         string = "database %s not found"
 )
 
 func init() {
@@ -47,5 +49,6 @@ func init() {
 		MSG_SCHEMA_NOT_FOUND = "schema %s no encontrado"
 		MSG_ROLLBACK_ERROR = "rollback error: %w: %s"
 		MSG_FIELD_NOT_FOUND = "field %s not found"
+		MSG_DB_NOT_FOUND = "database %s not found"
 	}
 }

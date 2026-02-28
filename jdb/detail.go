@@ -1,4 +1,4 @@
-package jql
+package jdb
 
 type Detail struct {
 	To              *From             `json:"to"`

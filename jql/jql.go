@@ -8,11 +8,11 @@ import (
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/response"
 	"github.com/cgalvisleon/et/utility"
+	"github.com/cgalvisleon/jql/jdb"
 )
 
 var (
 	ErrNotInserted = fmt.Errorf("record not inserted")
-	ErrNotUpdated  = fmt.Errorf("record not updated")
 	ErrNotFound    = fmt.Errorf("record not found")
 	ErrNotUpserted = fmt.Errorf("record not inserted or updated")
 	ErrDuplicate   = fmt.Errorf("record duplicate")
@@ -23,16 +23,16 @@ var (
 * @param name string, params Connection
 * @return (*DB, error)
 **/
-func ConnectTo(name string, params et.Json) (*DB, error) {
-	return getDb(name, params)
+func ConnectTo(name string, params et.Json) (*jdb.DB, error) {
+	return jdb.GetDb(name, params)
 }
 
 /**
 * LoadTo
 * @param name string
-* @return (*DB, error)
+* @return *jdb.DB, error
 **/
-func LoadTo(name string, host string, port int) (*DB, error) {
+func LoadTo(name string, host string, port int) (*jdb.DB, error) {
 	params := et.Json{
 		"driver":   envar.GetStr("DB_DRIVER", "postgres"),
 		"database": name,
@@ -49,9 +49,9 @@ func LoadTo(name string, host string, port int) (*DB, error) {
 
 /**
 * Load
-* @return (*DB, error)
+* @return (*jdb.DB, error)
 **/
-func Load() (*DB, error) {
+func Load() (*jdb.DB, error) {
 	name := envar.GetStr("DB_NAME", "josephine")
 	host := envar.GetStr("DB_HOST", "localhost")
 	port := envar.GetInt("DB_PORT", 5432)
@@ -59,48 +59,11 @@ func Load() (*DB, error) {
 }
 
 /**
-* NewDb
-* @param name string, host string, port int
-* @return (*DB, error)
-**/
-func NewDb(name string, host string, port int) (*DB, error) {
-	result, err := LoadTo(name, host, port)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-/**
-* GetDb
-* @param name string
-* @return (*DB, error)
-**/
-func GetDb(name string) (*DB, error) {
-	result, ok := dbs[name]
-	if ok {
-		return result, nil
-	}
-
-	exists, err := getCatalog("db", name, &result)
-	if err != nil {
-		return nil, err
-	}
-
-	if !exists {
-		return nil, ErrDbNotFound
-	}
-
-	return result, nil
-}
-
-/**
 * GetModel
 * @param database, schema, name string
-* @return (*Model, error)
+* @return *jdb.Model, error
 **/
-func GetModel(database, schema, name string) (*Model, error) {
+func GetModel(database, schema, name string) (*jdb.Model, error) {
 	db, err := GetDb(database)
 	if err != nil {
 		return nil, err
@@ -112,25 +75,6 @@ func GetModel(database, schema, name string) (*Model, error) {
 	}
 
 	return result, nil
-}
-
-/**
-* DeleteDb
-* @param name string
-* @return error
-**/
-func DeleteDb(name string) error {
-	_, ok := dbs[name]
-	if ok {
-		delete(dbs, name)
-	}
-
-	err := deleteCatalog("db", name)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 /**
@@ -154,13 +98,13 @@ func DeleteModel(database, schema, name string) error {
 
 /**
 * Define
-* @param definition et.Json
-* @return (*Model, error)
+* @param params et.Json
+* @return *jdb.Model, error
 **/
-func Define(definition et.Json) (*Model, error) {
-	database := definition.String("database")
+func Define(params et.Json) (*jdb.Model, error) {
+	database := params.String("database")
 	if !utility.ValidStr(database, 0, []string{}) {
-		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, "database")
+		return nil, fmt.Errorf(jdb.MSG_ATTRIBUTE_REQUIRED, "database")
 	}
 
 	db, err := GetDb(database)
@@ -168,18 +112,45 @@ func Define(definition et.Json) (*Model, error) {
 		return nil, err
 	}
 
-	return db.Define(definition)
+	return db.Define(params)
 }
 
 /**
-* Query
-* @param query et.Json
+* Insert
+* @param params et.Json
 * @return (et.Items, error)
 **/
-func Query(query et.Json) (et.Items, error) {
+func Insert(params et.Json) (et.Items, error) {
+	return et.Items{}, nil
+}
+
+/**
+* Update
+* @param params et.Json
+* @return (et.Items, error)
+**/
+func Update(params et.Json) (et.Items, error) {
+	return et.Items{}, nil
+}
+
+func Delete(params et.Json) (et.Items, error) {
+	return et.Items{}, nil
+}
+
+func Upsert(params et.Json) (et.Items, error) {
+	return et.Items{}, nil
+}
+
+/**
+* From
+* @param query et.Json
+* @return (et.Items, error)
+*
+ */
+func From(query et.Json) (et.Items, error) {
 	database := query.String("database")
 	if !utility.ValidStr(database, 0, []string{}) {
-		return et.Items{}, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, "database")
+		return et.Items{}, fmt.Errorf(jdb.MSG_ATTRIBUTE_REQUIRED, "database")
 	}
 
 	db, err := GetDb(database)

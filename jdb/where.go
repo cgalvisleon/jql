@@ -1,4 +1,4 @@
-package jql
+package jdb
 
 import (
 	"github.com/cgalvisleon/et/et"

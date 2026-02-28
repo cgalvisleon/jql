@@ -1,4 +1,4 @@
-package jql
+package jdb
 
 import "fmt"
 
@@ -8,8 +8,8 @@ const (
 	IDX        string = "idx"
 	STATUS     string = "status"
 	VERSION    string = "version"
-	PROJECT_ID string = "project_id"
 	TENANT_ID  string = "tenant_id"
+	PROJECT_ID string = "project_id"
 	CREATED_AT string = "created_at"
 	UPDATED_AT string = "updated_at"
 )

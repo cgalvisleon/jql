@@ -9,7 +9,10 @@
       "program": "${workspaceFolder}/cmd/server",
       "args": ["-port", "3500", "-rpc_port", "4500"],
       "cwd": "${workspaceFolder}",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "GOTOOLCHAIN": "auto"
+      }
     }
   ],
   "compounds": [
