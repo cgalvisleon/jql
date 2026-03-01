@@ -365,7 +365,7 @@ func (s *Cmd) upsert() (et.Items, error) {
 
 	if exists {
 		s.Type = UPDATE
-		s.Wheres.byPk(from, data)
+		s.Wheres.ByPk(from, data)
 		return s.update()
 	}
 

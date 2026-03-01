@@ -408,7 +408,7 @@ func (s *Model) Counted() (int, error) {
 func (s *Model) ItExists(data et.Json) *Ql {
 	result := newQuery(s, "A")
 	result.Type = EXISTS
-	result.Wheres.byPk(s, data)
+	result.Wheres.ByPk(s, data)
 	return result
 }
 
@@ -424,7 +424,7 @@ func (s *Model) Current(data et.Json) *Ql {
 			result.Selects = append(result.Selects, field)
 		}
 	}
-	result.Wheres.byPk(s, data)
+	result.Wheres.ByPk(s, data)
 	return result
 }
 
