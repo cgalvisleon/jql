@@ -759,3 +759,11 @@ func (s *Ql) ItExistsTx(tx *Tx) (bool, error) {
 func (s *Ql) ItExists() (bool, error) {
 	return s.ItExistsTx(nil)
 }
+
+/**
+* Query
+* @return Items, error
+**/
+func (s *Ql) Query(params et.Json) (et.Items, error) {
+	return s.db.Query(s)
+}

@@ -393,12 +393,12 @@ func (s *Model) Select(fields ...interface{}) *Ql {
 
 /**
 * Counted
-* @return *Ql
+* @return int, error
 **/
-func (s *Model) Counted() *Ql {
+func (s *Model) Counted() (int, error) {
 	result := newQuery(s, "A")
 	result.Type = COUNTED
-	return result
+	return result.Count()
 }
 
 /**
@@ -426,4 +426,14 @@ func (s *Model) Current(data et.Json) *Ql {
 	}
 	result.Wheres.byPk(s, data)
 	return result
+}
+
+/**
+* Query
+* @param query et.Json
+* @return et.Items, error
+**/
+func (s *Model) Query(query et.Json) (et.Items, error) {
+	result := newQuery(s, "A")
+	return result.Query(query)
 }
