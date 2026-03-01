@@ -75,9 +75,9 @@ func SetSerie(tag, format string, value int) error {
 * @param tag string
 * @return et.Json, error
 **/
-func GetSerie(tag string) (et.Json, error) {
+func GetSerie(tag string) (int, string, error) {
 	if series == nil {
-		return et.Json{}, nil
+		return 0, "", nil
 	}
 
 	now := timezone.Now()
@@ -101,13 +101,12 @@ func GetSerie(tag string) (et.Json, error) {
 		Where(Eq("tag", tag)).
 		One()
 	if err != nil {
-		return et.Json{}, err
+		return 0, "", err
 	}
 
-	return et.Json{
-		"value":  item.Int("value"),
-		"format": item.String("format"),
-	}, nil
+	value := item.Int("value")
+	format := item.String("format")
+	return value, format, nil
 }
 
 /**
