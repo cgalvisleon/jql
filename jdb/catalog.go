@@ -25,8 +25,8 @@ func defineCatalog(db *DB) error {
 	if err != nil {
 		return err
 	}
-	catalog.defineCreatedAtField()
-	catalog.defineUpdatedAtField()
+	catalog.DefineCreatedAtField()
+	catalog.DefineUpdatedAtField()
 	catalog.DefineColumn("type", TEXT, "")
 	catalog.DefineColumn("name", KEY, "")
 	catalog.DefineColumn("version", INT, 0)

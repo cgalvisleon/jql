@@ -22,8 +22,8 @@ func defineSeries(db *DB) error {
 	if err != nil {
 		return err
 	}
-	series.defineCreatedAtField()
-	series.defineUpdatedAtField()
+	series.DefineCreatedAtField()
+	series.DefineUpdatedAtField()
 	series.DefineColumn("tag", TEXT, "")
 	series.DefineColumn("format", TEXT, "")
 	series.DefineColumn("value", INT, 0)

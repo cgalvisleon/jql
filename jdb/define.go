@@ -171,17 +171,16 @@ func (s *Model) DefineForeignKey(to *Model, keys map[string]string, onDeleteCasc
 
 /**
 * DefineSourceField
-* @param name string
 * @return error
 **/
-func (s *Model) DefineSourceField(name string) (*Column, error) {
-	result, err := s.DefineColumn(name, JSON, et.Json{})
+func (s *Model) DefineSourceField() (*Column, error) {
+	result, err := s.DefineColumn(SOURCE, JSON, et.Json{})
 	if err != nil {
 		return nil, err
 	}
 
-	s.SourceField = name
-	s.DefineIndex(name)
+	s.SourceField = SOURCE
+	s.DefineIndex(SOURCE)
 	return result, nil
 }
 
@@ -207,7 +206,7 @@ func (s *Model) defineIdxField() (*Column, error) {
 **/
 func (s *Model) DefineAttribute(name string, tpData TypeData, defaultValue interface{}) (*Column, error) {
 	if s.SourceField == "" {
-		_, err := s.DefineSourceField(SOURCE)
+		_, err := s.DefineSourceField()
 		if err != nil {
 			return nil, err
 		}
@@ -291,48 +290,39 @@ func (s *Model) DefineCalc(name string, fn DataContext) error {
 }
 
 /**
-* defineCreatedAtField
+* DefineCreatedAtField
 * @return *Model
 **/
-func (s *Model) defineCreatedAtField() *Model {
+func (s *Model) DefineCreatedAtField() *Model {
 	s.DefineColumn(CREATED_AT, DATETIME, "")
 	return s
 }
 
 /**
-* defineUpdatedAtField
+* DefineUpdatedAtField
 * @return *Model
 **/
-func (s *Model) defineUpdatedAtField() *Model {
+func (s *Model) DefineUpdatedAtField() *Model {
 	s.DefineColumn(UPDATED_AT, DATETIME, "")
 	return s
 }
 
 /**
-* defineStatusFieldDefault
+* DefineStatusField
 * @return *Model
 **/
-func (s *Model) defineStatusFieldDefault() *Model {
+func (s *Model) DefineStatusField() *Model {
 	s.DefineColumn(STATUS, KEY, "")
 	return s
 }
 
 /**
-* definePrimaryKeyField
+* DefinePrimaryKeyField
 * @return *Model
 **/
-func (s *Model) definePrimaryKeyField() *Model {
+func (s *Model) DefinePrimaryKeyField() *Model {
 	s.DefineColumn(ID, KEY, "")
 	s.DefinePrimaryKeys(ID)
-	return s
-}
-
-/**
-* defineSourceFieldDefault
-* @return *Model
-**/
-func (s *Model) defineSourceFieldDefault() *Model {
-	s.DefineSourceField(SOURCE)
 	return s
 }
 
@@ -341,11 +331,11 @@ func (s *Model) defineSourceFieldDefault() *Model {
 * @return *Model
 **/
 func (s *Model) DefineModel() *Model {
-	s.defineCreatedAtField()
-	s.defineUpdatedAtField()
-	s.defineStatusFieldDefault()
-	s.definePrimaryKeyField()
-	s.defineSourceFieldDefault()
+	s.DefineCreatedAtField()
+	s.DefineUpdatedAtField()
+	s.DefineStatusField()
+	s.DefinePrimaryKeyField()
+	s.DefineSourceField()
 	return s
 }
 
@@ -354,12 +344,11 @@ func (s *Model) DefineModel() *Model {
 * @return *Model
 **/
 func (s *Model) DefineProjectModel() *Model {
-	s.defineCreatedAtField()
-	s.defineUpdatedAtField()
-	s.defineStatusFieldDefault()
-	s.definePrimaryKeyField()
+	s.DefineCreatedAtField()
+	s.DefineUpdatedAtField()
+	s.DefineStatusField()
+	s.DefinePrimaryKeyField()
 	s.DefineColumn(PROJECT_ID, KEY, "")
-	s.defineSourceFieldDefault()
 	s.defineIdxField()
 	s.DefineIndex(PROJECT_ID)
 	return s
