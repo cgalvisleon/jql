@@ -35,6 +35,30 @@ type Cmd struct {
 }
 
 /**
+* newCommand
+* @param model *Model, cmd TypeCommand
+* @return *Cmd
+**/
+func newCommand(s *Model, cmd TypeCommand) *Cmd {
+	result := &Cmd{
+		Type:          cmd,
+		Model:         s,
+		Wheres:        newWhere(),
+		Data:          make([]et.Json, 0),
+		New:           et.Json{},
+		beforeInserts: s.beforeInserts,
+		beforeUpdates: s.beforeUpdates,
+		beforeDeletes: s.beforeDeletes,
+		afterInserts:  s.afterInserts,
+		afterUpdates:  s.afterUpdates,
+		afterDeletes:  s.afterDeletes,
+		db:            s.db,
+	}
+
+	return result
+}
+
+/**
 * Serialize
 * @return []byte, error
 **/
@@ -67,27 +91,22 @@ func (s *Cmd) ToJson() et.Json {
 }
 
 /**
-* newCommand
-* @param model *Model, cmd TypeCommand
+* SetDebug
+* @param isDebug bool
 * @return *Cmd
 **/
-func newCommand(s *Model, cmd TypeCommand) *Cmd {
-	result := &Cmd{
-		Type:          cmd,
-		Model:         s,
-		Wheres:        newWhere(),
-		Data:          make([]et.Json, 0),
-		New:           et.Json{},
-		beforeInserts: s.beforeInserts,
-		beforeUpdates: s.beforeUpdates,
-		beforeDeletes: s.beforeDeletes,
-		afterInserts:  s.afterInserts,
-		afterUpdates:  s.afterUpdates,
-		afterDeletes:  s.afterDeletes,
-		db:            s.db,
-	}
+func (s *Cmd) SetDebug(isDebug bool) *Cmd {
+	s.IsDebug = isDebug
+	return s
+}
 
-	return result
+/**
+* Debug
+* @return *Cmd
+**/
+func (s *Cmd) Debug() *Cmd {
+	s.IsDebug = true
+	return s
 }
 
 /**

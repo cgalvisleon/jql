@@ -29,7 +29,7 @@ type Ql struct {
 	Type     TypeQuery              `json:"type"`
 	Froms    []*From                `json:"froms"`
 	Selects  []*Field               `json:"select"`
-	Hidden   []string               `json:"hidden"`
+	Hiddens  []string               `json:"hidden"`
 	Wheres   *Wheres                `json:"wheres"`
 	Joins    []*Joins               `json:"joins"`
 	Details  map[string]*Detail     `json:"details"`
@@ -64,7 +64,7 @@ func newQuery(model *Model, as string) *Ql {
 		Froms:    []*From{from},
 		Joins:    make([]*Joins, 0),
 		Selects:  make([]*Field, 0),
-		Hidden:   make([]string, 0),
+		Hiddens:  make([]string, 0),
 		Wheres:   newWhere(),
 		Details:  make(map[string]*Detail),
 		Rollups:  make(map[string]*Detail),
@@ -639,15 +639,15 @@ func (s *Ql) OrderByDesc(fields ...string) *Ql {
 }
 
 /**
-* Hiddens
+* Hidden
 * @param fields ...string
 * @return *Ql
 **/
-func (s *Ql) Hiddens(fields ...string) *Ql {
+func (s *Ql) Hidden(fields ...string) *Ql {
 	for _, name := range fields {
 		fld := s.findField(name)
 		if fld != nil {
-			s.Hidden = append(s.Hidden, fld.AS())
+			s.Hiddens = append(s.Hiddens, fld.AS())
 		}
 	}
 	return s

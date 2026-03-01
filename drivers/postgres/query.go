@@ -119,7 +119,7 @@ func (s *Driver) buildSelect(ql *jdb.Ql) (string, error) {
 	result := ""
 	if ql.Type == jdb.DATA {
 		if len(ql.Selects) == 0 {
-			hiddens := ql.Hidden
+			hiddens := ql.Hiddens
 			hiddens = append(hiddens, jdb.SOURCE)
 			def := fmt.Sprintf("to_jsonb(A) - ARRAY[%s]", strings.Join(hiddens, ", "))
 			result = strs.Append(result, def, "||")
@@ -170,7 +170,7 @@ func (s *Driver) buildSelect(ql *jdb.Ql) (string, error) {
 	}
 
 	if len(ql.Selects) == 0 {
-		hiddens := ql.Hidden
+		hiddens := ql.Hiddens
 		if len(hiddens) > 0 {
 			result += fmt.Sprintf("to_jsonb(A) - ARRAY[%s]", strings.Join(hiddens, ", "))
 		} else {

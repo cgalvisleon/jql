@@ -207,17 +207,15 @@ func EXP(field string) *Agg {
 	return agg("exp", field)
 }
 
-type Status string
-
 const (
-	ACTIVE     Status = "active"
-	ARCHIVED   Status = "archived"
-	CANCELED   Status = "canceled"
-	OF_SYSTEM  Status = "of_system"
-	FOR_DELETE Status = "for_delete"
-	PENDING    Status = "pending"
-	APPROVED   Status = "approved"
-	REJECTED   Status = "rejected"
+	ACTIVE     string = "active"
+	ARCHIVED   string = "archived"
+	CANCELED   string = "canceled"
+	OF_SYSTEM  string = "of_system"
+	FOR_DELETE string = "for_delete"
+	PENDING    string = "pending"
+	APPROVED   string = "approved"
+	REJECTED   string = "rejected"
 )
 
 type Column struct {
