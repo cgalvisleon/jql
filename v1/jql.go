@@ -11,17 +11,72 @@ import (
 	"github.com/cgalvisleon/jql/jdb"
 )
 
-var (
-	ErrNotInserted = fmt.Errorf("record not inserted")
-	ErrNotFound    = fmt.Errorf("record not found")
-	ErrNotUpserted = fmt.Errorf("record not inserted or updated")
-	ErrDuplicate   = fmt.Errorf("record duplicate")
+const (
+	DriverPostgres = jdb.DriverPostgres
+	DriverSqlite   = jdb.DriverSqlite
+	// Field names
+	SOURCE     = jdb.SOURCE
+	ID         = jdb.ID
+	IDX        = jdb.IDX
+	STATUS     = jdb.STATUS
+	VERSION    = jdb.VERSION
+	PROJECT_ID = jdb.PROJECT_ID
+	TENANT_ID  = jdb.TENANT_ID
+	CREATED_AT = jdb.CREATED_AT
+	UPDATED_AT = jdb.UPDATED_AT
+	// Data types
+	ANY      = jdb.ANY
+	BYTES    = jdb.BYTES
+	INT      = jdb.INT
+	FLOAT    = jdb.FLOAT
+	KEY      = jdb.KEY
+	TEXT     = jdb.TEXT
+	MEMO     = jdb.MEMO
+	JSON     = jdb.JSON
+	DATETIME = jdb.DATETIME
+	BOOLEAN  = jdb.BOOLEAN
+	GEOMETRY = jdb.GEOMETRY
+	CALC     = jdb.CALC
+	// Column types
+	COLUMN = jdb.COLUMN
+	ATTRIB = jdb.ATTRIB
+	DETAIL = jdb.DETAIL
+	ROLLUP = jdb.ROLLUP
+	AGG    = jdb.AGG
+	// Status record
+	ACTIVE     = jdb.ACTIVE
+	ARCHIVED   = jdb.ARCHIVED
+	CANCELED   = jdb.CANCELED
+	OF_SYSTEM  = jdb.OF_SYSTEM
+	FOR_DELETE = jdb.FOR_DELETE
+	PENDING    = jdb.PENDING
+	APPROVED   = jdb.APPROVED
+	REJECTED   = jdb.REJECTED
 )
+
+var (
+	// Error
+	ErrNotUpdated        = jdb.ErrNotUpdated
+	ErrNotInserted error = fmt.Errorf("record not inserted")
+	ErrNotFound    error = fmt.Errorf("record not found")
+	ErrNotUpserted error = fmt.Errorf("record not inserted or updated")
+	ErrDuplicate   error = fmt.Errorf("record duplicate")
+)
+
+type TypeColumn = jdb.TypeColumn
+type TypeData = jdb.TypeData
+type Driver = jdb.Driver
+type DB = jdb.DB
+type Model = jdb.Model
+type Tx = jdb.Tx
+type Condition = jdb.Condition
+type Ql = jdb.Ql
+type Cmd = jdb.Cmd
 
 /**
 * ConnectTo
 * @param name string, params Connection
-* @return (*DB, error)
+* @return *jdb.DB, error
 **/
 func ConnectTo(name string, params et.Json) (*jdb.DB, error) {
 	return jdb.LoadDb(name, params)
@@ -56,6 +111,25 @@ func Load() (*jdb.DB, error) {
 	host := envar.GetStr("DB_HOST", "localhost")
 	port := envar.GetInt("DB_PORT", 5432)
 	return LoadTo(name, host, port)
+}
+
+/**
+* NewModel
+* @param db *DB, schema, name string, version int
+* @return (*Model, error)
+**/
+func NewModel(db *DB, schema, name string, version int) (*Model, error) {
+	result, err := db.Define(et.Json{
+		"schema":  schema,
+		"name":    name,
+		"version": version,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 /**
