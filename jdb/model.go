@@ -370,6 +370,17 @@ func (s *Model) Upsert(data et.Json) *Cmd {
 }
 
 /**
+* Where
+* @param condition *Condition
+* @return *Ql
+**/
+func (s *Model) Where(condition *Condition) *Ql {
+	result := newQuery(s, "A")
+	result.Wheres.add(condition)
+	return result
+}
+
+/**
 * Select
 * @param fields ...interface{}
 * @return *Ql

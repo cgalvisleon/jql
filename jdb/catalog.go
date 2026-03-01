@@ -96,9 +96,9 @@ func setCatalog(tp, name string, version int, obj any) error {
 **/
 func getCatalog(tp, name string, dest any) (bool, error) {
 	item, err := catalog.
-		Select().
 		Where(Eq("type", tp)).
 		And(Eq("name", name)).
+		Select().
 		One()
 	if err != nil {
 		return false, err
