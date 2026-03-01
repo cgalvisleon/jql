@@ -429,6 +429,17 @@ func (s *Model) Current(data et.Json) *Ql {
 }
 
 /**
+* Join
+* @param model *Model, as string, keys map[string]string
+* @return *Ql
+**/
+func (s *Model) Join(model *Model, as string, keys map[string]string) *Ql {
+	result := newQuery(s, "A")
+	result.join(JOIN, model, as, keys)
+	return result
+}
+
+/**
 * Query
 * @param query et.Json
 * @return et.Items, error
