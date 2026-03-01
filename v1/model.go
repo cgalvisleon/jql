@@ -139,6 +139,15 @@ func GetSerie(tag string) (int, string, error) {
 }
 
 /**
+* DeleteSerie
+* @param tag string
+* @return error
+**/
+func DeleteSerie(tag string) error {
+	return jdb.DeleteSerie(tag)
+}
+
+/**
 * HttpDefine
 * @param w http.ResponseWriter, r *http.Request
 * @return
