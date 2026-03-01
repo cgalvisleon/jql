@@ -129,3 +129,12 @@ func Define(params et.Json) (*jdb.Model, error) {
 
 	return db.Define(params)
 }
+
+/**
+* Query
+* @param params et.Json
+* @return (et.Items, error)
+**/
+func Query(params et.Json) (et.Items, error) {
+	return et.Items{}, nil
+}
