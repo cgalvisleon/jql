@@ -78,12 +78,23 @@ func (s *Wheres) add(condition *Condition) *Wheres {
 * @param model *From, data et.Json
 * @return *Wheres
 **/
-func (s *Wheres) ByPk(model *From, data et.Json) *Wheres {
-	for _, key := range model.PrimaryKeys {
-		if _, ok := data[key]; !ok {
-			continue
+func (s *Wheres) ByPk(model interface{}, data et.Json) *Wheres {
+	switch v := model.(type) {
+	case *From:
+		for _, key := range v.PrimaryKeys {
+			if _, ok := data[key]; !ok {
+				continue
+			}
+			s.add(Eq(key, data[key]))
 		}
-		s.add(Eq(key, data[key]))
+	case *Model:
+		for _, key := range v.PrimaryKeys {
+			if _, ok := data[key]; !ok {
+				continue
+			}
+			s.add(Eq(key, data[key]))
+		}
 	}
+
 	return s
 }

@@ -165,6 +165,7 @@ func (s *Model) from() *From {
 		Name:        s.Name,
 		Table:       s.Table,
 		As:          s.Name,
+		Columns:     s.Columns,
 		PrimaryKeys: s.PrimaryKeys,
 		Fields:      make([]*Field, 0),
 	}

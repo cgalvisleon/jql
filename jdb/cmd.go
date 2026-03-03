@@ -355,17 +355,17 @@ func (s *Cmd) upsert() (et.Items, error) {
 	}
 
 	data := s.Data[0]
-	from := s.Model
-	exists, err := from.
+	model := s.Model
+	exists, err := NewQuery(model, "A").
 		ItExists(data).
-		ItExists()
+		Exists()
 	if err != nil {
 		return et.Items{}, err
 	}
 
 	if exists {
 		s.Type = UPDATE
-		s.Wheres.ByPk(from, data)
+		s.Wheres.ByPk(model, data)
 		return s.update()
 	}
 

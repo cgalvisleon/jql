@@ -106,12 +106,3 @@ func DeleteDb(name string) error {
 
 	return nil
 }
-
-/**
-* from
-* @param model *Model
-* @return *Ql
-**/
-func from(model *Model) *Ql {
-	return NewQuery(model, "")
-}

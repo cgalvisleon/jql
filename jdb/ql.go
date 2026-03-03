@@ -548,6 +548,30 @@ func (s *Ql) ItExists(data et.Json) *Ql {
 }
 
 /**
+* Current
+* @return *Ql
+**/
+func (s *Ql) Current(data et.Json) *Ql {
+	if len(s.Froms) == 0 {
+		return s
+	}
+
+	model := s.Froms[0]
+	if model == nil {
+		return s
+	}
+
+	for _, col := range model.Columns {
+		if col.TypeColumn == COLUMN {
+			field := col.Field()
+			s.Selects = append(s.Selects, field)
+		}
+	}
+	s.Wheres.ByPk(model, data)
+	return s
+}
+
+/**
 * AllTx
 * @param tx *Tx
 * @return et.Items, error

@@ -60,6 +60,7 @@ type From struct {
 	Name        string             `json:"name"`
 	Table       string             `json:"table"`
 	As          string             `json:"as"`
+	Columns     []*Column          `json:"columns"`
 	PrimaryKeys []string           `json:"primary_keys"`
 	Fields      []*Field           `json:"fields"`
 	References  map[string]*Detail `json:"references"`
