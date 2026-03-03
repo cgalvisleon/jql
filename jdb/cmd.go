@@ -252,7 +252,7 @@ func (s *Cmd) update() (et.Items, error) {
 	from := s.Model
 	result := et.Items{}
 	for _, data := range s.Data {
-		current, err := from.
+		current, err := NewQuery(from, "A").
 			Current(data).
 			All()
 		if err != nil {
@@ -305,7 +305,7 @@ func (s *Cmd) delete() (et.Items, error) {
 	from := s.Model
 	result := et.Items{}
 	for _, data := range s.Data {
-		current, err := from.
+		current, err := NewQuery(from, "A").
 			Current(data).
 			All()
 		if err != nil {
