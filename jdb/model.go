@@ -383,70 +383,11 @@ func (s *Model) Where(condition *Condition) *Ql {
 }
 
 /**
-* Select
-* @param fields ...interface{}
-* @return *Ql
-**/
-func (s *Model) Select(fields ...interface{}) *Ql {
-	result := NewQuery(s, "A")
-	result.Select(fields...)
-	return result
-}
-
-/**
-* Counted
-* @return int, error
-**/
-func (s *Model) Counted() (int, error) {
-	result := newQuery(s)
-	result.Type = COUNTED
-	return result.Count()
-}
-
-/**
-* ItExists
-* @return *Ql
-**/
-func (s *Model) ItExists(data et.Json) *Ql {
-	result := newQuery(s, "A")
-	result.Type = EXISTS
-	result.Wheres.ByPk(s, data)
-	return result
-}
-
-/**
-* Current
-* @return *Ql
-**/
-func (s *Model) Current(data et.Json) *Ql {
-	result := newQuery(s, "A")
-	for _, col := range s.Columns {
-		if col.TypeColumn == COLUMN {
-			field := col.Field()
-			result.Selects = append(result.Selects, field)
-		}
-	}
-	result.Wheres.ByPk(s, data)
-	return result
-}
-
-/**
-* Join
-* @param model *Model, as string, keys map[string]string
-* @return *Ql
-**/
-func (s *Model) Join(model *Model, as string, keys map[string]string) *Ql {
-	result := newQuery(s, "A")
-	result.join(JOIN, model, as, keys)
-	return result
-}
-
-/**
 * Query
 * @param query et.Json
 * @return et.Items, error
 **/
 func (s *Model) Query(query et.Json) (et.Items, error) {
-	result := newQuery(s, "A")
+	result := NewQuery(s, "A")
 	return result.Query(query)
 }

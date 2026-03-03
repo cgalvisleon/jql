@@ -268,7 +268,7 @@ func (s *Ql) getDetails(tx *Tx, data et.Json) {
 			return
 		}
 
-		ql := model.
+		ql := NewQuery(model, "A").
 			Select(dtl.Select...)
 		for pk, fk := range dtl.Keys {
 			val := data[pk]
@@ -297,7 +297,7 @@ func (s *Ql) getRollups(tx *Tx, data et.Json) {
 		}
 
 		flc := len(dtl.Select)
-		ql := model.
+		ql := NewQuery(model, "A").
 			Select(dtl.Select...)
 		for pk, fk := range dtl.Keys {
 			val := data[pk]
@@ -637,6 +637,7 @@ func (s *Ql) One() (et.Item, error) {
 * @return int, error
 **/
 func (s *Ql) CountTx(tx *Tx) (int, error) {
+	s.Type = COUNTED
 	result, err := s.OneTx(tx)
 	if err != nil {
 		return 0, err
