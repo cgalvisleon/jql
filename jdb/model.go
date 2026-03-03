@@ -160,12 +160,13 @@ func (s *Model) Db() *sql.DB {
 **/
 func (s *Model) from() *From {
 	result := &From{
-		Database: s.Database,
-		Schema:   s.Schema,
-		Name:     s.Name,
-		Table:    s.Table,
-		As:       s.Name,
-		Fields:   make([]*Field, 0),
+		Database:    s.Database,
+		Schema:      s.Schema,
+		Name:        s.Name,
+		Table:       s.Table,
+		As:          s.Name,
+		PrimaryKeys: s.PrimaryKeys,
+		Fields:      make([]*Field, 0),
 	}
 	for _, column := range s.Columns {
 		result.Fields = append(result.Fields, column.Field())
@@ -375,7 +376,7 @@ func (s *Model) Upsert(data et.Json) *Cmd {
 * @return *Ql
 **/
 func (s *Model) Where(condition *Condition) *Ql {
-	result := newQuery(s, "A")
+	result := NewQuery(s, "A")
 	result.Wheres.add(condition)
 	return result
 }
@@ -386,7 +387,7 @@ func (s *Model) Where(condition *Condition) *Ql {
 * @return *Ql
 **/
 func (s *Model) Select(fields ...interface{}) *Ql {
-	result := newQuery(s, "A")
+	result := NewQuery(s, "A")
 	result.Select(fields...)
 	return result
 }
@@ -396,7 +397,7 @@ func (s *Model) Select(fields ...interface{}) *Ql {
 * @return int, error
 **/
 func (s *Model) Counted() (int, error) {
-	result := newQuery(s, "A")
+	result := newQuery(s)
 	result.Type = COUNTED
 	return result.Count()
 }

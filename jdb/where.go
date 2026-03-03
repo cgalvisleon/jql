@@ -75,10 +75,10 @@ func (s *Wheres) add(condition *Condition) *Wheres {
 
 /**
 * ByPk
-* @param model *Model, data et.Json
+* @param model *From, data et.Json
 * @return *Wheres
 **/
-func (s *Wheres) ByPk(model *Model, data et.Json) *Wheres {
+func (s *Wheres) ByPk(model *From, data et.Json) *Wheres {
 	for _, key := range model.PrimaryKeys {
 		if _, ok := data[key]; !ok {
 			continue

@@ -55,16 +55,17 @@ const (
 )
 
 type From struct {
-	Database   string             `json:"database"`
-	Schema     string             `json:"schema"`
-	Name       string             `json:"name"`
-	Table      string             `json:"table"`
-	As         string             `json:"as"`
-	Fields     []*Field           `json:"fields"`
-	References map[string]*Detail `json:"references"`
-	Details    map[string]*Detail `json:"details"`
-	Rollups    map[string]*Detail `json:"rollups"`
-	Relations  map[string]*Detail `json:"relations"`
+	Database    string             `json:"database"`
+	Schema      string             `json:"schema"`
+	Name        string             `json:"name"`
+	Table       string             `json:"table"`
+	As          string             `json:"as"`
+	PrimaryKeys []string           `json:"primary_keys"`
+	Fields      []*Field           `json:"fields"`
+	References  map[string]*Detail `json:"references"`
+	Details     map[string]*Detail `json:"details"`
+	Rollups     map[string]*Detail `json:"rollups"`
+	Relations   map[string]*Detail `json:"relations"`
 }
 
 func (s *From) Key() string {

@@ -2,10 +2,6 @@ package jdb
 
 import (
 	"encoding/json"
-	"regexp"
-	"slices"
-	"strconv"
-	"strings"
 
 	"github.com/cgalvisleon/et/envar"
 	"github.com/cgalvisleon/et/et"
@@ -47,21 +43,19 @@ type Ql struct {
 }
 
 /**
-* newQuery
-* @param model *Model, as string, tp TypeQuery
+* NewQuery
+* @param model *Model, as string
 * @return *Ql
 **/
-func newQuery(model *Model, as string) *Ql {
+func NewQuery(model *Model, as string) *Ql {
 	tp := SELECT
 	if model.SourceField != "" {
 		tp = DATA
 	}
-	from := model.from()
-	from.As = as
 	maxRows := envar.GetInt("MAX_ROWS", 100)
 	result := &Ql{
 		Type:     tp,
-		Froms:    []*From{from},
+		Froms:    make([]*From, 0),
 		Joins:    make([]*Joins, 0),
 		Selects:  make([]*Field, 0),
 		Hiddens:  make([]string, 0),
@@ -78,6 +72,7 @@ func newQuery(model *Model, as string) *Ql {
 		db:       model.db,
 		tx:       nil,
 	}
+	result.addFrom(model, as)
 
 	return result
 }
@@ -134,134 +129,15 @@ func (s *Ql) Debug() *Ql {
 }
 
 /**
-* findFieldByName
-* @param froms []*From, name string // from.name:as|1:30
-* @return *Field
+* addFrom
+* @param model *Model, as string
+* @return *From
 **/
-func findFieldByStr(froms []*From, name string) *Field {
-	pattern1 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+):([A-Za-z0-9]+)$`) // from.name:as
-	pattern2 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+)$`)                // from.name
-	pattern3 := regexp.MustCompile(`^([A-Za-z]+)\((.+)\):([A-Za-z0-9]+)$`)            // agg(field):as
-	pattern4 := regexp.MustCompile(`^([A-Za-z]+)\((.+)\)`)                            // agg(field)
-	pattern5 := regexp.MustCompile(`^(\d+)\|(\d+)$`)                                  // page:rows
-
-	split := strings.Split(name, "|")
-	if len(split) == 2 {
-		name = split[0]
-		limit := split[1]
-		result := findFieldByStr(froms, name)
-		if result != nil {
-			if pattern5.MatchString(limit) {
-				matches := pattern5.FindStringSubmatch(limit)
-				if len(matches) == 3 {
-					page, err := strconv.Atoi(matches[1])
-					if err != nil {
-						page = 0
-					}
-					rows, err := strconv.Atoi(matches[2])
-					if err != nil {
-						rows = 0
-					}
-					result.Page = page
-					result.Rows = rows
-				}
-			}
-		}
-
-		return result
-	}
-
-	if pattern1.MatchString(name) {
-		matches := pattern1.FindStringSubmatch(name)
-		if len(matches) == 4 {
-			from := matches[1]
-			name = matches[2]
-			as := matches[3]
-			var result *Field
-			for _, f := range froms {
-				if f.As == from {
-					result = f.findField(name)
-				} else if f.Name == from {
-					result = f.findField(name)
-				}
-				if result != nil {
-					result.From = f
-					result.As = as
-					return result
-				}
-			}
-		}
-	} else if pattern2.MatchString(name) {
-		matches := pattern2.FindStringSubmatch(name)
-		if len(matches) == 3 {
-			from := matches[1]
-			name = matches[2]
-			as := matches[2]
-			var result *Field
-			for _, f := range froms {
-				if f.As == from {
-					result = f.findField(name)
-				} else if f.Name == from {
-					result = f.findField(name)
-				}
-				if result != nil {
-					result.From = f
-					result.As = as
-					return result
-				}
-			}
-		}
-	} else if pattern3.MatchString(name) {
-		matches := pattern3.FindStringSubmatch(name)
-		if len(matches) == 4 {
-			agg := matches[1]
-			name = matches[2]
-			as := matches[3]
-			if !slices.Contains(Aggs, agg) {
-				return nil
-			}
-			result := findFieldByStr(froms, name)
-			if result != nil {
-				result.TypeColumn = AGG
-				result.Field = &Agg{
-					Agg:   agg,
-					Field: name,
-				}
-				result.As = as
-				return result
-			}
-		}
-	} else if pattern4.MatchString(name) {
-		matches := pattern4.FindStringSubmatch(name)
-		if len(matches) == 3 {
-			agg := matches[1]
-			name = matches[2]
-			as := agg
-			if !slices.Contains(Aggs, agg) {
-				return nil
-			}
-			result := findFieldByStr(froms, name)
-			if result != nil {
-				result.TypeColumn = AGG
-				result.Field = &Agg{
-					Agg:   agg,
-					Field: name,
-				}
-				result.As = as
-				return result
-			}
-		}
-	} else {
-		for _, f := range froms {
-			result := f.findField(name)
-			if result != nil {
-				result.From = f
-				return result
-			}
-		}
-	}
-
-	return nil
+func (s *Ql) addFrom(model *Model, as string) *From {
+	result := model.from()
+	result.As = as
+	s.Froms = append(s.Froms, result)
+	return result
 }
 
 /**
@@ -468,9 +344,7 @@ func (s *Ql) getCalls(tx *Tx, data et.Json) {
 * @return *Ql
 **/
 func (s *Ql) join(tp TypeJoin, model *Model, as string, keys map[string]string) *Ql {
-	from := model.from()
-	from.As = as
-	s.Froms = append(s.Froms, from)
+	from := s.addFrom(model, as)
 
 	rKeys := make(map[string]string)
 	for k, fk := range keys {
@@ -654,6 +528,26 @@ func (s *Ql) Hidden(fields ...string) *Ql {
 }
 
 /**
+* ItExists
+* @param data et.Json
+* @return *Ql
+**/
+func (s *Ql) ItExists(data et.Json) *Ql {
+	if len(s.Froms) == 0 {
+		return s
+	}
+
+	model := s.Froms[0]
+	if model == nil {
+		return s
+	}
+
+	s.Type = EXISTS
+	s.Wheres.ByPk(model, data)
+	return s
+}
+
+/**
 * AllTx
 * @param tx *Tx
 * @return et.Items, error
@@ -737,11 +631,11 @@ func (s *Ql) Count() (int, error) {
 }
 
 /**
-* ItExistsTx
+* ExistsTx
 * @param tx *Tx
 * @return bool, error
 **/
-func (s *Ql) ItExistsTx(tx *Tx) (bool, error) {
+func (s *Ql) ExistsTx(tx *Tx) (bool, error) {
 	s.Type = EXISTS
 	result, err := s.OneTx(tx)
 	if err != nil {
@@ -753,11 +647,11 @@ func (s *Ql) ItExistsTx(tx *Tx) (bool, error) {
 }
 
 /**
-* ItExists
+* Exists
 * @return bool, error
 **/
-func (s *Ql) ItExists() (bool, error) {
-	return s.ItExistsTx(nil)
+func (s *Ql) Exists() (bool, error) {
+	return s.ExistsTx(nil)
 }
 
 /**

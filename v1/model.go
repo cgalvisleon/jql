@@ -1,7 +1,6 @@
 package jql
 
 import (
-	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/jql/jdb"
 )
 
@@ -11,12 +10,7 @@ import (
 * @return (*Model, error)
 **/
 func NewModel(db *DB, schema, name string, version int) (*Model, error) {
-	result, err := db.Define(et.Json{
-		"schema":  schema,
-		"name":    name,
-		"version": version,
-	})
-
+	result, err := db.NewModel(schema, name, version)
 	if err != nil {
 		return nil, err
 	}

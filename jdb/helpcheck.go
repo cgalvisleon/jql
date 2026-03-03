@@ -6,6 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"regexp"
+	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -206,4 +209,135 @@ func RowsToItems(rows *sql.Rows) et.Items {
 	}
 
 	return result
+}
+
+/**
+* findFieldByName
+* @param froms []*From, name string // from.name:as|1:30
+* @return *Field
+**/
+func findFieldByStr(froms []*From, name string) *Field {
+	pattern1 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+):([A-Za-z0-9]+)$`) // from.name:as
+	pattern2 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+)$`)                // from.name
+	pattern3 := regexp.MustCompile(`^([A-Za-z]+)\((.+)\):([A-Za-z0-9]+)$`)            // agg(field):as
+	pattern4 := regexp.MustCompile(`^([A-Za-z]+)\((.+)\)`)                            // agg(field)
+	pattern5 := regexp.MustCompile(`^(\d+)\|(\d+)$`)                                  // page:rows
+
+	split := strings.Split(name, "|")
+	if len(split) == 2 {
+		name = split[0]
+		limit := split[1]
+		result := findFieldByStr(froms, name)
+		if result != nil {
+			if pattern5.MatchString(limit) {
+				matches := pattern5.FindStringSubmatch(limit)
+				if len(matches) == 3 {
+					page, err := strconv.Atoi(matches[1])
+					if err != nil {
+						page = 0
+					}
+					rows, err := strconv.Atoi(matches[2])
+					if err != nil {
+						rows = 0
+					}
+					result.Page = page
+					result.Rows = rows
+				}
+			}
+		}
+
+		return result
+	}
+
+	if pattern1.MatchString(name) {
+		matches := pattern1.FindStringSubmatch(name)
+		if len(matches) == 4 {
+			from := matches[1]
+			name = matches[2]
+			as := matches[3]
+			var result *Field
+			for _, f := range froms {
+				if f.As == from {
+					result = f.findField(name)
+				} else if f.Name == from {
+					result = f.findField(name)
+				}
+				if result != nil {
+					result.From = f
+					result.As = as
+					return result
+				}
+			}
+		}
+	} else if pattern2.MatchString(name) {
+		matches := pattern2.FindStringSubmatch(name)
+		if len(matches) == 3 {
+			from := matches[1]
+			name = matches[2]
+			as := matches[2]
+			var result *Field
+			for _, f := range froms {
+				if f.As == from {
+					result = f.findField(name)
+				} else if f.Name == from {
+					result = f.findField(name)
+				}
+				if result != nil {
+					result.From = f
+					result.As = as
+					return result
+				}
+			}
+		}
+	} else if pattern3.MatchString(name) {
+		matches := pattern3.FindStringSubmatch(name)
+		if len(matches) == 4 {
+			agg := matches[1]
+			name = matches[2]
+			as := matches[3]
+			if !slices.Contains(Aggs, agg) {
+				return nil
+			}
+			result := findFieldByStr(froms, name)
+			if result != nil {
+				result.TypeColumn = AGG
+				result.Field = &Agg{
+					Agg:   agg,
+					Field: name,
+				}
+				result.As = as
+				return result
+			}
+		}
+	} else if pattern4.MatchString(name) {
+		matches := pattern4.FindStringSubmatch(name)
+		if len(matches) == 3 {
+			agg := matches[1]
+			name = matches[2]
+			as := agg
+			if !slices.Contains(Aggs, agg) {
+				return nil
+			}
+			result := findFieldByStr(froms, name)
+			if result != nil {
+				result.TypeColumn = AGG
+				result.Field = &Agg{
+					Agg:   agg,
+					Field: name,
+				}
+				result.As = as
+				return result
+			}
+		}
+	} else {
+		for _, f := range froms {
+			result := f.findField(name)
+			if result != nil {
+				result.From = f
+				return result
+			}
+		}
+	}
+
+	return nil
 }
