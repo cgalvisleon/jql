@@ -37,6 +37,36 @@ func defineSeries(db *DB) error {
 }
 
 /**
+* InitSerie
+* @param tag, format string, value int
+* @return error
+**/
+func InitSerie(tag, format string) error {
+	if series == nil {
+		return nil
+	}
+
+	now := timezone.Now()
+	_, err := series.
+		Insert(et.Json{
+			"tag":    tag,
+			"format": format,
+			"value":  0,
+		}).
+		BeforeInsert(func(tx *Tx, old, new et.Json) error {
+			new.Set("created_at", now)
+			new.Set("updated_at", now)
+			return nil
+		}).
+		Exec()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/**
 * SetSerie
 * @param tag, format string, value int
 * @return error

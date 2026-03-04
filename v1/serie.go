@@ -3,6 +3,15 @@ package jql
 import "github.com/cgalvisleon/jql/jdb"
 
 /**
+* InitSerie
+* @param tag, format string
+* @return error
+**/
+func InitSerie(tag, format string) error {
+	return jdb.InitSerie(tag, format)
+}
+
+/**
 * SetSerie
 * @param tag, format string, value int
 * @return error
