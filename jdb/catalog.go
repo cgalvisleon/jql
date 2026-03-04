@@ -96,8 +96,8 @@ func setCatalog(tp, name string, version int, obj any) error {
 **/
 func getCatalog(tp, name string, dest any) (bool, error) {
 	item, err := NewQuery(catalog, "A").
-		Where(Eq("type", tp)).
-		And(Eq("name", name)).
+		Where(Eq("A.type", tp)).
+		And(Eq("A.name", name)).
 		Select().
 		One()
 	if err != nil {

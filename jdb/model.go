@@ -134,6 +134,11 @@ func (s *Model) Init() error {
 		return nil
 	}
 
+	err := s.db.loadModel(s)
+	if err != nil {
+		return err
+	}
+
 	s.isInit = true
 	return s.save()
 }

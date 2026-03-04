@@ -262,6 +262,29 @@ func (s *DB) DeleteModel(schema, name string) error {
 }
 
 /**
+* loadModel
+* @param model *Model
+* @return error
+**/
+func (s *DB) loadModel(model *Model) error {
+	if s.driver == nil {
+		return errors.New(MSG_DRIVER_NOT_FOUND)
+	}
+
+	sql, err := s.driver.Load(model)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.sqlTx(nil, sql)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/**
 * Command
 * @param command *Command
 * @return et.Items, error
