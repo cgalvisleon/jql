@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/cgalvisleon/et/envar"
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/logs"
 	"github.com/cgalvisleon/et/strs"
@@ -25,6 +26,7 @@ type DB struct {
 	Params  et.Json            `json:"params"`
 	driver  Driver             `json:"-"`
 	db      *sql.DB            `json:"-"`
+	IsDebug bool               `json:"-"`
 }
 
 /**
@@ -86,12 +88,14 @@ func (s *DB) init() error {
 		return err
 	}
 
+	s.db = db
+	isDebug := envar.GetBool("DEBUG", false)
+	s.IsDebug = isDebug
 	isCore := s.Params.Bool("is_core")
-	if !isCore {
+	if isCore {
 		s.initCore()
 	}
 
-	s.db = db
 	return s.Save()
 }
 
@@ -134,6 +138,8 @@ func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
 		afterUpdates:  make([]TriggerFunction, 0),
 		afterDeletes:  make([]TriggerFunction, 0),
 		calcs:         make(map[string]DataContext),
+		db:            s,
+		IsDebug:       s.IsDebug,
 	}
 	result.defineIdxField()
 
@@ -145,13 +151,20 @@ func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
 }
 
 /**
+* Debug
+**/
+func (s *DB) Debug() {
+	s.IsDebug = true
+}
+
+/**
 * sqlTx
 * @param tx *Tx, sql string, arg ...any
 * @return et.Items, error
 *
  */
-func (s *DB) sqlTx(tx *Tx, _sql string, arg ...any) (et.Items, error) {
-	query := SQLParse(_sql, arg...)
+func (s *DB) sqlTx(tx *Tx, query string, arg ...any) (et.Items, error) {
+	query = SQLParse(query, arg...)
 	if tx != nil {
 		err := tx.Begin(s.db)
 		if err != nil {

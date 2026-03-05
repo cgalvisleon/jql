@@ -154,10 +154,15 @@ func (s *Driver) buildTable(model *jdb.Model) (string, error) {
 		tpData := column.TypeData
 		tp := getType(tpData)
 		df := column.Default
-		if df == nil {
+		switch v := df.(type) {
+		case string:
+			if v == "" {
+				df = defaultValue(tpData)
+			}
+		default:
 			df = defaultValue(tpData)
 		}
-		def := fmt.Sprintf("\n\t%s %s DEFAULT %s", column.Name, tp, df)
+		def := fmt.Sprintf("\n\t%s %s DEFAULT %v", column.Name, tp, df)
 		columnsDef = strs.Append(columnsDef, def, ",")
 	}
 

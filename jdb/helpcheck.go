@@ -170,8 +170,7 @@ func insertBeforeLast[T any](s []T, v T) []T {
 		return []T{v, s[0]}
 	}
 
-	s = append(s[:len(s)-1], s[len(s)-1:]...)
-	s[len(s)-2] = v
+	s = append(s[:len(s)-1], append([]T{v}, s[len(s)-1:]...)...)
 	return s
 }
 

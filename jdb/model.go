@@ -126,6 +126,13 @@ func (s *Model) save() error {
 }
 
 /**
+* Debug
+**/
+func (s *Model) Debug() {
+	s.IsDebug = true
+}
+
+/**
 * Init
 * @return error
 **/

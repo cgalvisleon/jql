@@ -95,6 +95,7 @@ func LoadTo(name string, host string, port int) (*jdb.DB, error) {
 		"password": envar.GetStr("DB_PASSWORD", "test"),
 		"app":      envar.GetStr("DB_APP", "jql"),
 		"version":  envar.GetInt("DB_VERSION", 15),
+		"is_core":  true,
 	}
 
 	return ConnectTo(name, params)
