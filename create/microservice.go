@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/cgalvisleon/et/utility"
-	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 )
 
@@ -13,35 +12,20 @@ var CmdMicro = &cobra.Command{
 	Short: "Create project base type microservice.",
 	Long:  "Template project to microservice include folder cmd, deployments, pkg, rest, test and web, with files .go required for making a microservice.",
 	Run: func(cmd *cobra.Command, args []string) {
-		packageName, err := utility.GoMod("module")
+		packageName, err := utility.GetGoMod("module")
 		if err != nil {
 			fmt.Printf("Prompt failed %v\n", err)
 			return
 		}
 
-		var name string
-		var schema string
+		name, err := PrompStr("Name", true)
+		if err != nil {
+			fmt.Printf("Prompt failed %v\n", err)
+			return
+		}
 
-		form := huh.NewForm(
-			huh.NewGroup(
-				huh.NewInput().
-					Title("Name").
-					Prompt("? ").
-					Validate(func(s string) error {
-						if len(s) == 0 {
-							return fmt.Errorf("name is required")
-						}
-						return nil
-					}).
-					Value(&name),
-				huh.NewInput().
-					Title("Schema").
-					Prompt("? ").
-					Value(&schema),
-			),
-		)
-
-		if err := form.Run(); err != nil {
+		schema, err := PrompStr("Schema", false)
+		if err != nil {
 			fmt.Printf("Prompt failed %v\n", err)
 			return
 		}

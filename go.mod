@@ -21,6 +21,7 @@ require (
 	github.com/charmbracelet/x/cellbuf v0.0.13 // indirect
 	github.com/charmbracelet/x/exp/strings v0.0.0-20240722160745-212f7b056ed0 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
@@ -46,6 +47,7 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/manifoldco/promptui v0.9.0
 	github.com/oklog/ulid/v2 v2.1.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/spf13/cobra v1.9.1

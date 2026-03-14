@@ -3,48 +3,42 @@ package create
 import (
 	"fmt"
 
-	"github.com/cgalvisleon/et/logs"
-	"github.com/charmbracelet/huh"
+	"github.com/manifoldco/promptui"
 )
 
 func PromptCreate() {
-	var opt string
+	prompt := promptui.Select{
+		Label: "What do you want created?",
+		Items: []string{
+			"Microservice",
+			"Modelo",
+			"Rpc",
+		},
+	}
 
-	form := huh.NewForm(
-		huh.NewGroup(
-			huh.NewSelect[string]().
-				Title("What do you want created?").
-				Options(
-					huh.NewOption("Microservice", "microservice"),
-					huh.NewOption("Modelo", "modelo"),
-					huh.NewOption("Rpc", "rpc"),
-				).
-				Value(&opt),
-		),
-	)
-
-	if err := form.Run(); err != nil {
+	opt, _, err := prompt.Run()
+	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return
 	}
 
 	switch opt {
-	case "microservice":
+	case 0:
 		err := CmdMicro.Execute()
 		if err != nil {
-			logs.Errorf("Error executing microservice command: %v", err)
+			fmt.Printf("Error executing microservice command: %v", err)
 			return
 		}
-	case "modelo":
+	case 1:
 		err := CmdModelo.Execute()
 		if err != nil {
-			logs.Errorf("Error executing modelo command: %v", err)
+			fmt.Printf("Error executing modelo command: %v", err)
 			return
 		}
-	case "rpc":
+	case 2:
 		err := CmdRpc.Execute()
 		if err != nil {
-			logs.Errorf("Error executing rpc command: %v", err)
+			fmt.Printf("Error executing rpc command: %v", err)
 			return
 		}
 	}
