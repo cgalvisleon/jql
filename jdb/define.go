@@ -6,6 +6,8 @@ import (
 	"slices"
 
 	"github.com/cgalvisleon/et/et"
+	"github.com/cgalvisleon/et/reg"
+	"github.com/cgalvisleon/et/timezone"
 	"github.com/cgalvisleon/et/utility"
 )
 
@@ -336,6 +338,15 @@ func (s *Model) DefineModel() *Model {
 	s.DefineStatusField()
 	s.DefinePrimaryKeyField()
 	s.DefineSourceField()
+	s.BeforeInsert(func(tx *Tx, old, new et.Json) error {
+		new.Set(CREATED_AT, timezone.Now())
+		new.Set(UPDATED_AT, timezone.Now())
+		return nil
+	})
+	s.BeforeUpdate(func(tx *Tx, old, new et.Json) error {
+		new.Set(UPDATED_AT, timezone.Now())
+		return nil
+	})
 	return s
 }
 
@@ -351,5 +362,16 @@ func (s *Model) DefineProjectModel() *Model {
 	s.DefineColumn(PROJECT_ID, KEY, "")
 	s.defineIdxField()
 	s.DefineIndex(PROJECT_ID)
+	s.BeforeInsert(func(tx *Tx, old, new et.Json) error {
+		new.Set(CREATED_AT, timezone.Now())
+		new.Set(UPDATED_AT, timezone.Now())
+		id := reg.GenULID(s.Name)
+		new.Set(ID, id)
+		return nil
+	})
+	s.BeforeUpdate(func(tx *Tx, old, new et.Json) error {
+		new.Set(UPDATED_AT, timezone.Now())
+		return nil
+	})
 	return s
 }

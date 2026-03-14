@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cgalvisleon/et/utility"
+	"github.com/cgalvisleon/jql/create/made"
 	"github.com/spf13/cobra"
 )
 
@@ -38,8 +39,17 @@ var CmdMicro = &cobra.Command{
 	},
 }
 
+/**
+* MkMicroservice
+* @param projectName, name, schema string
+* @return error
+**/
 func MkMicroservice(projectName, name, schema string) error {
 	ProgressAdd(6)
+	err := made.Cmd(projectName, name)
+	if err != nil {
+		return err
+	}
 
 	ProgressNext()
 	return nil
