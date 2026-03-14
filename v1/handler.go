@@ -3,6 +3,7 @@ package jql
 import (
 	"net/http"
 
+	"github.com/cgalvisleon/et/request"
 	"github.com/cgalvisleon/et/response"
 )
 
@@ -12,7 +13,7 @@ import (
 * @return
 **/
 func HttpDefine(w http.ResponseWriter, r *http.Request) {
-	body, err := response.GetBody(r)
+	body, err := request.GetBody(r)
 	if err != nil {
 		response.HTTPError(w, r, http.StatusBadRequest, err.Error())
 		return
@@ -33,7 +34,7 @@ func HttpDefine(w http.ResponseWriter, r *http.Request) {
 * @return
 **/
 func HttpQuery(w http.ResponseWriter, r *http.Request) {
-	body, err := response.GetBody(r)
+	body, err := request.GetBody(r)
 	if err != nil {
 		response.HTTPError(w, r, http.StatusBadRequest, err.Error())
 		return
