@@ -85,18 +85,6 @@ func (s *Model) ToJson() et.Json {
 }
 
 /**
-* From
-* @return *From
-**/
-func (s *Model) From() *From {
-	return &From{
-		Database: s.Database,
-		Schema:   s.Schema,
-		Name:     s.Name,
-	}
-}
-
-/**
 * Key
 * @return string
 **/
@@ -172,17 +160,12 @@ func (s *Model) Db() *sql.DB {
 **/
 func (s *Model) from() *From {
 	result := &From{
-		Database:    s.Database,
-		Schema:      s.Schema,
-		Name:        s.Name,
-		Table:       s.Table,
-		As:          s.Name,
-		Columns:     s.Columns,
-		PrimaryKeys: s.PrimaryKeys,
-		Fields:      make([]*Field, 0),
-	}
-	for _, column := range s.Columns {
-		result.Fields = append(result.Fields, column.Field())
+		Database: s.Database,
+		Schema:   s.Schema,
+		Name:     s.Name,
+		Table:    s.Table,
+		As:       s.Name,
+		model:    s,
 	}
 	return result
 }

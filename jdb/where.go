@@ -8,7 +8,7 @@ import (
 * Wheres
 **/
 type Wheres struct {
-	Conditions []*Condition `json:"-"`
+	Conditions []*Condition `json:"Conditions"`
 	isDebug    bool         `json:"-"`
 }
 
@@ -81,18 +81,26 @@ func (s *Wheres) add(condition *Condition) *Wheres {
 func (s *Wheres) ByPk(model interface{}, data et.Json) *Wheres {
 	switch v := model.(type) {
 	case *From:
-		for _, key := range v.PrimaryKeys {
+		for _, key := range v.model.PrimaryKeys {
 			if _, ok := data[key]; !ok {
 				continue
 			}
-			s.add(Eq(key, data[key]))
+			col := v.model.FindColumn(key)
+			if col == nil {
+				continue
+			}
+			s.add(Eq(col, data[key]))
 		}
 	case *Model:
 		for _, key := range v.PrimaryKeys {
 			if _, ok := data[key]; !ok {
 				continue
 			}
-			s.add(Eq(key, data[key]))
+			col := v.FindColumn(key)
+			if col == nil {
+				continue
+			}
+			s.add(Eq(col, data[key]))
 		}
 	}
 

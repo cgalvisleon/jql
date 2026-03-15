@@ -18,11 +18,11 @@ func init() {
 }
 
 /**
-* LoadDb
+* Connect
 * @param name string, params et.Json
 * @return *DB, error
 **/
-func LoadDb(name string, params et.Json) (*DB, error) {
+func Connect(name string, params et.Json) (*DB, error) {
 	if !utility.ValidStr(name, 0, []string{""}) {
 		return nil, fmt.Errorf(MSG_ATTRIBUTE_REQUIRED, "name")
 	}
@@ -43,6 +43,7 @@ func LoadDb(name string, params et.Json) (*DB, error) {
 		Name:    name,
 		Schemas: make(map[string]*Schema),
 		Params:  params,
+		UseCore: params.Bool("use_core"),
 		driver:  drv(),
 	}
 	err := result.init()

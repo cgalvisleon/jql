@@ -116,7 +116,7 @@ func NewDb(tenantId string, params et.Json) (*jdb.DB, error) {
 		return tenant.DB, nil
 	}
 
-	result, err := jdb.LoadDb(tenantId, params)
+	result, err := jdb.Connect(tenantId, params)
 	if err != nil {
 		return nil, err
 	}

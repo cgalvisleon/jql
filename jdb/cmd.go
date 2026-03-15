@@ -357,7 +357,7 @@ func (s *Cmd) upsert() (et.Items, error) {
 	data := s.Data[0]
 	model := s.Model
 	exists, err := NewQuery(model, "A").
-		ItExists(data).
+		Current(data).
 		Exists()
 	if err != nil {
 		return et.Items{}, err

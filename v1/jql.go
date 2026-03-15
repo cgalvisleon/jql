@@ -77,7 +77,7 @@ type Cmd = jdb.Cmd
 * @return *jdb.DB, error
 **/
 func ConnectTo(name string, params et.Json) (*jdb.DB, error) {
-	return jdb.LoadDb(name, params)
+	return jdb.Connect(name, params)
 }
 
 /**
@@ -95,7 +95,7 @@ func LoadTo(name string, host string, port int) (*jdb.DB, error) {
 		"password": envar.GetStr("DB_PASSWORD", "test"),
 		"app":      envar.GetStr("DB_APP", "jql"),
 		"version":  envar.GetInt("DB_VERSION", 15),
-		"is_core":  true,
+		"use_core": envar.GetBool("DB_USE_CORE", false),
 	}
 
 	return ConnectTo(name, params)

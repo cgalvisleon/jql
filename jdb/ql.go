@@ -52,7 +52,6 @@ func NewQuery(model *Model, as string) *Ql {
 	if model.SourceField != "" {
 		tp = DATA
 	}
-	maxRows := envar.GetInt("MAX_ROWS", 100)
 	result := &Ql{
 		Type:     tp,
 		Froms:    make([]*From, 0),
@@ -68,9 +67,10 @@ func NewQuery(model *Model, as string) *Ql {
 		OrdersBy: make([]*Orders, 0),
 		Page:     0,
 		Rows:     0,
-		MaxRows:  maxRows,
+		MaxRows:  envar.GetInt("MAX_ROWS", 100),
 		db:       model.db,
 		tx:       nil,
+		IsDebug:  envar.GetBool("DEBUG", false),
 	}
 	result.addFrom(model, as)
 
@@ -148,9 +148,9 @@ func (s *Ql) addFrom(model *Model, as string) *From {
 func (s *Ql) findField(field interface{}) *Field {
 	switch v := field.(type) {
 	case string:
-		return findFieldByStr(s.Froms, v)
+		return findField(s.Froms, v)
 	case *Agg:
-		return findFieldByStr(s.Froms, v.Field)
+		return findField(s.Froms, v.Field)
 	case *Field:
 		return v
 	default:
@@ -170,9 +170,10 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 	if len(fields) == 0 {
 		s.Selects = make([]*Field, 0)
 		for _, from := range s.Froms {
-			for _, field := range from.Fields {
-				if field.TypeColumn == COLUMN {
-					field.From = from
+			for _, col := range from.model.Columns {
+				if col.TypeColumn == COLUMN {
+					field := col.Field()
+					field.From.As = from.As
 					s.Selects = append(s.Selects, field)
 				}
 			}
@@ -345,23 +346,7 @@ func (s *Ql) getCalls(tx *Tx, data et.Json) {
 **/
 func (s *Ql) join(tp TypeJoin, model *Model, as string, keys map[string]string) *Ql {
 	from := s.addFrom(model, as)
-
-	rKeys := make(map[string]string)
-	for k, fk := range keys {
-		field := s.findField(k)
-		if field != nil {
-			k = field.AS()
-		}
-
-		field = s.findField(fk)
-		if field != nil {
-			fk = field.AS()
-		}
-
-		rKeys[k] = fk
-	}
-
-	join := newJoins(tp, from, rKeys)
+	join := newJoins(tp, from, keys)
 	s.Joins = append(s.Joins, join)
 
 	return s
@@ -521,29 +506,9 @@ func (s *Ql) Hidden(fields ...string) *Ql {
 	for _, name := range fields {
 		fld := s.findField(name)
 		if fld != nil {
-			s.Hiddens = append(s.Hiddens, fld.AS())
+			s.Hiddens = append(s.Hiddens, fld.Name())
 		}
 	}
-	return s
-}
-
-/**
-* ItExists
-* @param data et.Json
-* @return *Ql
-**/
-func (s *Ql) ItExists(data et.Json) *Ql {
-	if len(s.Froms) == 0 {
-		return s
-	}
-
-	model := s.Froms[0]
-	if model == nil {
-		return s
-	}
-
-	s.Type = EXISTS
-	s.Wheres.ByPk(model, data)
 	return s
 }
 
@@ -556,7 +521,7 @@ func (s *Ql) Current(data et.Json) *Ql {
 		return s
 	}
 
-	model := s.Froms[0]
+	model := s.Froms[0].model
 	if model == nil {
 		return s
 	}

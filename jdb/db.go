@@ -15,15 +15,16 @@ import (
 )
 
 type Schema struct {
-	Database string           `json:"-"`
-	Name     string           `json:"name"`
-	Models   map[string]*From `json:"models"`
+	Database string            `json:"-"`
+	Name     string            `json:"name"`
+	Models   map[string]*Model `json:"models"`
 }
 
 type DB struct {
 	Name    string             `json:"name"`
 	Schemas map[string]*Schema `json:"schemas"`
 	Params  et.Json            `json:"params"`
+	UseCore bool               `json:"use_core"`
 	driver  Driver             `json:"-"`
 	db      *sql.DB            `json:"-"`
 	IsDebug bool               `json:"-"`
@@ -89,12 +90,11 @@ func (s *DB) init() error {
 	}
 
 	s.db = db
-	isDebug := envar.GetBool("DEBUG", false)
-	s.IsDebug = isDebug
-	isCore := s.Params.Bool("is_core")
-	if isCore {
+	if s.UseCore {
 		s.initCore()
 	}
+	isDebug := envar.GetBool("DEBUG", false)
+	s.IsDebug = isDebug
 
 	return s.Save()
 }
@@ -144,7 +144,7 @@ func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
 	result.defineIdxField()
 
 	sch := s.getSchema(schema)
-	sch.Models[name] = result.From()
+	sch.Models[name] = result
 	models[key] = result
 
 	return result, nil
@@ -206,7 +206,7 @@ func (s *DB) getSchema(name string) *Schema {
 	result = &Schema{
 		Database: s.Name,
 		Name:     name,
-		Models:   make(map[string]*From),
+		Models:   make(map[string]*Model),
 	}
 	s.Schemas[name] = result
 	return result

@@ -211,11 +211,11 @@ func RowsToItems(rows *sql.Rows) et.Items {
 }
 
 /**
-* findFieldByName
+* findField
 * @param froms []*From, name string // from.name:as|1:30
 * @return *Field
 **/
-func findFieldByStr(froms []*From, name string) *Field {
+func findField(froms []*From, name string) *Field {
 	pattern1 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+):([A-Za-z0-9]+)$`) // from.name:as
 	pattern2 := regexp.MustCompile(`^([A-Za-z0-9]+)\.([A-Za-z0-9]+)$`)                // from.name
 	pattern3 := regexp.MustCompile(`^([A-Za-z]+)\((.+)\):([A-Za-z0-9]+)$`)            // agg(field):as
@@ -226,7 +226,7 @@ func findFieldByStr(froms []*From, name string) *Field {
 	if len(split) == 2 {
 		name = split[0]
 		limit := split[1]
-		result := findFieldByStr(froms, name)
+		result := findField(froms, name)
 		if result != nil {
 			if pattern5.MatchString(limit) {
 				matches := pattern5.FindStringSubmatch(limit)
@@ -257,9 +257,9 @@ func findFieldByStr(froms []*From, name string) *Field {
 			var result *Field
 			for _, f := range froms {
 				if f.As == from {
-					result = f.findField(name)
+					result = f.model.findField(name)
 				} else if f.Name == from {
-					result = f.findField(name)
+					result = f.model.findField(name)
 				}
 				if result != nil {
 					result.From = f
@@ -277,9 +277,9 @@ func findFieldByStr(froms []*From, name string) *Field {
 			var result *Field
 			for _, f := range froms {
 				if f.As == from {
-					result = f.findField(name)
+					result = f.model.findField(name)
 				} else if f.Name == from {
-					result = f.findField(name)
+					result = f.model.findField(name)
 				}
 				if result != nil {
 					result.From = f
@@ -297,7 +297,7 @@ func findFieldByStr(froms []*From, name string) *Field {
 			if !slices.Contains(Aggs, agg) {
 				return nil
 			}
-			result := findFieldByStr(froms, name)
+			result := findField(froms, name)
 			if result != nil {
 				result.TypeColumn = AGG
 				result.Field = &Agg{
@@ -317,7 +317,7 @@ func findFieldByStr(froms []*From, name string) *Field {
 			if !slices.Contains(Aggs, agg) {
 				return nil
 			}
-			result := findFieldByStr(froms, name)
+			result := findField(froms, name)
 			if result != nil {
 				result.TypeColumn = AGG
 				result.Field = &Agg{
@@ -330,7 +330,7 @@ func findFieldByStr(froms []*From, name string) *Field {
 		}
 	} else {
 		for _, f := range froms {
-			result := f.findField(name)
+			result := f.model.findField(name)
 			if result != nil {
 				result.From = f
 				return result

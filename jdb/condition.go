@@ -87,7 +87,7 @@ type Condition struct {
 func (s *Condition) ToJson() et.Json {
 	if s.Connector == NAC {
 		return et.Json{
-			s.Field.AS(): et.Json{
+			s.Field.Name(): et.Json{
 				s.Operator.Str(): s.Value,
 			},
 		}
@@ -95,7 +95,7 @@ func (s *Condition) ToJson() et.Json {
 
 	return et.Json{
 		s.Connector.Str(): et.Json{
-			s.Field.AS(): et.Json{
+			s.Field.Name(): et.Json{
 				s.Operator.Str(): s.Value,
 			},
 		},
@@ -158,12 +158,53 @@ func ToCondition(json et.Json) *Condition {
 * @return *Condition
 **/
 func condition(field interface{}, value interface{}, op Operator) *Condition {
-	return &Condition{
-		Field:     &Field{Field: field},
-		Operator:  op,
-		Value:     value,
-		Connector: NAC,
+	var result *Condition
+	switch v := field.(type) {
+	case *Column:
+		result = &Condition{
+			Field: v.Field(),
+		}
+	case Column:
+		result = &Condition{
+			Field: v.Field(),
+		}
+	case *Field:
+		result = &Condition{
+			Field: v,
+		}
+	case Field:
+		result = &Condition{
+			Field: &v,
+		}
+	case *Agg:
+		result = &Condition{
+			Field: &Field{Field: v.Field, As: v.Agg},
+		}
+	case Agg:
+		result = &Condition{
+			Field: &Field{Field: v.Field, As: v.Agg},
+		}
+	case string:
+		lst := strs.Split(v, ":")
+		field := lst[0]
+		as := ""
+		if len(lst) > 1 {
+			as = lst[1]
+		}
+		result = &Condition{
+			Field: &Field{Field: field, As: as},
+		}
+	default:
+		result = &Condition{
+			Field: &Field{Field: field},
+		}
 	}
+
+	result.Operator = op
+	result.Value = value
+	result.Connector = NAC
+
+	return result
 }
 
 /**
