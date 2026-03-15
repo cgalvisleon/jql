@@ -85,22 +85,22 @@ func (s *Wheres) ByPk(model interface{}, data et.Json) *Wheres {
 			if _, ok := data[key]; !ok {
 				continue
 			}
-			col := v.model.FindColumn(key)
-			if col == nil {
+			fld := v.findField(key)
+			if fld == nil {
 				continue
 			}
-			s.add(Eq(col, data[key]))
+			s.add(Eq(fld, data[key]))
 		}
 	case *Model:
 		for _, key := range v.PrimaryKeys {
 			if _, ok := data[key]; !ok {
 				continue
 			}
-			col := v.FindColumn(key)
-			if col == nil {
+			fld := v.findField(key)
+			if fld == nil {
 				continue
 			}
-			s.add(Eq(col, data[key]))
+			s.add(Eq(fld, data[key]))
 		}
 	}
 

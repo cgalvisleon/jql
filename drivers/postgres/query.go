@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cgalvisleon/et/logs"
 	"github.com/cgalvisleon/et/strs"
 	"github.com/cgalvisleon/jql/jdb"
 )
@@ -16,10 +15,6 @@ import (
 * @return (string, error)
 **/
 func (s *Driver) buildQuery(ql *jdb.Ql) (string, error) {
-	if ql.IsDebug {
-		logs.Debug("query:", ql.ToJson().ToString())
-	}
-
 	sql, err := s.buildSelect(ql)
 	if err != nil {
 		return "", err
@@ -109,7 +104,7 @@ func (s *Driver) buildQuery(ql *jdb.Ql) (string, error) {
 **/
 func (s *Driver) buildSelect(ql *jdb.Ql) (string, error) {
 	if ql.Type == jdb.EXISTS {
-		return "", nil
+		return "1", nil
 	}
 
 	if ql.Type == jdb.COUNTED {
@@ -213,9 +208,9 @@ func (s *Driver) buildFrom(ql *jdb.Ql) (string, error) {
 	for _, from := range ql.Froms {
 		as := from.As
 		table := from.Table
-		def := fmt.Sprintf("%s AS %s", table, as)
+		def := strs.Append(table, as, " AS ")
 		if as == table {
-			def = fmt.Sprintf("%s", table)
+			def = table
 		}
 
 		result = strs.Append(result, def, ", ")

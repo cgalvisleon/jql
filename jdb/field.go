@@ -20,6 +20,24 @@ func (s *From) Key() string {
 	return result
 }
 
+/**
+* findField
+* @param name string
+* @return *Field
+**/
+func (s *From) findField(name string) *Field {
+	col := s.model.FindColumn(name)
+	if col == nil {
+		return nil
+	}
+	return &Field{
+		TypeColumn: col.TypeColumn,
+		From:       s,
+		Field:      col.Name,
+		As:         col.Name,
+	}
+}
+
 type Agg struct {
 	Agg   string `json:"agg"`
 	Field string `json:"field"`

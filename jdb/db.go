@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"sync"
 
 	"github.com/cgalvisleon/et/envar"
 	"github.com/cgalvisleon/et/et"
@@ -300,61 +299,44 @@ func (s *DB) loadModel(model *Model) error {
 /**
 * Command
 * @param command *Command
-* @return et.Items, error
+* @return string, error
 **/
-func (s *DB) Command(command *Cmd) (et.Items, error) {
+func (s *DB) Command(command *Cmd) (string, error) {
 	if s.driver == nil {
-		return et.Items{}, errors.New(MSG_DRIVER_NOT_FOUND)
+		return "", errors.New(MSG_DRIVER_NOT_FOUND)
 	}
 
 	if command.IsDebug {
 		logs.Debugf("command:%s", command.ToJson().ToEscapeHTML())
 	}
 
-	sql, err := s.driver.Command(command)
-	if err != nil {
-		return et.Items{}, err
-	}
-
-	return s.sqlTx(command.tx, sql)
+	return s.driver.Command(command)
 }
 
 /**
-* Ql
+* Query
 * @param query *Ql
+* @return string, error
+**/
+func (s *DB) Ql(ql *Ql) (string, error) {
+	if s.driver == nil {
+		return "", errors.New(MSG_DRIVER_NOT_FOUND)
+	}
+
+	if ql.IsDebug {
+		logs.Debugf("query:%s", ql.ToJson().ToEscapeHTML())
+	}
+
+	return s.driver.Query(ql)
+}
+
+/**
+* Query
+* @param query et.Json
 * @return et.Items, error
 **/
-func (s *DB) Query(query *Ql) (et.Items, error) {
-	if s.driver == nil {
-		return et.Items{}, errors.New(MSG_DRIVER_NOT_FOUND)
-	}
-
-	if query.IsDebug {
-		logs.Debugf("query:%s", query.ToJson().ToEscapeHTML())
-	}
-
-	sql, err := s.driver.Query(query)
-	if err != nil {
-		return et.Items{}, err
-	}
-
-	result, err := s.sqlTx(query.tx, sql)
-	if err != nil {
-		return et.Items{}, err
-	}
-
-	wg := &sync.WaitGroup{}
-	for _, item := range result.Result {
-		wg.Add(1)
-		go func(item et.Json) {
-			query.getDetails(query.tx, item)
-			query.getRollups(query.tx, item)
-			query.getCalls(query.tx, item)
-		}(item)
-	}
-	wg.Wait()
-
-	return result, nil
+func (s *DB) Query(query et.Json) (et.Items, error) {
+	return et.Items{}, nil
 }
 
 /**

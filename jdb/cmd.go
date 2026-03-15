@@ -221,7 +221,12 @@ func (s *Cmd) insert() (et.Items, error) {
 		}
 
 		s.New = new
-		result, err := s.db.Command(s)
+		sql, err := s.db.Command(s)
+		if err != nil {
+			return et.Items{}, err
+		}
+
+		result, err = s.db.sqlTx(s.tx, sql)
 		if err != nil {
 			return et.Items{}, err
 		}
@@ -273,7 +278,12 @@ func (s *Cmd) update() (et.Items, error) {
 			}
 
 			s.New = new
-			result, err := s.db.Command(s)
+			sql, err := s.db.Command(s)
+			if err != nil {
+				return et.Items{}, err
+			}
+
+			result, err = s.db.sqlTx(s.tx, sql)
 			if err != nil {
 				return et.Items{}, err
 			}
@@ -321,7 +331,12 @@ func (s *Cmd) delete() (et.Items, error) {
 				}
 			}
 
-			result, err := s.db.Command(s)
+			sql, err := s.db.Command(s)
+			if err != nil {
+				return et.Items{}, err
+			}
+
+			result, err = s.db.sqlTx(s.tx, sql)
 			if err != nil {
 				return et.Items{}, err
 			}
@@ -356,7 +371,7 @@ func (s *Cmd) upsert() (et.Items, error) {
 
 	data := s.Data[0]
 	model := s.Model
-	exists, err := NewQuery(model, "A").
+	exists, err := NewQuery(model, "").
 		Current(data).
 		Exists()
 	if err != nil {

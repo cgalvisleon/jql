@@ -2,6 +2,7 @@ package jdb
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/cgalvisleon/et/envar"
 	"github.com/cgalvisleon/et/et"
@@ -521,18 +522,20 @@ func (s *Ql) Current(data et.Json) *Ql {
 		return s
 	}
 
-	model := s.Froms[0].model
-	if model == nil {
+	from := s.Froms[0]
+	if from == nil {
 		return s
 	}
 
-	for _, col := range model.Columns {
+	for _, col := range from.model.Columns {
 		if col.TypeColumn == COLUMN {
 			field := col.Field()
+			field.From = from
 			s.Selects = append(s.Selects, field)
 		}
 	}
-	s.Wheres.ByPk(model, data)
+
+	s.Wheres.ByPk(from, data)
 	return s
 }
 
@@ -542,7 +545,30 @@ func (s *Ql) Current(data et.Json) *Ql {
 * @return et.Items, error
 **/
 func (s *Ql) AllTx(tx *Tx) (et.Items, error) {
-	return s.db.Query(s)
+	sql, err := s.db.Ql(s)
+	if err != nil {
+		return et.Items{}, err
+	}
+
+	result, err := s.db.sqlTx(s.tx, sql)
+	if err != nil {
+		return et.Items{}, err
+	}
+
+	wg := &sync.WaitGroup{}
+	for _, item := range result.Result {
+		wg.Add(1)
+		go func(item et.Json) {
+			defer wg.Done()
+
+			s.getDetails(s.tx, item)
+			s.getRollups(s.tx, item)
+			s.getCalls(s.tx, item)
+		}(item)
+	}
+	wg.Wait()
+
+	return result, nil
 }
 
 /**
@@ -648,6 +674,6 @@ func (s *Ql) Exists() (bool, error) {
 * Query
 * @return Items, error
 **/
-func (s *Ql) Query(params et.Json) (et.Items, error) {
-	return s.db.Query(s)
+func (s *Ql) Query(query et.Json) (et.Items, error) {
+	return s.db.Query(query)
 }
