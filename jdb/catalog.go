@@ -90,6 +90,40 @@ func setCatalog(tp, name string, version int, obj any) error {
 }
 
 /**
+* existsCatalog
+* @param tp, name string
+* @return bool, error
+**/
+func existsCatalog(tp, name string) (bool, error) {
+	return NewQuery(catalog, "").
+		Where(Eq("type", tp)).
+		And(Eq("name", name)).
+		Exists()
+}
+
+/**
+* versionCatalog
+* @param tp, name string
+* @return int, error
+**/
+func versionCatalog(tp, name string) (int, error) {
+	item, err := NewQuery(catalog, "").
+		Where(Eq("type", tp)).
+		And(Eq("name", name)).
+		Select("version").
+		One()
+	if err != nil {
+		return 0, err
+	}
+
+	if !item.Ok {
+		return 0, nil
+	}
+
+	return item.Int("version"), nil
+}
+
+/**
 * getCatalog
 * @param tp, name string, dest any
 * @return bool, error

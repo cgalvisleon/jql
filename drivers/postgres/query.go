@@ -3,7 +3,6 @@ package postgres
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/cgalvisleon/et/strs"
 	"github.com/cgalvisleon/jql/jdb"
@@ -116,7 +115,8 @@ func (s *Driver) buildSelect(ql *jdb.Ql) (string, error) {
 		if len(ql.Selects) == 0 {
 			hiddens := ql.Hiddens
 			hiddens = append(hiddens, jdb.SOURCE)
-			def := fmt.Sprintf("to_jsonb(A) - ARRAY[%s]", strings.Join(hiddens, ", "))
+
+			def := fmt.Sprintf("to_jsonb(A) - ARRAY[%s]", strs.JoinQuoted(hiddens, ", "))
 			result = strs.Append(result, def, "||")
 		} else {
 			selects := map[string]string{}
@@ -167,7 +167,7 @@ func (s *Driver) buildSelect(ql *jdb.Ql) (string, error) {
 	if len(ql.Selects) == 0 {
 		hiddens := ql.Hiddens
 		if len(hiddens) > 0 {
-			result += fmt.Sprintf("to_jsonb(A) - ARRAY[%s]", strings.Join(hiddens, ", "))
+			result += fmt.Sprintf("to_jsonb(A) - ARRAY[%s]", strs.JoinQuoted(hiddens, ", "))
 		} else {
 			result += "A.*"
 		}
@@ -383,12 +383,13 @@ func (s *Driver) buildLimit(ql *jdb.Ql) (string, error) {
 
 	if ql.Rows > ql.MaxRows {
 		ql.Rows = ql.MaxRows
-	} else if ql.Rows == 0 {
-		ql.Rows = 1
 	}
 
 	if ql.Page == 0 {
-		return fmt.Sprintf("LIMIT %d", ql.Rows), nil
+		if ql.Rows > 0 {
+			return fmt.Sprintf("LIMIT %d", ql.Rows), nil
+		}
+		return "", nil
 	}
 
 	offset := (ql.Page - 1) * ql.Rows

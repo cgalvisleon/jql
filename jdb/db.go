@@ -79,6 +79,10 @@ func (s *DB) Save() error {
 * @return error
 **/
 func (s *DB) init() error {
+	if s.db != nil {
+		return nil
+	}
+
 	if s.driver == nil {
 		return errors.New(MSG_DRIVER_NOT_FOUND)
 	}
@@ -88,14 +92,22 @@ func (s *DB) init() error {
 		return err
 	}
 
+	s.IsDebug = envar.GetBool("DEBUG", false)
 	s.db = db
 	if s.UseCore {
 		s.initCore()
 	}
-	isDebug := envar.GetBool("DEBUG", false)
-	s.IsDebug = isDebug
 
-	return s.Save()
+	exists, err := existsCatalog("db", s.Name)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		return s.Save()
+	}
+
+	return nil
 }
 
 /**
@@ -140,7 +152,10 @@ func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
 		db:            s,
 		IsDebug:       s.IsDebug,
 	}
-	result.defineIdxField()
+	_, err := result.defineIdxField()
+	if err != nil {
+		return nil, err
+	}
 
 	sch := s.getSchema(schema)
 	sch.Models[name] = result

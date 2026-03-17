@@ -610,7 +610,10 @@ func (s *Ql) OneTx(tx *Tx) (et.Item, error) {
 		return et.Item{}, err
 	}
 
-	return result.First(), nil
+	return et.Item{
+		Ok:     result.Ok,
+		Result: result.First(),
+	}, nil
 }
 
 /**

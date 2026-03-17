@@ -96,10 +96,10 @@ func (s *Model) Key() string {
 }
 
 /**
-* save
+* Save
 * @return error
 **/
-func (s *Model) save() error {
+func (s *Model) Save() error {
 	if s.IsCore {
 		return nil
 	}
@@ -135,7 +135,20 @@ func (s *Model) Init() error {
 	}
 
 	s.isInit = true
-	return s.save()
+	if s.IsCore {
+		return nil
+	}
+
+	oldVersion, err := versionCatalog("model", s.Key())
+	if err != nil {
+		return err
+	}
+
+	if oldVersion < s.Version {
+		return s.Save()
+	}
+
+	return nil
 }
 
 /**

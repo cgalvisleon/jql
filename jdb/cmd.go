@@ -235,7 +235,7 @@ func (s *Cmd) insert() (et.Items, error) {
 			continue
 		}
 
-		new = result.First().Result
+		new = result.First()
 		for _, fn := range s.afterInserts {
 			err := fn(s.tx, old, new)
 			if err != nil {
@@ -292,7 +292,7 @@ func (s *Cmd) update() (et.Items, error) {
 				continue
 			}
 
-			new = result.First().Result
+			new = result.First()
 			for _, fn := range s.afterUpdates {
 				err := fn(s.tx, old, new)
 				if err != nil {
@@ -345,7 +345,7 @@ func (s *Cmd) delete() (et.Items, error) {
 				continue
 			}
 
-			old = result.First().Result
+			old = result.First()
 			for _, fn := range s.afterDeletes {
 				err := fn(s.tx, old, new)
 				if err != nil {
@@ -432,7 +432,10 @@ func (s *Cmd) OneTx(tx *Tx) (et.Item, error) {
 		return et.Item{}, err
 	}
 
-	return result.First(), nil
+	return et.Item{
+		Ok:     result.Ok,
+		Result: result.First(),
+	}, nil
 }
 
 /**

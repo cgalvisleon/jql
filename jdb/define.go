@@ -198,6 +198,10 @@ func (s *Model) defineIdxField() (*Column, error) {
 
 	s.IdxField = IDX
 	s.DefineIndex(IDX)
+	s.BeforeInsert(func(tx *Tx, old, new et.Json) error {
+		new[IDX] = reg.ULID()
+		return nil
+	})
 	return result, nil
 }
 

@@ -190,6 +190,8 @@ func condition(field interface{}, value interface{}, op Operator) *Condition {
 		as := ""
 		if len(lst) > 1 {
 			as = lst[1]
+		} else {
+			as = field
 		}
 		result = &Condition{
 			Field: &Field{Field: field, As: as},
