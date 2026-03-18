@@ -222,8 +222,8 @@ func (s *Model) DefineAttribute(name string, tpData TypeData, defaultValue inter
 
 /**
 * DefineDetail
-* @param name string, to *Model, keys map[string]string
-* @return *Column
+* @param name string, keys map[string]string, version int
+* @return *Model, error
 **/
 func (s *Model) DefineDetail(name string, keys map[string]string, version int) (*Model, error) {
 	_, err := s.defineColumn(name, DETAIL, JSON, []et.Json{}, []byte{})

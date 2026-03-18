@@ -527,13 +527,13 @@ func (s *Ql) Current(data et.Json) *Ql {
 		return s
 	}
 
-	for _, col := range from.model.Columns {
-		if col.TypeColumn == COLUMN {
-			field := col.Field()
-			field.From = from
-			s.Selects = append(s.Selects, field)
-		}
-	}
+	// for _, col := range from.model.Columns {
+	// 	if col.TypeColumn == COLUMN {
+	// 		field := col.Field()
+	// 		field.From = from
+	// 		s.Selects = append(s.Selects, field)
+	// 	}
+	// }
 
 	s.Wheres.ByPk(from, data)
 	return s
