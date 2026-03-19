@@ -96,7 +96,7 @@ func (s *Wheres) ByPk(model interface{}, data et.Json) *Wheres {
 			if _, ok := data[key]; !ok {
 				continue
 			}
-			fld := v.findField(key)
+			fld := v.FindField(key)
 			if fld == nil {
 				continue
 			}

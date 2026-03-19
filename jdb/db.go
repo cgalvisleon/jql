@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cgalvisleon/et/envar"
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/logs"
 	"github.com/cgalvisleon/et/strs"
@@ -92,7 +91,6 @@ func (s *DB) init() error {
 		return err
 	}
 
-	s.IsDebug = envar.GetBool("DEBUG", false)
 	s.db = db
 	if s.UseCore {
 		s.initCore()
@@ -162,6 +160,14 @@ func (s *DB) NewModel(schema, name string, version int) (*Model, error) {
 	models[key] = result
 
 	return result, nil
+}
+
+/**
+* SetDebug
+* @param debug bool
+**/
+func (s *DB) SetDebug(debug bool) {
+	s.IsDebug = debug
 }
 
 /**

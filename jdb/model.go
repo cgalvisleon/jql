@@ -193,9 +193,9 @@ func (s *Model) idxColumn(name string) int {
 }
 
 /**
-* FindField
+* FindColumn
 * @param name string
-* @return *Field
+* @return *Column
 **/
 func (s *Model) FindColumn(name string) *Column {
 	idx := s.idxColumn(name)
@@ -215,11 +215,11 @@ func (s *Model) FindColumn(name string) *Column {
 }
 
 /**
-* findField
+* FindField
 * @param name string
 * @return *Field
 **/
-func (s *Model) findField(name string) *Field {
+func (s *Model) FindField(name string) *Field {
 	pattern1 := regexp.MustCompile(`^([A-Za-z0-9>]+):([A-Za-z0-9]+)$`) // name:as
 	pattern2 := regexp.MustCompile(`^([A-Za-z0-9>]+)$`)                // name
 

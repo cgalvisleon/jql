@@ -3,7 +3,6 @@ package jdb
 import (
 	"errors"
 	"fmt"
-	"slices"
 
 	"github.com/cgalvisleon/et/et"
 	"github.com/cgalvisleon/et/reg"
@@ -50,12 +49,7 @@ func (s *Model) DefineIndex(names ...string) {
 			continue
 		}
 
-		idx = slices.Index(s.Indexes, name)
-		if idx != -1 {
-			continue
-		}
-
-		s.Indexes = append(s.Indexes, name)
+		s.Indexes = utility.Add(s.Indexes, name)
 	}
 }
 
@@ -70,13 +64,8 @@ func (s *Model) DefinePrimaryKeys(names ...string) {
 			continue
 		}
 
-		idx = slices.Index(s.PrimaryKeys, name)
-		if idx != -1 {
-			continue
-		}
-
-		s.PrimaryKeys = append(s.PrimaryKeys, name)
-		s.DefineRequired(name)
+		s.PrimaryKeys = utility.Add(s.PrimaryKeys, name)
+		s.Required = utility.Add(s.Required, name)
 	}
 }
 
@@ -91,12 +80,8 @@ func (s *Model) DefineUnique(names ...string) {
 			continue
 		}
 
-		idx = slices.Index(s.Unique, name)
-		if idx != -1 {
-			continue
-		}
-
-		s.Unique = append(s.Unique, name)
+		s.Unique = utility.Add(s.Unique, name)
+		s.Indexes = utility.Add(s.Indexes, name)
 	}
 }
 
@@ -111,12 +96,8 @@ func (s *Model) DefineRequired(names ...string) {
 			continue
 		}
 
-		idx = slices.Index(s.Required, name)
-		if idx != -1 {
-			continue
-		}
-
-		s.Required = append(s.Required, name)
+		s.Required = utility.Add(s.Required, name)
+		s.Indexes = utility.Add(s.Indexes, name)
 	}
 }
 
@@ -131,12 +112,7 @@ func (s *Model) DefineHidden(names ...string) {
 			continue
 		}
 
-		idx = slices.Index(s.Hidden, name)
-		if idx != -1 {
-			continue
-		}
-
-		s.Hidden = append(s.Hidden, name)
+		s.Hidden = utility.Add(s.Hidden, name)
 	}
 }
 
@@ -157,12 +133,12 @@ func (s *Model) DefineColumn(name string, tpData TypeData, defaultValue interfac
 func (s *Model) DefineForeignKey(to *Model, keys map[string]string, onDeleteCascade, onUpdateCascade bool) error {
 	detail := newDetail(to, keys, []interface{}{}, onDeleteCascade, onUpdateCascade)
 	for fk, pk := range keys {
-		fld := s.findField(pk)
+		fld := s.FindField(pk)
 		if fld == nil {
 			return fmt.Errorf(MSG_FIELD_NOT_FOUND, pk)
 		}
 
-		fld = to.findField(fk)
+		fld = to.FindField(fk)
 		if fld == nil {
 			return fmt.Errorf(MSG_FIELD_NOT_FOUND, fk)
 		}
@@ -182,7 +158,7 @@ func (s *Model) DefineSourceField() (*Column, error) {
 	}
 
 	s.SourceField = SOURCE
-	s.DefineIndex(SOURCE)
+	s.Indexes = utility.Add(s.Indexes, SOURCE)
 	return result, nil
 }
 
@@ -197,11 +173,12 @@ func (s *Model) defineIdxField() (*Column, error) {
 	}
 
 	s.IdxField = IDX
-	s.DefineIndex(IDX)
+	s.Indexes = utility.Add(s.Indexes, IDX)
+	s.Hidden = utility.Add(s.Hidden, IDX)
 	s.BeforeInsert(func(tx *Tx, old, new et.Json) error {
 		new[IDX] = reg.ULID()
 		return nil
-	})
+	})	
 	return result, nil
 }
 
@@ -333,6 +310,27 @@ func (s *Model) DefinePrimaryKeyField() *Model {
 }
 
 /**
+* DefineSourceModel
+* @return *Model
+**/
+func (s *Model) DefineSourceModel() *Model {
+	s.DefineCreatedAtField()
+	s.DefineUpdatedAtField()
+	s.DefinePrimaryKeyField()
+	s.DefineSourceField()
+	s.BeforeInsert(func(tx *Tx, old, new et.Json) error {
+		new.Set(CREATED_AT, timezone.Now())
+		new.Set(UPDATED_AT, timezone.Now())
+		return nil
+	})
+	s.BeforeUpdate(func(tx *Tx, old, new et.Json) error {
+		new.Set(UPDATED_AT, timezone.Now())
+		return nil
+	})
+	return s
+}
+
+/**
 * DefineModel
 * @return *Model
 **/
@@ -364,8 +362,7 @@ func (s *Model) DefineProjectModel() *Model {
 	s.DefineStatusField()
 	s.DefinePrimaryKeyField()
 	s.DefineColumn(PROJECT_ID, KEY, "")
-	s.defineIdxField()
-	s.DefineIndex(PROJECT_ID)
+	s.Indexes = utility.Add(s.Indexes, PROJECT_ID)
 	s.BeforeInsert(func(tx *Tx, old, new et.Json) error {
 		new.Set(CREATED_AT, timezone.Now())
 		new.Set(UPDATED_AT, timezone.Now())

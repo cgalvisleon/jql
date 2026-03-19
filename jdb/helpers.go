@@ -257,9 +257,9 @@ func findField(froms []*From, name string) *Field {
 			var result *Field
 			for _, f := range froms {
 				if f.As == from {
-					result = f.model.findField(name)
+					result = f.model.FindField(name)
 				} else if f.Name == from {
-					result = f.model.findField(name)
+					result = f.model.FindField(name)
 				}
 				if result != nil {
 					result.From = f
@@ -277,9 +277,9 @@ func findField(froms []*From, name string) *Field {
 			var result *Field
 			for _, f := range froms {
 				if f.As == from {
-					result = f.model.findField(name)
+					result = f.model.FindField(name)
 				} else if f.Name == from {
-					result = f.model.findField(name)
+					result = f.model.FindField(name)
 				}
 				if result != nil {
 					result.From = f
@@ -330,7 +330,7 @@ func findField(froms []*From, name string) *Field {
 		}
 	} else {
 		for _, f := range froms {
-			result := f.model.findField(name)
+			result := f.model.FindField(name)
 			if result != nil {
 				result.From = f
 				return result

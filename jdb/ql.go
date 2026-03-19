@@ -71,7 +71,6 @@ func NewQuery(model *Model, as string) *Ql {
 		MaxRows:  envar.GetInt("MAX_ROWS", 100),
 		db:       model.db,
 		tx:       nil,
-		IsDebug:  envar.GetBool("DEBUG", false),
 	}
 	result.addFrom(model, as)
 
@@ -151,7 +150,12 @@ func (s *Ql) findField(field interface{}) *Field {
 	case string:
 		return findField(s.Froms, v)
 	case *Agg:
-		return findField(s.Froms, v.Field)
+		result := findField(s.Froms, v.Name())
+		if result != nil {
+			result.TypeColumn = AGG
+			result.Field = v
+		}
+		return result
 	case *Field:
 		return v
 	default:
@@ -169,16 +173,6 @@ func (s *Ql) Select(fields ...interface{}) *Ql {
 	}
 
 	if len(fields) == 0 {
-		s.Selects = make([]*Field, 0)
-		for _, from := range s.Froms {
-			for _, col := range from.model.Columns {
-				if col.TypeColumn == COLUMN {
-					field := col.Field()
-					field.From.As = from.As
-					s.Selects = append(s.Selects, field)
-				}
-			}
-		}
 		return s
 	}
 
@@ -526,14 +520,6 @@ func (s *Ql) Current(data et.Json) *Ql {
 	if from == nil {
 		return s
 	}
-
-	// for _, col := range from.model.Columns {
-	// 	if col.TypeColumn == COLUMN {
-	// 		field := col.Field()
-	// 		field.From = from
-	// 		s.Selects = append(s.Selects, field)
-	// 	}
-	// }
 
 	s.Wheres.ByPk(from, data)
 	return s

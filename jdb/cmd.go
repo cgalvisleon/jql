@@ -23,6 +23,7 @@ type Cmd struct {
 	Wheres        *Wheres           `json:"wheres"`
 	Data          []et.Json         `json:"data"`
 	New           et.Json           `json:"new"`
+	Returns       []*Field          `json:"returns"`
 	IsDebug       bool              `json:"is_debug"`
 	beforeInserts []TriggerFunction `json:"-"`
 	beforeUpdates []TriggerFunction `json:"-"`
@@ -46,6 +47,7 @@ func newCommand(s *Model, cmd TypeCommand) *Cmd {
 		Wheres:        newWhere(),
 		Data:          make([]et.Json, 0),
 		New:           et.Json{},
+		Returns:       make([]*Field, 0),
 		beforeInserts: s.beforeInserts,
 		beforeUpdates: s.beforeUpdates,
 		beforeDeletes: s.beforeDeletes,
@@ -389,6 +391,52 @@ func (s *Cmd) upsert() (et.Items, error) {
 }
 
 /**
+* findField
+* @param field interface{}
+* @return *Field
+**/
+func (s *Cmd) findField(field interface{}) *Field {
+	switch v := field.(type) {
+	case string:
+		return s.Model.FindField(v)
+	case *Agg:
+		result := s.Model.FindField(v.Name())
+		if result != nil {
+			result.TypeColumn = AGG
+			result.Field = v
+		}
+		return result
+	case *Field:
+		return v
+	default:
+		return nil
+	}
+}
+
+/**
+* Returning
+* @param fields ...string
+* @return *Cmd
+**/
+func (s *Cmd) Returning(fields ...string) *Cmd {
+	for _, fld := range fields {
+		f := s.findField(fld)
+		if f == nil {
+			continue
+		}
+
+		switch f.TypeColumn {
+		case COLUMN:
+			s.Returns = append(s.Returns, f)
+		case ATTRIB:
+			s.Returns = append(s.Returns, f)
+		}
+	}
+
+	return s
+}
+
+/**
 * ExecTx
 * @param tx *Tx
 * @return et.Items, error
@@ -444,22 +492,6 @@ func (s *Cmd) OneTx(tx *Tx) (et.Item, error) {
 **/
 func (s *Cmd) One() (et.Item, error) {
 	return s.OneTx(nil)
-}
-
-/**
-* findField
-* @param field interface{}
-* @return *Field
-**/
-func (s *Cmd) findField(field interface{}) *Field {
-	switch v := field.(type) {
-	case string:
-		return s.Model.findField(v)
-	case *Field:
-		return v
-	default:
-		return nil
-	}
 }
 
 /**
