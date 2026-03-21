@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cgalvisleon/et/strs"
+	"github.com/cgalvisleon/et/utility"
 	"github.com/cgalvisleon/jql/jdb"
 )
 
@@ -113,8 +114,9 @@ func (s *Driver) buildSelect(ql *jdb.Ql) (string, error) {
 	result := ""
 	if ql.Type == jdb.DATA {
 		if len(ql.Selects) == 0 {
-			hiddens := ql.Hiddens
-			hiddens = append(hiddens, jdb.SOURCE)
+			hiddens := ql.Froms[0].Hidden()
+			hiddens = append(hiddens, ql.Hiddens...)
+			hiddens = utility.Add(hiddens, jdb.SOURCE)
 
 			def := fmt.Sprintf("to_jsonb(A) - ARRAY[%s]", strs.JoinQuoted(hiddens, ", "))
 			result = strs.Append(result, def, "||")
@@ -165,7 +167,8 @@ func (s *Driver) buildSelect(ql *jdb.Ql) (string, error) {
 	}
 
 	if len(ql.Selects) == 0 {
-		hiddens := ql.Hiddens
+		hiddens := ql.Froms[0].Hidden()
+		hiddens = append(hiddens, ql.Hiddens...)
 		if len(hiddens) > 0 {
 			result += fmt.Sprintf("to_jsonb(A) - ARRAY[%s]", strs.JoinQuoted(hiddens, ", "))
 		} else {

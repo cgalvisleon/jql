@@ -159,6 +159,7 @@ func (s *Model) DefineSourceField() (*Column, error) {
 
 	s.SourceField = SOURCE
 	s.Indexes = utility.Add(s.Indexes, SOURCE)
+	s.Hidden = utility.Add(s.Hidden, SOURCE)
 	return result, nil
 }
 
@@ -178,7 +179,7 @@ func (s *Model) defineIdxField() (*Column, error) {
 	s.BeforeInsert(func(tx *Tx, old, new et.Json) error {
 		new[IDX] = reg.ULID()
 		return nil
-	})	
+	})
 	return result, nil
 }
 

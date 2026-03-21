@@ -38,6 +38,14 @@ func (s *From) findField(name string) *Field {
 	}
 }
 
+/**
+* Hidden
+* @return []string
+**/
+func (s *From) Hidden() []string {
+	return s.model.Hidden
+}
+
 type Agg struct {
 	Agg   string `json:"agg"`
 	Field string `json:"field"`
