@@ -3,7 +3,7 @@ module github.com/cgalvisleon/jql
 go 1.23.0
 
 require (
-	github.com/cgalvisleon/et v1.0.20
+	github.com/cgalvisleon/et v1.0.21
 	github.com/lib/pq v1.10.9
 	github.com/schollz/progressbar/v3 v3.19.0
 )
